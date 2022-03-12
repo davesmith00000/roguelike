@@ -1,5 +1,9 @@
 # My Generic Roguelike
 
+[Click here to play!](https://davesmith00000.github.io/roguelike/)
+
+## What is this?
+
 This is a reworking of the [Indigo Roguelike-Tutorials](https://github.com/davesmith00000/roguelike-tutorial) I produced in the summer of 2021.
 
 Current status: Working, but ugly and unbalanced.
