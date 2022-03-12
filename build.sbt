@@ -1,0 +1,127 @@
+import scala.sys.process._
+import scala.language.postfixOps
+
+import sbtwelcome._
+
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
+ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+
+lazy val roguelike =
+  (project in file("."))
+    .enablePlugins(ScalaJSPlugin, SbtIndigo)
+    .settings(
+      name         := "roguelike",
+      version      := "0.0.1",
+      scalaVersion := "3.1.1",
+      organization := "roguelike",
+      libraryDependencies ++= Seq(
+        "org.scalameta" %%% "munit" % "0.7.29" % Test
+      ),
+      testFrameworks += new TestFramework("munit.Framework"),
+      Test / scalaJSLinkerConfig ~= {
+        _.withModuleKind(ModuleKind.CommonJSModule)
+      },
+      showCursor            := true,
+      title                 := "Indigo Roguelike!",
+      gameAssetsDirectory   := "assets",
+      windowStartWidth      := 1280,
+      windowStartHeight     := 720,
+      disableFrameRateLimit := false,
+      libraryDependencies ++= Seq(
+        "io.indigoengine" %%% "indigo-json-circe"    % "0.12.1",
+        "io.indigoengine" %%% "indigo"               % "0.12.1",
+        "io.indigoengine" %%% "indigo-extras"        % "0.12.1",
+        "io.indigoengine" %%% "roguelike-starterkit" % "0.1.0-SNAPSHOT"
+      ),
+      scalafixOnCompile := true,
+      semanticdbEnabled := true,
+      semanticdbVersion := scalafixSemanticdb.revision
+      // scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) } // required for parcel, but will break indigoRun & indigoBuild
+    )
+    .settings(
+      code := { "code ." ! },
+      oni2 := { "oni2 ." ! }
+    )
+    .settings(
+      Compile / sourceGenerators += Def.task {
+        val cachedFun = FileFunction.cached(
+          streams.value.cacheDirectory / "gamedata"
+        ) { (gameData: Set[File]) =>
+          val outDir = (Compile / sourceManaged).value
+          MeleeGen.gen("Melee", "roguelike.model.gamedata", gameData, outDir) ++
+            ArmourGen
+              .gen("Armour", "roguelike.model.gamedata", gameData, outDir) ++
+            ConsumablesGen.gen(
+              "Consumables",
+              "roguelike.model.gamedata",
+              gameData,
+              outDir
+            ) ++
+            RangedGen
+              .gen("Ranged", "roguelike.model.gamedata", gameData, outDir) ++
+            HostilesGen
+              .gen("Hostiles", "roguelike.model.gamedata", gameData, outDir) ++
+            KeyMappingsGen
+              .gen(
+                "KeyMapping",
+                "roguelike.model.gamedata",
+                gameData,
+                outDir
+              )
+        }
+
+        cachedFun(IO.listFiles((baseDirectory.value / "gamedata")).toSet).toSeq
+      }.taskValue
+    )
+    .settings(
+      logo := rawLogo + "(v" + version.value.toString + ")",
+      usefulTasks := Seq(
+        UsefulTask("", "runGame", "Run the game (requires Electron)"),
+        UsefulTask("", "buildGame", "Build web version"),
+        UsefulTask(
+          "",
+          "runGameFull",
+          "Run the fully optimised game (requires Electron)"
+        ),
+        UsefulTask(
+          "",
+          "buildGameFull",
+          "Build the fully optimised web version"
+        ),
+        UsefulTask("", "code", "Launch VSCode"),
+        UsefulTask("", "oni2", "Launch Onivim 2")
+      ),
+      logoColor        := scala.Console.YELLOW,
+      aliasColor       := scala.Console.BLUE,
+      commandColor     := scala.Console.CYAN,
+      descriptionColor := scala.Console.WHITE
+    )
+
+// To use indigoBuild or indigoRun, first comment out the line above that says: `scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }`
+addCommandAlias("runGame", ";compile;fastOptJS;indigoRun")
+addCommandAlias("runGameFull", ";compile;fullOptJS;indigoRunFull")
+addCommandAlias("buildGame", ";compile;fastOptJS;indigoBuild")
+addCommandAlias("buildGameFull", ";compile;fullOptJS;indigoBuildFull")
+
+lazy val code =
+  taskKey[Unit]("Launch VSCode in the current directory")
+lazy val oni2 =
+  taskKey[Unit]("Launch Onivim 2 in the current directory")
+
+// format: off
+lazy val rawLogo: String =
+"""
+                                                   .__        
+  _____ ___.__.    ____   ____   ____   ___________|__| ____  
+ /     <   |  |   / ___\_/ __ \ /    \_/ __ \_  __ \  |/ ___\ 
+|  Y Y  \___  |  / /_/  >  ___/|   |  \  ___/|  | \/  \  \___ 
+|__|_|  / ____|  \___  / \___  >___|  /\___  >__|  |__|\___  >
+      \/\/      /_____/      \/     \/     \/              \/ 
+                                   .__  .__ __                
+_______  ____   ____  __ __   ____ |  | |__|  | __ ____       
+\_  __ \/  _ \ / ___\|  |  \_/ __ \|  | |  |  |/ // __ \      
+ |  | \(  <_> ) /_/  >  |  /\  ___/|  |_|  |    <\  ___/      
+ |__|   \____/\___  /|____/  \___  >____/__|__|_ \\___  >     
+             /_____/             \/             \/    \/      
+"""
