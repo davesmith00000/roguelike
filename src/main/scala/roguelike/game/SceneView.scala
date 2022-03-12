@@ -4,6 +4,7 @@ import indigo._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameGraphics
+import roguelike.RogueLikeGame
 import roguelike.model.GameState
 import roguelike.model.GameTile
 import roguelike.model.Model
@@ -189,9 +190,21 @@ object SceneView:
     val hostiles   = hostilesAndHealthBars.map(_._1)
     val healthBars = hostilesAndHealthBars.map(_._2).flatten
 
+    val camera =
+      model.currentState match
+        case GameState.LookAround(_) =>
+          val offset =
+            (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
+          Camera.Fixed(viewModel.lookAtPosition - offset)
+
+        case _ =>
+          val offset =
+            (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
+          Camera.Fixed(viewModel.playerPosition.display - offset)
+
     SceneUpdateFragment(
       Layer(
-        BindingKey("game"),
+        RogueLikeGame.layerKeyGame,
         gameGrid ++
           hover ++
           collectables ++
@@ -199,18 +212,11 @@ object SceneView:
           player ++
           healthBars ++
           lookAround
-      ).withCamera(
-        model.currentState match
-          case GameState.LookAround(_) =>
-            val offset =
-              (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-            Camera.Fixed(viewModel.lookAtPosition - offset)
-
-          case _ =>
-            val offset =
-              (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-            Camera.Fixed(viewModel.playerPosition.display - offset)
-      ).withMagnification(viewModel.magnification)
+      ).withCamera(camera)
+        .withMagnification(viewModel.magnification),
+      Layer(RogueLikeGame.layerKeyUiOverlay)
+        .withCamera(camera)
+        .withMagnification(viewModel.magnification)
     )
 
   def drawUiLayer(
@@ -220,7 +226,7 @@ object SceneView:
   ): SceneUpdateFragment =
     SceneUpdateFragment(
       Layer(
-        BindingKey("ui"),
+        RogueLikeGame.layerKeyUi,
         UIElements.renderBar(
           model.player,
           20,

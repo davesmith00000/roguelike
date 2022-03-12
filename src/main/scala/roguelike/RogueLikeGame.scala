@@ -6,6 +6,7 @@ import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.game.GameScene
 import roguelike.model.Model
+import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ViewModel
 
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -15,6 +16,11 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
 
   val screenSize: Size = Size(80, 50)
   val charSize: Size   = Size(10, 10)
+
+  val layerKeyGame      = BindingKey("game")
+  val layerKeyUiOverlay = BindingKey("ui-overlay")
+  val layerKeyUi        = BindingKey("ui")
+  val layerKeyFPS       = BindingKey("fps")
 
   def initialScene(bootData: Size): Option[SceneName] =
     None
@@ -35,6 +41,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
           val vp = screenSize * charSize
           GameViewport(vp.width, vp.height)
       }
+
     Outcome(
       BootResult(
         GameConfig.default
@@ -50,8 +57,9 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         .withSubSystems(
           FPSCounter(
             Point(5, 100),
-            BindingKey("fps")
-          )
+            layerKeyFPS
+          ),
+          FloatingMessage.subSystem
         )
     )
 
@@ -88,9 +96,9 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        Layer(BindingKey("game")),
-        Layer(BindingKey("windows")),
-        Layer(BindingKey("ui")),
-        Layer(BindingKey("fps"))
+        Layer(layerKeyGame),
+        Layer(layerKeyUiOverlay),
+        Layer(layerKeyUi),
+        Layer(layerKeyFPS)
       )
     )

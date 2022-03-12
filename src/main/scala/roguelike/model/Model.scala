@@ -156,6 +156,9 @@ final case class Model(
         )
       )
 
+    case InventoryEvent.PickedUp(_) =>
+      Outcome(this)
+
     case InventoryEvent.UseRanged(inventoryPosition, Ranged.LightningScroll) =>
       RangedHelper
         .useLightningScroll(

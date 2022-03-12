@@ -59,3 +59,4 @@ enum InventoryEvent:
   case DropItem(item: Item, mapPosition: Point)
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
+  case PickedUp(item: Item)

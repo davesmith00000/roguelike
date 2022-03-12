@@ -4,6 +4,7 @@ import indigo._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameEvent
+import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.model.GameMap
 import roguelike.model.GamePhase
@@ -13,6 +14,7 @@ import roguelike.model.entity.Collectable
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
+import roguelike.subsystems.FloatingMessage
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
@@ -42,6 +44,24 @@ final case class GameViewModel(
       context: FrameContext[Size],
       model: Model
   ): GlobalEvent => Outcome[GameViewModel] =
+    case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
+      Outcome(this)
+        .addGlobalEvents(
+          FloatingMessage.spawnEvent(
+            playerPosition.display,
+            FloatingMessage.Message("+1 " + item.name, RGB.Green)
+          )
+        )
+
+    case GameEvent.Inventory(InventoryEvent.DropItem(item, _)) =>
+      Outcome(this)
+        .addGlobalEvents(
+          FloatingMessage.spawnEvent(
+            playerPosition.display,
+            FloatingMessage.Message("-1 " + item.name, RGB.Red)
+          )
+        )
+
     case KeyboardEvent.KeyDown(KeyMapping.ZoomIn) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))

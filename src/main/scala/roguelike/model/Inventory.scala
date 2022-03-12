@@ -1,7 +1,6 @@
 package roguelike.model
 
 import indigo.shared.Outcome
-import indigo.shared.datatypes.BindingKey
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGB
 import io.circe._

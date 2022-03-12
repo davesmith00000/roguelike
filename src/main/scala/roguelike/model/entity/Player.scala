@@ -6,6 +6,7 @@ import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.InventoryEvent
 import roguelike.model.Equipment
 import roguelike.model.GameMap
 import roguelike.model.Inventory
@@ -100,6 +101,7 @@ final case class Player(
             )
           }
           .addGlobalEvents(
+            GameEvent.Inventory(InventoryEvent.PickedUp(collectable.item)),
             GameEvent
               .Log(
                 Message(
