@@ -237,7 +237,10 @@ object SceneView:
           model.currentFloor
         ),
         UIElements.renderCharacterInfo(model.player),
-        UIElements.renderControls(viewModel.viewportSize),
+        UIElements.renderControls(
+          viewModel.viewportSize,
+          viewModel.helpControlsText
+        ),
         UIElements.renderNameHints(
           viewModel.squareSize,
           context.mouse.position,

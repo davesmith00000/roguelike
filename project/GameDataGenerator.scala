@@ -168,9 +168,10 @@ object KeyMappingsGen extends GameDataGenerator {
     case "forward slash"              => "/"
     case "period"                     => "."
     case "add"                        => "+"
-    case "equals sign"                => "="
+    case "equal sign"                 => "="
     case "subtract"                   => "-"
     case "dash"                       => "_"
+    case "escape"                     => "esc"
     case k if k.split(" ").length > 1 => k.split(" ").head
     case k                            => k
   }
@@ -180,12 +181,12 @@ object KeyMappingsGen extends GameDataGenerator {
       val n  = GameDataGenerator.sanitizeName(command)
       val m1 = toHelpChar(mapping1)
       val m2 = toHelpChar(mapping2)
-      s"""|    |$command = $m1 or $m2"""
+      s"""|    ("$command" -> List("$m1", "$m2")),"""
 
     case command :: mapping1 :: Nil =>
       val n  = GameDataGenerator.sanitizeName(command)
       val m1 = toHelpChar(mapping1)
-      s"""|    |$command = $m1"""
+      s"""|    ("$command" -> List("$m1")),"""
   }
 
   def mappers(moduleName: String): List[PartialFunction[List[String], String]] =
@@ -206,9 +207,12 @@ object KeyMappingsGen extends GameDataGenerator {
     |object $moduleName:
     |${contents(0)}
     |
-    |  val helpText: String =
-    |    $tripleQuotes
-    ${contents(1)}$tripleQuotes.stripMargin
+    |  val helpText: List[(String, List[String])] = List(
+    ${contents(1)}
+    |  )
+    |
+    |  val longestCommandName: Int = helpText.map(_._1.length).sorted.reverse.headOption.getOrElse(-1)
+    |  val longestMappings: Int = helpText.map(_._2.mkString.length).sorted.reverse.headOption.getOrElse(-1)
     |""".stripMargin
 
 }

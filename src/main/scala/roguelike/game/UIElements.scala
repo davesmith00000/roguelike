@@ -177,11 +177,12 @@ object UIElements:
     )
       .moveTo(5, 5)
 
-  def renderControls(viewportSize: Size): Text[TerminalText] =
-    val text = KeyMapping.helpText
-
+  def renderControls(
+      viewportSize: Size,
+      helpControlsText: String
+  ): Text[TerminalText] =
     Text(
-      text,
+      helpControlsText,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
       TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
     ).alignRight
