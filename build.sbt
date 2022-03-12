@@ -23,7 +23,7 @@ lazy val roguelike =
         _.withModuleKind(ModuleKind.CommonJSModule)
       },
       showCursor            := true,
-      title                 := "Indigo Roguelike!",
+      title                 := "My Generic Roguelike",
       gameAssetsDirectory   := "assets",
       windowStartWidth      := 1280,
       windowStartHeight     := 720,
@@ -37,7 +37,6 @@ lazy val roguelike =
       scalafixOnCompile := true,
       semanticdbEnabled := true,
       semanticdbVersion := scalafixSemanticdb.revision
-      // scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) } // required for parcel, but will break indigoRun & indigoBuild
     )
     .settings(
       code := { "code ." ! },
@@ -97,12 +96,29 @@ lazy val roguelike =
       commandColor     := scala.Console.CYAN,
       descriptionColor := scala.Console.WHITE
     )
+    .enablePlugins(GhpagesPlugin) // Website stuff
+    .settings(
+      siteSourceDirectory      := target.value / "indigoBuildFull",
+      makeSite / includeFilter := "*",
+      makeSite / excludeFilter := ".DS_Store",
+      git.remoteRepo           := "git@github.com:davesmith00000/roguelike.git",
+      ghpagesNoJekyll          := true
+    )
 
 // To use indigoBuild or indigoRun, first comment out the line above that says: `scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }`
 addCommandAlias("runGame", ";compile;fastOptJS;indigoRun")
 addCommandAlias("runGameFull", ";compile;fullOptJS;indigoRunFull")
 addCommandAlias("buildGame", ";compile;fastOptJS;indigoBuild")
 addCommandAlias("buildGameFull", ";compile;fullOptJS;indigoBuildFull")
+
+addCommandAlias(
+  "publishGame",
+  List(
+    "buildGameFull",
+    "makeSite",
+    "ghpagesPushSite"
+  ).mkString(";", ";", "")
+)
 
 lazy val code =
   taskKey[Unit]("Launch VSCode in the current directory")
