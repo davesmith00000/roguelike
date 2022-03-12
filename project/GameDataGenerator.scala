@@ -150,26 +150,42 @@ object KeyMappingsGen extends GameDataGenerator {
 
   def genLookUpValues(
       moduleName: String
-  ): PartialFunction[List[String], String] = { case command :: mapping :: Nil =>
-    val n = GameDataGenerator.sanitizeName(command)
-    val m = toKeyFormat(mapping)
-    s"""  val $n: Key = Key.$m"""
+  ): PartialFunction[List[String], String] = {
+    case command :: mapping1 :: mapping2 :: Nil =>
+      val n  = GameDataGenerator.sanitizeName(command)
+      val m1 = toKeyFormat(mapping1)
+      val m2 = toKeyFormat(mapping2)
+      s"  val ${n}1: Key = Key.$m1\n" +
+        s"  val ${n}2: Key = Key.$m2"
+
+    case command :: mapping1 :: Nil =>
+      val n = GameDataGenerator.sanitizeName(command)
+      val m = toKeyFormat(mapping1)
+      s"""  val $n: Key = Key.$m"""
   }
 
   def toHelpChar: String => String = {
     case "forward slash"              => "/"
     case "period"                     => "."
     case "add"                        => "+"
+    case "equals sign"                => "="
     case "subtract"                   => "-"
+    case "dash"                       => "_"
     case k if k.split(" ").length > 1 => k.split(" ").head
     case k                            => k
   }
 
   def genHelpText(moduleName: String): PartialFunction[List[String], String] = {
-    case command :: mapping :: Nil =>
-      val n = GameDataGenerator.sanitizeName(command)
-      val m = toHelpChar(mapping)
-      s"""|    |$command = $m"""
+    case command :: mapping1 :: mapping2 :: Nil =>
+      val n  = GameDataGenerator.sanitizeName(command)
+      val m1 = toHelpChar(mapping1)
+      val m2 = toHelpChar(mapping2)
+      s"""|    |$command = $m1 or $m2"""
+
+    case command :: mapping1 :: Nil =>
+      val n  = GameDataGenerator.sanitizeName(command)
+      val m1 = toHelpChar(mapping1)
+      s"""|    |$command = $m1"""
   }
 
   def mappers(moduleName: String): List[PartialFunction[List[String], String]] =
@@ -232,8 +248,10 @@ trait GameDataGenerator {
 object GameDataGenerator {
 
   val fallback: String => PartialFunction[List[String], String] =
-    moduleName => { case _ =>
-      val msg = moduleName + " gen: Unexpected number of data fields"
+    moduleName => { case fields =>
+      val msg =
+        moduleName + " gen: Unexpected number of data fields, got: " + fields
+          .mkString("[", ", ", "]")
       println(msg)
       throw new Exception(msg)
     }

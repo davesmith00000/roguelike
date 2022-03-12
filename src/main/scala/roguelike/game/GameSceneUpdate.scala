@@ -209,7 +209,8 @@ object GameSceneUpdate:
         if model.currentState.isRunning || model.currentState.showingDropMenu =>
       Outcome(model.toggleDropMenu)
 
-    case KeyboardEvent.KeyUp(KeyMapping.Quit)
+    case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
+        KeyboardEvent.KeyUp(KeyMapping.Quit2)
         if model.currentState.isRunning || model.currentState.showingQuit =>
       Outcome(model.toggleQuit)
 

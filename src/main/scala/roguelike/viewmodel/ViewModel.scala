@@ -62,12 +62,14 @@ final case class GameViewModel(
           )
         )
 
-    case KeyboardEvent.KeyDown(KeyMapping.ZoomIn) =>
+    case KeyboardEvent.KeyDown(KeyMapping.ZoomIn1) |
+        KeyboardEvent.KeyDown(KeyMapping.ZoomIn2) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))
       )
 
-    case KeyboardEvent.KeyDown(KeyMapping.ZoomOut) =>
+    case KeyboardEvent.KeyDown(KeyMapping.ZoomOut1) |
+        KeyboardEvent.KeyDown(KeyMapping.ZoomOut2) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
