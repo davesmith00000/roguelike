@@ -4,6 +4,16 @@
 
 [Check what I'm working on!](https://github.com/davesmith00000/roguelike/projects/1)
 
+## Controls
+
+### Keyboard
+
+The key controls are somewhat in flux, but current key bindings are listed in the game at the top right of the screen or in the [key-mappings data file](https://github.com/davesmith00000/roguelike/blob/main/gamedata/key-mappings.md).
+
+### Mouse
+
+The mouse has limited use at the moment, but you can click on the map to move there. As long as there are no enemies visible on the screen the player will keep moving towards the square you clicked on, otherwise only one move will be performed.
+
 ## What is this?
 
 This is a reworking of the [Indigo Roguelike-Tutorials](https://github.com/davesmith00000/roguelike-tutorial) I produced in the summer of 2021.
@@ -14,7 +24,7 @@ The plan is to take the game made by following the roguelike tutorials at face v
 
 This is: **My Generic Roguelike!**
 
-That said, the plan is to ultimately polish up as much as possible. The ascii terminal has already been replaced with placeholder graphics, some rudimentary animations have been added, there is a camera. Time will reveal how far I get.
+That said, the plan is to ultimately polish up as much as possible. The ASCII terminal has already been replaced with placeholder graphics, some rudimentary animations have been added, there is a camera. Time will reveal how far I get.
 
 ## Eating my own dog food
 
