@@ -217,14 +217,102 @@ object DungeonGen:
       x2: Int,
       y: Int
   ): List[(Point, GameTile)] =
-    (Math.min(x1, x2) to Math.max(x1, x2)).map { x =>
-      (Point(x, y), GameTile.Ground)
-    }.toList
+    val start = Math.min(x1, x2)
+    val end   = Math.max(x1, x2)
+    (start to end).toList.flatMap { x =>
+      if x == start then
+        List(
+          (Point(x - 1, y - 1), GameTile.Wall),
+          (Point(x - 1, y + 1), GameTile.Wall)
+        ) ++
+          List(
+            (Point(x, y - 1), GameTile.Wall),
+            (Point(x, y), GameTile.Ground),
+            (Point(x, y + 1), GameTile.Wall)
+          )
+      else if x == end then
+        List(
+          (Point(x + 1, y - 1), GameTile.Wall),
+          (Point(x + 1, y + 1), GameTile.Wall)
+        ) ++
+          List(
+            (Point(x, y - 1), GameTile.Wall),
+            (Point(x, y), GameTile.Ground),
+            (Point(x, y + 1), GameTile.Wall)
+          )
+      else
+        List(
+          (Point(x, y - 1), GameTile.Wall),
+          (Point(x, y), GameTile.Ground),
+          (Point(x, y + 1), GameTile.Wall)
+        )
+    }
 
   def createVerticalTunnel(y1: Int, y2: Int, x: Int): List[(Point, GameTile)] =
-    (Math.min(y1, y2) to Math.max(y1, y2)).map { y =>
-      (Point(x, y), GameTile.Ground)
-    }.toList
+    val start = Math.min(y1, y2)
+    val end   = Math.max(y1, y2)
+    (start to end).toList.flatMap { y =>
+      if y == start then
+        List(
+          (Point(x - 1, y - 1), GameTile.Wall),
+          (Point(x + 1, y - 1), GameTile.Wall)
+        ) ++
+          List(
+            (Point(x - 1, y), GameTile.Wall),
+            (Point(x, y), GameTile.Ground),
+            (Point(x + 1, y), GameTile.Wall)
+          )
+      else if y == end then
+        List(
+          (Point(x - 1, y + 1), GameTile.Wall),
+          (Point(x + 1, y + 1), GameTile.Wall)
+        ) ++
+          List(
+            (Point(x - 1, y), GameTile.Wall),
+            (Point(x, y), GameTile.Ground),
+            (Point(x + 1, y), GameTile.Wall)
+          )
+      else
+        List(
+          (Point(x - 1, y), GameTile.Wall),
+          (Point(x, y), GameTile.Ground),
+          (Point(x + 1, y), GameTile.Wall)
+        )
+    }
+
+  @tailrec
+  def finaliseTiles(
+      remaining: List[(Point, GameTile)],
+      accepted: List[(Point, GameTile)]
+  ): List[(Point, GameTile)] =
+    remaining match
+      case Nil =>
+        accepted
+
+      case t :: ts if t._2.isDownStairs =>
+        finaliseTiles(ts, t :: accepted.filterNot(p => p._1 == t._1))
+
+      case t :: ts if t._2.isGround =>
+        accepted.find(_._1 == t._1) match
+          case None =>
+            finaliseTiles(ts, t :: accepted)
+
+          case Some(tile) if tile._2.isDownStairs =>
+            finaliseTiles(ts, accepted)
+
+          case Some(tile) =>
+            finaliseTiles(ts, t :: accepted.filterNot(p => p._1 == t._1))
+
+      case (pt, GameTile.Wall) :: ts =>
+        accepted.find(_._1 == pt) match
+          case None =>
+            finaliseTiles(ts, (pt, GameTile.Wall) :: accepted)
+
+          case Some(_) =>
+            finaliseTiles(ts, accepted)
+
+      case _ :: ts =>
+        finaliseTiles(ts, accepted)
 
   def makeMap(
       dice: Dice,
@@ -254,7 +342,7 @@ object DungeonGen:
             Dungeon(
               playerStart,
               stairsPosition,
-              roomTiles ++ tunnelTiles,
+              finaliseTiles(roomTiles ++ tunnelTiles, Nil),
               hostiles,
               collectables
             )
@@ -263,7 +351,10 @@ object DungeonGen:
             Dungeon(
               playerStart,
               center,
-              roomTiles ++ tunnelTiles ++ List((center, GameTile.DownStairs)),
+              finaliseTiles(
+                roomTiles ++ tunnelTiles ++ List((center, GameTile.DownStairs)),
+                Nil
+              ),
               hostiles,
               collectables
             )
