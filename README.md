@@ -12,7 +12,13 @@ The key controls are somewhat in flux, but current key bindings are listed in th
 
 ### Mouse
 
-The mouse has limited use at the moment, but you can click on the map to move there. As long as there are no enemies visible on the screen the player will keep moving towards the square you clicked on, otherwise only one move will be performed.
+#### Moving and attacking
+
+You can click on the map to move in that direction. As long as there are no enemies visible on the screen the player will keep moving towards the square you clicked on, otherwise only one move will be performed. Note that the path finding is currently rather ...unintelligent, and will get stuck up against large walls that are in the way.
+
+#### Zooming
+
+You can use the mouse wheel to zoom in and out.
 
 ## What is this?
 

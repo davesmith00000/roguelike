@@ -75,6 +75,17 @@ final case class GameViewModel(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
 
+    case FrameTick if context.mouse.scrolled.exists(_ == MouseWheel.ScrollUp) =>
+      Outcome(
+        this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))
+      )
+
+    case FrameTick
+        if context.mouse.scrolled.exists(_ == MouseWheel.ScrollDown) =>
+      Outcome(
+        this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
+      )
+
     case GameEvent.Redraw =>
       Outcome(this)
 
