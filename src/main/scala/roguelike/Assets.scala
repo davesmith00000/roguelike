@@ -7,11 +7,17 @@ object Assets:
   val tileMap: AssetName = AssetName("Anikki_square_10x10")
   val icons: AssetName   = AssetName("simple-sprites-24x24")
 
+  val miniMapFragShader = AssetName("minimap frag")
+
   val assets: Set[AssetType] =
     Required.assets ++ Set(
       AssetType
         .Image(tileMap, AssetPath("assets/" + tileMap.toString + ".png")),
-      AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png"))
+      AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png")),
+      AssetType.Text(
+        miniMapFragShader,
+        AssetPath("assets/shaders/minimap.frag")
+      )
     )
 
   object Required:

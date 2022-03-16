@@ -51,6 +51,13 @@ final case class GameMap(
       this.copy(hostiles = hm)
     }
 
+  def exploredWalls: js.Array[Point] =
+    tileMap.toListWithPosition.toJSArray
+      .collect {
+        case (vtx, tile) if tile.isWall && explored.contains(vtx.toPoint) =>
+          vtx.toPoint
+      }
+
   def update(
       dice: Dice,
       playerPosition: Point,

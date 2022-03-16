@@ -224,21 +224,27 @@ object SceneView:
       model: Model,
       viewModel: GameViewModel
   ): SceneUpdateFragment =
+    val vpSize = viewModel.viewportSize
+
     SceneUpdateFragment(
       Layer(
         RogueLikeGame.layerKeyUi,
+        viewModel.miniMap
+          .moveTo(
+            vpSize.toPoint - viewModel.miniMap.size.toPoint - Point(5)
+          ),
         UIElements.renderBar(
           model.player,
           20,
-          Point(0, viewModel.viewportSize.height - 40)
+          Point(0, vpSize.height - 40)
         ),
         UIElements.renderLevel(
-          Point(0, viewModel.viewportSize.height - 20),
+          Point(0, vpSize.height - 20),
           model.currentFloor
         ),
         UIElements.renderCharacterInfo(model.player),
         UIElements.renderControls(
-          viewModel.viewportSize,
+          vpSize,
           viewModel.helpControlsText
         ),
         UIElements.renderNameHints(
@@ -251,31 +257,31 @@ object SceneView:
         UIElements.levelUpMenu(
           model.currentState,
           model.player.fighter,
-          viewModel.viewportSize
+          vpSize
         ),
         UIElements.inventory(
           model.currentState,
           model.player.inventory,
           model.player.equipment,
-          viewModel.viewportSize
+          vpSize
         ),
         UIElements.dropMenu(
           model.currentState,
           model.player.inventory,
-          viewModel.viewportSize
+          vpSize
         ),
         UIElements.equipMenu(
           model.currentState,
           model.player.equipment,
-          viewModel.viewportSize
+          vpSize
         ),
-        UIElements.quitMenu(model.currentState, viewModel.viewportSize)
+        UIElements.quitMenu(model.currentState, vpSize)
       )
     ) |+| UIElements
       .historyViewer(
         model.currentState,
         model.messageLog,
         viewModel.terminals.history,
-        viewModel.viewportSize
+        vpSize
       )
       .addCloneBlanks(GameGraphics.tileClone)
