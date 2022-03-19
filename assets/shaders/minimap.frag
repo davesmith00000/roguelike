@@ -8,7 +8,7 @@ vec4 COLOR;
 vec2 UV;
 
 //<indigo-fragment>
-#define MAX_TILE_COUNT 4000
+#define MAX_TILE_COUNT 1000
 
 layout (std140) uniform MiniMapData {
   vec2 GRID_DIMENSIONS;
@@ -16,8 +16,13 @@ layout (std140) uniform MiniMapData {
 };
 
 layout (std140) uniform MiniMapBlockData {
-  float[MAX_TILE_COUNT] BLOCKS;
+  vec4[MAX_TILE_COUNT] BLOCKS;
 };
+
+int lookUp(int index, vec4[MAX_TILE_COUNT] data) {
+  vec4 v = data[index / 4];
+  return int(v[index % 4]);
+}
 
 void fragment(){
 
@@ -29,8 +34,8 @@ void fragment(){
   // Which sequential box is that? e.g. 4 of 9
   int index = int(floor(gridSquare.y) * GRID_DIMENSIONS.x + floor(gridSquare.x));
 
-  // Check for wall, 0.0 none, 1.0 present
-  int block = int(BLOCKS[index]);
+  // Check for wall, 0 none, 1 present
+  int block = lookUp(index, BLOCKS);
 
   // 0 = none, 1 = wall, 2 = player, 3 = hostile
   switch(block) {

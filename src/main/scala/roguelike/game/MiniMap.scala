@@ -43,7 +43,7 @@ final case class MiniMap(
 
     walls.foreach { pt =>
       val idx = pt.y * size.width + pt.x
-      arr(idx * 4) = 1.0f
+      arr(idx) = 1.0f
     }
 
     rawJSArray(arr)
@@ -69,7 +69,7 @@ final case class MiniMap(
 object MiniMap:
 
   val EmptyArray: js.Array[Float] =
-    Array.fill[Float](4000 * 4)(0.0).toJSArray
+    Array.fill[Float](4000)(0.0).toJSArray
 
   def initial(position: Point, size: Size): MiniMap =
     MiniMap(
