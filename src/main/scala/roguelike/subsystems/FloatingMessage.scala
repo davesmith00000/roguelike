@@ -21,7 +21,7 @@ object FloatingMessage:
           Text(
             "",
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           ).alignCenter
         ),
         Seconds(1.5d)

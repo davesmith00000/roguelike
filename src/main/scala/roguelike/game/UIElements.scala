@@ -30,7 +30,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -38,7 +38,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -46,19 +46,19 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA(0.3, 0.3, 0.3, 1.0))
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA(0.3, 0.3, 0.3, 1.0))
     )
   val toolTipAlive: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Blue)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Blue)
     )
   val toolTipDead: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Red)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Red)
     )
 
   val letters: List[String]             = ('a' to 'z').toList.map(_.toString)
@@ -183,7 +183,7 @@ object UIElements:
     Text(
       text,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(5, 5)
 
@@ -194,7 +194,7 @@ object UIElements:
     Text(
       helpControlsText,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
 
@@ -220,7 +220,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -256,7 +256,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -320,7 +320,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -341,7 +341,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -380,7 +380,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -418,7 +418,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -439,7 +439,7 @@ object UIElements:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)

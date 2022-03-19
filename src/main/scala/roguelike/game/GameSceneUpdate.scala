@@ -37,7 +37,7 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(Key.KEY_1)
         if model.currentState.showingQuit && model.player.isAlive =>
       val saveData = model.toSaveData
-      Outcome(model.copy(loadInfo = GameLoadInfo(None, Option(saveData))))
+      Outcome(model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)))
         .addGlobalEvents(
           StorageEvent.Save(
             ModelSaveData.saveKey,
@@ -49,7 +49,7 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(Key.KEY_2)
         if model.currentState.showingQuit && model.player.isAlive =>
       val saveData = model.toSaveData
-      Outcome(model.copy(loadInfo = GameLoadInfo(None, Option(saveData))))
+      Outcome(model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)))
         .addGlobalEvents(
           StorageEvent.Save(ModelSaveData.saveKey, saveData.toJsonString),
           SceneEvent.JumpTo(MainMenuScene.name)

@@ -4,30 +4,35 @@ import indigo._
 
 object Assets:
 
-  val tileMap: AssetName = AssetName("Anikki_square_10x10")
-  val icons: AssetName   = AssetName("simple-sprites-24x24")
-
-  val miniMapFragShader = AssetName("minimap frag")
-
-  val assets: Set[AssetType] =
-    Required.assets ++ Set(
-      AssetType
-        .Image(tileMap, AssetPath("assets/" + tileMap.toString + ".png")),
-      AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png")),
-      AssetType.Text(
-        miniMapFragShader,
-        AssetPath("assets/shaders/minimap.frag")
-      )
-    )
-
-  object Required:
-    val textFragShader = AssetName("text frag")
+  object Basic:
+    val textFragShader     = AssetName("text frag")
+    val tileMap: AssetName = AssetName("Anikki_square_10x10")
 
     val assets: Set[AssetType] =
       Set(
-        AssetType.Text(textFragShader, AssetPath("assets/shaders/text.frag"))
+        AssetType.Text(textFragShader, AssetPath("assets/shaders/text.frag")),
+        AssetType
+          .Image(tileMap, AssetPath("assets/" + tileMap.toString + ".png"))
       )
-  end Required
+  end Basic
+
+  object Game:
+    val icons: AssetName  = AssetName("simple-sprites-24x24")
+    val miniMapFragShader = AssetName("minimap frag")
+
+    val assets: Set[AssetType] =
+      Set(
+        AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png")),
+        AssetType.Text(
+          miniMapFragShader,
+          AssetPath("assets/shaders/minimap.frag")
+        )
+      )
+
+    def loaded(assetCollection: AssetCollection): Boolean =
+      assetCollection.findImageDataByName(icons).isDefined &&
+        assetCollection.findTextDataByName(miniMapFragShader).isDefined
+  end Game
 
 end Assets
 
@@ -36,24 +41,24 @@ object GameGraphics:
   val tileClone: CloneBlank =
     CloneBlank(
       CloneId("rogue bg tiles"),
-      Graphic(24, 24, Material.Bitmap(Assets.icons))
+      Graphic(24, 24, Material.Bitmap(Assets.Game.icons))
     )
 
   // Bg tiles
   val wall: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(0, 0, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(0, 0, 24, 24)
   val wallInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(24, 0, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(24, 0, 24, 24)
 
   val floor: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(0, 24, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(0, 24, 24, 24)
   val floorInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(24, 24, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(24, 24, 24, 24)
 
   val stairs: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(48, 0, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(48, 0, 24, 24)
   val stairsInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(48, 24, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(48, 24, 24, 24)
 
   def wallTile(position: Point): CloneTileData =
     CloneTileData(position.x, position.y, 0, 0, 24, 24)
@@ -73,28 +78,28 @@ object GameGraphics:
   //
 
   val highlight: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(0, 48, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(0, 48, 24, 24)
 
   val target: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(24, 48, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(24, 48, 24, 24)
 
   val fireScroll: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(0, 72, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(0, 72, 24, 24)
   val lightningScroll: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(24, 72, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(24, 72, 24, 24)
   val confusionScroll: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(0, 96, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(0, 96, 24, 24)
   val scrollInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(24, 96, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(24, 96, 24, 24)
 
   val healthPotion: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(48, 96, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(48, 96, 24, 24)
 
   val leatherArmour: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(72, 72, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(72, 72, 24, 24)
   val chainmail: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(96, 72, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(96, 72, 24, 24)
   val dagger: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(72, 96, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(72, 96, 24, 24)
   val sword: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(Assets.icons)).withCrop(96, 96, 24, 24)
+    Graphic(24, 24, Material.Bitmap(Assets.Game.icons)).withCrop(96, 96, 24, 24)

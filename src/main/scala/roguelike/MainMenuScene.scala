@@ -79,19 +79,19 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         Text(
           "My Generic Roguelite",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.tileMap, RGB.Yellow, RGBA.Zero)
+          TerminalText(Assets.Basic.tileMap, RGB.Yellow, RGBA.Zero)
         )
           .moveTo(10, 10),
         Text(
           "[n] Play a new game",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.tileMap, RGB.White, RGBA.Zero)
+          TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
         )
           .moveTo(10, 25),
         Text(
           "[c] Continue last game",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.tileMap, loadColor, RGBA.Zero)
+          TerminalText(Assets.Basic.tileMap, loadColor, RGBA.Zero)
         )
           .moveTo(10, 35)
       )

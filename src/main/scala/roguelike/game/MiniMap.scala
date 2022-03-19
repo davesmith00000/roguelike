@@ -86,4 +86,4 @@ object MiniMap:
   val shader: EntityShader.External =
     EntityShader
       .External(shaderId)
-      .withFragmentProgram(Assets.miniMapFragShader)
+      .withFragmentProgram(Assets.Game.miniMapFragShader)

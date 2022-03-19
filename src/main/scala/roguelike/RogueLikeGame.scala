@@ -51,11 +51,8 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         gameViewport.size
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
-        .withAssets(Assets.assets)
-        .withShaders(
-          TerminalText.standardShader,
-          MiniMap.shader
-        )
+        .withAssets(Assets.Basic.assets)
+        .withShaders(TerminalText.standardShader)
         .withSubSystems(
           FPSCounter(
             Point(5, 100),
@@ -76,7 +73,13 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       assetCollection: AssetCollection,
       dice: Dice
   ): Outcome[Startup[Size]] =
-    Outcome(Startup.Success(bootData))
+    if Assets.Game.loaded(assetCollection) then
+      Outcome(
+        Startup
+          .Success(bootData)
+          .addShaders(MiniMap.shader)
+      )
+    else Outcome(Startup.Success(bootData))
 
   def updateModel(
       context: FrameContext[Size],

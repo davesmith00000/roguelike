@@ -587,7 +587,7 @@ object Model:
       false,
       GameState.Game,
       None,
-      GameLoadInfo(None, None),
+      GameLoadInfo.initial,
       0,
       GamePhase.PlayerTurn,
       Nil
@@ -600,7 +600,7 @@ object Model:
       stairsPosition = saveData.stairsPosition,
       gameMap = saveData.gameMap,
       messageLog = saveData.messageLog,
-      loadInfo = GameLoadInfo(None, Option(saveData)),
+      loadInfo = GameLoadInfo.withSaveData(saveData),
       currentFloor = saveData.currentFloor
     )
 
@@ -633,7 +633,7 @@ object Model:
           false,
           GameState.Game,
           None,
-          GameLoadInfo(None, None),
+          GameLoadInfo.initial,
           0,
           GamePhase.PlayerTurn,
           Nil

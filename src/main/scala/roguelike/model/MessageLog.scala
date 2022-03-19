@@ -121,5 +121,10 @@ object MessageLog:
       startOffset: Int
   ): TerminalEntity =
     logToTerminal(size, messages, reversed, startOffset, true)
-      .draw(Assets.tileMap, RogueLikeGame.charSize, MapTile(Tile.SPACE), 4000)
+      .draw(
+        Assets.Basic.tileMap,
+        RogueLikeGame.charSize,
+        MapTile(Tile.SPACE),
+        4000
+      )
       .moveTo(position)

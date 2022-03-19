@@ -97,7 +97,7 @@ final case class GameViewModel(
           .toTerminal(Size(50, 30), false, 0, true)
           .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
             (fg, bg) =>
-              Graphic(10, 10, TerminalText(Assets.tileMap, fg, bg))
+              Graphic(10, 10, TerminalText(Assets.Basic.tileMap, fg, bg))
           }
 
       Outcome(
