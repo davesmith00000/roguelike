@@ -52,7 +52,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
         case LoadingState.Complete if loadInfo.isReallyComplete =>
           Outcome(loadInfo.updateTimeout(context.delta))
-            .addGlobalEvents(SceneEvent.Next)
+            .addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
 
         case LoadingState.Complete =>
           Outcome(loadInfo.updateTimeout(context.delta))

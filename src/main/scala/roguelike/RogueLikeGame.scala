@@ -27,7 +27,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     None
 
   def scenes(bootData: Size): NonEmptyList[Scene[Size, Model, ViewModel]] =
-    NonEmptyList(LoadingScene, MainMenuScene, GameScene)
+    NonEmptyList(LoadingScene, MainMenuScene, GeneratingLevelScene, GameScene)
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
