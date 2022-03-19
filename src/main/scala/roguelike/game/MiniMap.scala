@@ -17,7 +17,7 @@ final case class MiniMap(
   val flip: Flip                   = Flip.default
   val ref: Point                   = Point.zero
   val rotation: Radians            = Radians.zero
-  val scale: Vector2               = Vector2.one
+  val scale: Vector2               = Vector2(2)
   val eventHandlerEnabled: Boolean = false
   def eventHandler: ((MiniMap, GlobalEvent)) => Option[GlobalEvent] =
     Function.const(None)

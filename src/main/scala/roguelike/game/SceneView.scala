@@ -229,10 +229,7 @@ object SceneView:
     SceneUpdateFragment(
       Layer(
         RogueLikeGame.layerKeyUi,
-        viewModel.miniMap
-          .moveTo(
-            vpSize.toPoint - viewModel.miniMap.size.toPoint - Point(5)
-          ),
+        UIElements.renderMiniMap(vpSize, viewModel.miniMap),
         UIElements.renderBar(
           model.player,
           20,

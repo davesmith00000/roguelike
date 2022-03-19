@@ -82,6 +82,16 @@ object UIElements:
       healthStatusLine.withText(formatStatus(player))
     ).moveTo(position)
 
+  def renderMiniMap(vpSize: Size, miniMap: MiniMap): Group =
+    val miniMapSize = miniMap.size * 2
+    val miniMapBounds =
+      Rectangle(miniMapSize)
+
+    Group(
+      miniMap,
+      Shape.Box(miniMapBounds, Fill.None, Stroke(1, RGBA.White))
+    ).moveTo(vpSize.toPoint - miniMapBounds.size.toPoint - Point(5))
+
   def renderLevel(position: Point, currentFloor: Int): Text[TerminalText] =
     healthStatusLine
       .withText("Dungeon level: " + currentFloor.toString)
