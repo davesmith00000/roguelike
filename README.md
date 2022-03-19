@@ -2,7 +2,17 @@
 
 [Click here to play!](https://davesmith00000.github.io/roguelike/)
 
-[Check what I'm working on!](https://github.com/davesmith00000/roguelike/projects/1)
+Browser compatibility:
+
+|Browser|Status|Comments|
+|---|---|---|
+|Chrome|✅|***Please use Chrome!!***|
+|Firefox|🐢|Works, slower than Chrome|
+|Safari|⚠️|Dude... where's my mini-map?|
+|Opera|✅|Seems... fine?|
+|Edge / Other|👽|_Unknown..._|
+
+[Check out the project board to see what I'm working on!](https://github.com/davesmith00000/roguelike/projects/1)
 
 ## Controls
 
