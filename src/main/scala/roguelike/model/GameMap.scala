@@ -1,17 +1,12 @@
 package roguelike.model
 
 import indigo._
-import indigoextras.geometry.BoundingBox
-import indigoextras.geometry.Vertex
-import indigoextras.trees.QuadTree
-import indigoextras.trees.QuadTree.QuadBranch
-import indigoextras.trees.QuadTree.QuadEmpty
-import indigoextras.trees.QuadTree.QuadLeaf
 import io.circe._
 import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.model.entity._
+import roguelike.util.Indices
 
 import scala.annotation.tailrec
 import scala.scalajs.js
@@ -19,12 +14,15 @@ import scala.scalajs.js.JSConverters._
 
 final case class GameMap(
     size: Size,
-    tileMap: QuadTree[GameTile],
+    tileMap: js.Array[Option[GameTile]],
     visible: List[Point],
     explored: Set[Point],
     hostiles: HostilesManager,
     collectables: List[Collectable]
 ):
+  val bounds: Rectangle =
+    Rectangle(size)
+
   def noHostilesVisible: Boolean =
     visibleHostiles.isEmpty
 
@@ -52,10 +50,11 @@ final case class GameMap(
     }
 
   def exploredWalls: js.Array[Point] =
-    tileMap.toListWithPosition.toJSArray
+    tileMap.zipWithIndex
       .collect {
-        case (vtx, tile) if tile.isWall && explored.contains(vtx.toPoint) =>
-          vtx.toPoint
+        case (Some(tile), index)
+            if tile.isWall && explored.contains(pointFromIndex(index)) =>
+          pointFromIndex(index)
       }
 
   def update(
@@ -64,14 +63,14 @@ final case class GameMap(
       pause: Boolean
   ): Outcome[GameMap] =
     val newVisible =
-      GameMap.calculateFOV(GameMap.FOVRadius, playerPosition, tileMap)
+      GameMap.calculateFOV(GameMap.FOVRadius, playerPosition, this)
 
     val updatedEntities =
       hostiles.updateAllHostiles(
         dice,
         playerPosition,
         pause,
-        tileMap,
+        this,
         newVisible
       )
 
@@ -97,29 +96,32 @@ final case class GameMap(
         case _                   => false
 
     val walkable =
-      tileMap
-        .searchByBoundingBoxWithPosition(BoundingBox.fromRectangle(area))
+      GameMap
+        .searchByBoundsWithPosition(this, area)
         .filterNot(_._2.isBlocked)
-        .map(_._1.toPoint)
+        .map(_._1)
         .filterNot(additionalBlocked.contains)
 
     GameMap.getWalkablePathTo(dice, from, to, walkable, area)
 
   def insert(coords: Point, tile: GameTile): GameMap =
-    this.copy(
-      tileMap = tileMap.insertElement(tile, Vertex.fromPoint(coords))
-    )
+    if bounds.contains(coords) then
+      tileMap(indexFromPoint(coords)) = Option(tile)
+      this
+    else this
 
   def insert(tiles: List[(Point, GameTile)]): GameMap =
-    this.copy(
-      tileMap =
-        tileMap.insertElements(tiles.map(p => (p._2, Vertex.fromPoint(p._1))))
-    )
+    tiles.foreach { case (pt, tile) =>
+      tileMap(indexFromPoint(pt)) = Option(tile)
+    }
+    this
+
   def insert(tiles: (Point, GameTile)*): GameMap =
     insert(tiles.toList)
 
   def lookUp(at: Point): Option[GameTile] =
-    tileMap.fetchElementAt(Vertex.fromPoint(at))
+    if bounds.contains(at) then tileMap(indexFromPoint(at))
+    else None
 
   def dropCollectable(collectable: Collectable): GameMap =
     this.copy(
@@ -130,11 +132,18 @@ final case class GameMap(
     val topLeft: Point = center - (size.toPoint / 2)
     val bounds: Rectangle =
       Rectangle.fromPoints(topLeft, topLeft + size.toPoint)
-    tileMap
-      .searchByBoundingBoxWithPosition(BoundingBox.fromRectangle(bounds))
+
+    GameMap
+      .searchByBoundsWithPosition(this, bounds)
       .toJSArray
-      .map(p => (p._2, p._1.toPoint))
+      .map(p => (p._2, p._1))
       .filter((_, pos) => explored.contains(pos))
+
+  private def indexFromPoint(pt: Point): Int =
+    Indices.indexFromPoint(pt, size.width)
+
+  private def pointFromIndex(index: Int): Point =
+    Indices.pointFromIndex(index, size.width)
 
 object GameMap:
 
@@ -182,7 +191,7 @@ object GameMap:
   ): GameMap =
     GameMap(
       size,
-      QuadTree.empty(size.width, size.height),
+      List.fill(size.width * size.height)(None).toJSArray,
       Nil,
       Set(),
       HostilesManager(hostiles),
@@ -197,7 +206,7 @@ object GameMap:
   def calculateFOV(
       radius: Int,
       center: Point,
-      tileMap: QuadTree[GameTile]
+      gameMap: GameMap
   ): List[Point] =
     val bounds: Rectangle =
       Rectangle(
@@ -206,41 +215,40 @@ object GameMap:
       )
 
     val tiles =
-      tileMap
-        .searchByBoundingBoxWithPosition(BoundingBox.fromRectangle(bounds))
-        .map(p => (p._2, p._1.toPoint))
+      searchByBoundsWithPosition(gameMap, bounds)
+        .map(p => (p._2, p._1))
         .filter(t => center.distanceTo(t._2) <= radius)
 
     @tailrec
     def visibleTiles(
-        remaining: List[(GameTile, Point)],
+        remaining: js.Array[Point],
         acc: List[Point]
     ): List[Point] =
       remaining match
-        case Nil =>
+        case l if l.isEmpty =>
           acc
 
-        case (t, pt) :: pts =>
-          val lineOfSight = FOV.bresenhamLine(pt, center).dropRight(1)
+        case l =>
+          val lineOfSight = FOV.bresenhamLine(l.head, center).dropRight(1)
 
           if lineOfSight.forall(pt =>
               tiles.exists(t => t._2 == pt && !t._1.blockSight)
             )
           then
             visibleTiles(
-              pts,
-              pt :: acc
+              l.tail,
+              l.head :: acc
             )
-          else visibleTiles(pts, acc)
+          else visibleTiles(l.tail, acc)
 
-    visibleTiles(tiles, Nil)
+    visibleTiles(tiles.map(_._2), Nil)
 
   def getPathTo(
       dice: Dice,
       from: Point,
       to: Point,
       additionalBlocked: List[Point],
-      tileMap: QuadTree[GameTile]
+      gameMap: GameMap
   ): List[Point] =
     val area = Rectangle.fromPoints(from, to).expand(2)
     val filter: (GameTile, Point) => Boolean = (tile, _) =>
@@ -250,10 +258,9 @@ object GameMap:
         case _                   => false
 
     val walkable =
-      tileMap
-        .searchByBoundingBoxWithPosition(BoundingBox.fromRectangle(area))
+      searchByBoundsWithPosition(gameMap, area)
         .filterNot(_._2.isBlocked)
-        .map(_._1.toPoint)
+        .map(_._1)
         .filterNot(additionalBlocked.contains)
 
     GameMap.getWalkablePathTo(dice, from, to, walkable, area)
@@ -262,10 +269,20 @@ object GameMap:
       dice: Dice,
       from: Point,
       to: Point,
-      walkable: List[Point],
+      walkable: js.Array[Point],
       area: Rectangle
   ): List[Point] =
     PathFinder
-      .fromWalkable(area.size, walkable.map(_ - area.position))
+      .fromWalkable(area.size, walkable.map(_ - area.position).toList)
       .locatePath(dice, from - area.position, to - area.position, _ => 1)
       .map(_ + area.position)
+
+  def searchByBoundsWithPosition(
+      gameMap: GameMap,
+      bounds: Rectangle
+  ): js.Array[(Point, GameTile)] =
+    gameMap.tileMap.zipWithIndex.collect {
+      case (Some(tile), index)
+          if bounds.contains(Indices.indexToPoint(index, gameMap.size.width)) =>
+        (Indices.indexToPoint(index, gameMap.size.width), tile)
+    }

@@ -14,25 +14,25 @@ sealed trait GameTile:
 
 object GameTile:
   case object Wall extends GameTile:
-    val blocked: Boolean    = true
-    val blockSight: Boolean = true
+    val blocked: Boolean      = true
+    val blockSight: Boolean   = true
     val isDownStairs: Boolean = false
-    val isGround: Boolean = false
-    val isWall: Boolean = true
+    val isGround: Boolean     = false
+    val isWall: Boolean       = true
 
   case object Ground extends GameTile:
-    val blocked: Boolean    = false
-    val blockSight: Boolean = false
+    val blocked: Boolean      = false
+    val blockSight: Boolean   = false
     val isDownStairs: Boolean = false
-    val isGround: Boolean = true
-    val isWall: Boolean = false
+    val isGround: Boolean     = true
+    val isWall: Boolean       = false
 
   case object DownStairs extends GameTile:
-    val blocked: Boolean    = false
-    val blockSight: Boolean = false
+    val blocked: Boolean      = false
+    val blockSight: Boolean   = false
     val isDownStairs: Boolean = true
-    val isGround: Boolean = false
-    val isWall: Boolean = false
+    val isGround: Boolean     = false
+    val isWall: Boolean       = false
 
   val scoreAs: GameTile => Int = {
     case Ground     => 1

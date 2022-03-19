@@ -1,7 +1,6 @@
 package roguelike.model
 
 import indigo._
-import indigoextras.trees.QuadTree
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent

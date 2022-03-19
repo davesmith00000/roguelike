@@ -4,13 +4,11 @@ import indigo.shared.Outcome
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.Rectangle
 import indigo.shared.dice.Dice
-import indigoextras.geometry.BoundingBox
-import indigoextras.geometry.Vertex
-import indigoextras.trees.QuadTree
 import roguelike.GameEvent
 import roguelike.model.entity.Hostile
 
 import scala.annotation.tailrec
+import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 final case class HostilesManager(hostiles: List[Hostile]):
@@ -91,7 +89,7 @@ final case class HostilesManager(hostiles: List[Hostile]):
       dice: Dice,
       playerPosition: Point,
       pause: Boolean,
-      tileMap: QuadTree[GameTile],
+      tileMap: GameMap,
       newVisible: List[Point]
   ): Outcome[HostilesManager] =
     @tailrec
@@ -149,7 +147,7 @@ final case class HostilesManager(hostiles: List[Hostile]):
   def getRandomDirection(
       dice: Dice,
       position: Point,
-      tileMap: QuadTree[GameTile]
+      tileMap: GameMap
   ): Point =
     val up    = Point(0, -1)
     val down  = Point(0, 1)
@@ -163,7 +161,7 @@ final case class HostilesManager(hostiles: List[Hostile]):
         position + left,
         position + right
       ).filter { pt =>
-        tileMap.fetchElementAt(Vertex.fromPoint(pt)) match
+        tileMap.lookUp(pt) match
           case None =>
             false
 

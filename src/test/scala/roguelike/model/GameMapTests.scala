@@ -5,9 +5,12 @@ import indigo.Point
 import indigo.Rectangle
 import indigo.Size
 
+import scalajs.js
+import scalajs.js.JSConverters._
+
 class GameMapTests extends munit.FunSuite {
 
-  val walkable: List[Point] =
+  val walkable: js.Array[Point] =
     List(
       Point(4, 6),
       Point(3, 6),
@@ -35,7 +38,7 @@ class GameMapTests extends munit.FunSuite {
       Point(3, 0),
       Point(2, 1),
       Point(2, 0)
-    ).map(_ + Point(17, 21))
+    ).map(_ + Point(17, 21)).toJSArray
 
   test("getWalkablePathTo") {
     val actual =
@@ -66,6 +69,68 @@ class GameMapTests extends munit.FunSuite {
       )
 
     assert(possiblePaths.contains(actual))
+  }
+
+  test("searchByBoundsWithPosition - empty") {
+    val mapSize = Size(10)
+    val bounds  = Rectangle(1, 1, 3, 3)
+    val gameMap = GameMap.initial(mapSize, Nil, Nil)
+
+    val actual =
+      GameMap.searchByBoundsWithPosition(gameMap, bounds)
+
+    val expected =
+      js.Array[(Point, GameTile)]()
+
+    assertEquals(actual.toList, expected.toList)
+  }
+
+  test("searchByBoundsWithPosition - 1 item in bounds") {
+    val mapSize = Size(10)
+    val bounds  = Rectangle(1, 1, 3, 3)
+
+    val gameMap =
+      GameMap.initial(mapSize, Nil, Nil)
+        .insert(Point(1, 1), GameTile.Wall)
+
+    val actual =
+      GameMap.searchByBoundsWithPosition(gameMap, bounds)
+
+    val expected =
+      js.Array[(Point, GameTile)]((Point(1, 1), GameTile.Wall))
+
+    assertEquals(actual.toList, expected.toList)
+  }
+
+  test("searchByBoundsWithPosition - some in bounds, some out") {
+    val mapSize = Size(5)
+    val bounds  = Rectangle(1, 2, 3, 2)
+
+/*
+|X|_|_|_|_|
+|_|_|_|X|_|
+|X|_|X|_|_|
+|_|X|_|_|_|
+|_|_|X|_|X|
+*/
+    val gameMap =
+      GameMap.initial(mapSize, Nil, Nil)
+        .insert(Point(0, 0), GameTile.Wall) // Out
+        .insert(Point(0, 2), GameTile.Wall) // Out
+        .insert(Point(1, 3), GameTile.Wall) // In
+        .insert(Point(2, 2), GameTile.Ground) // In
+        .insert(Point(2, 4), GameTile.Wall) // Out
+        .insert(Point(3, 1), GameTile.Wall) // Out
+        .insert(Point(4, 4), GameTile.Wall) // Out
+
+    val actual =
+      GameMap.searchByBoundsWithPosition(gameMap, bounds)
+
+    val expected =
+      js.Array[(Point, GameTile)]((Point(1, 3), GameTile.Wall), (Point(2, 2), GameTile.Ground))
+
+    assert(actual.length == expected.length)
+    assert(actual.forall(a => expected.contains(a)))
   }
 
 }
