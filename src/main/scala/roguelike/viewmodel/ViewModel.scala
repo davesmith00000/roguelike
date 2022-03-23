@@ -6,6 +6,7 @@ import roguelike.Assets
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.ViewModelEvent
 import roguelike.game.MiniMap
 import roguelike.model.GameMap
 import roguelike.model.GamePhase
@@ -27,7 +28,11 @@ object ViewModel:
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(GameViewModel.initial(player, initialViewportSize))
 
+enum GameViewModelPhase:
+  case Idle, MovingPlayer
+
 final case class GameViewModel(
+    phase: GameViewModelPhase,
     magnification: Int,
     viewportSize: Size,
     squareSize: Point,
@@ -130,6 +135,13 @@ final case class GameViewModel(
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
+    case GameEvent.ViewModelHandOff(ViewModelEvent.MovePlayer) =>
+      Outcome(this.copy(phase = GameViewModelPhase.MovingPlayer))
+
+    case GameEvent.ViewModelPhaseComplete(e) =>
+      Outcome(this.copy(phase = GameViewModelPhase.Idle))
+        .addGlobalEvents(GameEvent.ModelHandOff(e))
+
     case _ =>
       Outcome(this)
 
@@ -150,6 +162,7 @@ object GameViewModel:
       .mkString("\n")
 
     GameViewModel(
+      GameViewModelPhase.Idle,
       magnification = 2,
       viewportSize = initialViewportSize,
       squareSize = SquareSize,
@@ -204,12 +217,19 @@ object GameViewModel:
         .filter(h => viewModel.tilePositions.contains(h.position))
 
     val nextPlayerPosition =
-      model.gamePhase match
-        case GamePhase.PlayerTurn =>
+      viewModel.phase match
+        case GameViewModelPhase.MovingPlayer =>
           viewModel.playerPosition
-            .next(context.delta, model.player.position, viewModel.squareSize)
+            .next(
+              context.delta,
+              model.player.position,
+              viewModel.squareSize,
+              GameEvent.ViewModelPhaseComplete(
+                ViewModelEvent.PlayerMoveComplete
+              )
+            )
 
-        case _ =>
+        case GameViewModelPhase.Idle =>
           Outcome(viewModel.playerPosition)
 
     val nextMiniMap =

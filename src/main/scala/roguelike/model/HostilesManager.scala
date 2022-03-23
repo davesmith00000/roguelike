@@ -13,7 +13,7 @@ import scala.scalajs.js.JSConverters._
 
 final case class HostilesManager(hostiles: List[Hostile]):
 
-  def toJSArray: scalajs.js.Array[Hostile] =
+  lazy val toJSArray: scalajs.js.Array[Hostile] =
     hostiles.toJSArray
 
   def findAllInRange(target: Point, range: Int) =

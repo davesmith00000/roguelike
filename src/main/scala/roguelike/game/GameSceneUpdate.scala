@@ -20,8 +20,8 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     model.gamePhase match
       case GamePhase.WaitForInput => onWaitingForInput(context, model)
-      case GamePhase.PlayerTurn   => otherPhase(context, model)
-      case GamePhase.NPCTurn      => otherPhase(context, model)
+      case GamePhase.MovingPlayer   => otherPhase(context, model)
+      case GamePhase.MovingNPC      => otherPhase(context, model)
 
   def onWaitingForInput(
       context: FrameContext[Size],

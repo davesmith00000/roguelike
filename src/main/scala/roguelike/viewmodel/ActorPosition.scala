@@ -17,7 +17,8 @@ final case class ActorPosition(
   def next(
       timeDelta: Seconds,
       position: Point,
-      squareSize: Point
+      squareSize: Point,
+      onCompleteEvent: GlobalEvent
   ): Outcome[ActorPosition] =
     val modelPosition = (position * squareSize) + (squareSize.x / 2)
     val elapsedTime   = travelTime + timeDelta
@@ -38,7 +39,7 @@ final case class ActorPosition(
       modelPosition == target && time >= ActorPosition.DefaultMoveDuration && (next ~== target.toVector)
 
     val events =
-      if moveIsComplete then List(GameEvent.PlayerTurnComplete) else Nil
+      if moveIsComplete then List(onCompleteEvent) else Nil
 
     Outcome(
       this.copy(

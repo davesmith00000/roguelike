@@ -5,6 +5,7 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.ViewModelEvent
 import roguelike.model.entity._
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
@@ -453,15 +454,8 @@ final case class Model(
             .addGlobalEvents(GameEvent.PlayerTurnEnd)
 
     case GameEvent.PlayerTurnEnd =>
-      Outcome(this.copy(gamePhase = GamePhase.PlayerTurn))
-
-    case GameEvent.PlayerTurnComplete =>
-      gameMap
-        .update(dice, player.position, paused)
-        .map { gm =>
-          this.copy(gameMap = gm, gamePhase = GamePhase.NPCTurn)
-        }
-        .addGlobalEvents(GameEvent.NPCTurnComplete)
+      Outcome(this.copy(gamePhase = GamePhase.MovingPlayer))
+        .addGlobalEvents(GameEvent.ViewModelHandOff(ViewModelEvent.MovePlayer))
 
     case GameEvent.PlayerMoveTowards(target) =>
       if autoMovePath.isEmpty then
@@ -531,6 +525,27 @@ final case class Model(
     case GameEvent.CameraSnapToPlayer =>
       Outcome(this)
 
+    case GameEvent.ViewModelPhaseComplete(_) =>
+      Outcome(this)
+
+    case GameEvent.ViewModelHandOff(_) =>
+      Outcome(this)
+
+    case GameEvent.ModelHandOff(ViewModelEvent.MovePlayer) =>
+      Outcome(this)
+
+    case GameEvent.ModelHandOff(ViewModelEvent.PlayerMoveComplete) =>
+      // This is a fudge. The player move is done and we should now check for
+      // other things the player is doing, like attacking, then hand off to the
+      // view model again for the next round of presentation.
+      // What we actually do is the entire NPC moves, and immediately complete.
+      gameMap
+        .update(dice, player.position, paused)
+        .map { gm =>
+          this.copy(gameMap = gm, gamePhase = GamePhase.MovingNPC)
+        }
+        .addGlobalEvents(GameEvent.NPCTurnComplete)
+
   def performPlayerTurn(dice: Dice, by: Point): Outcome[Model] =
     player.bump(by, gameMap).map(p => this.copy(player = p))
 
@@ -589,7 +604,7 @@ object Model:
       None,
       GameLoadInfo.initial,
       0,
-      GamePhase.PlayerTurn,
+      GamePhase.WaitForInput,
       Nil
     )
 
@@ -635,7 +650,7 @@ object Model:
           None,
           GameLoadInfo.initial,
           0,
-          GamePhase.PlayerTurn,
+          GamePhase.WaitForInput,
           Nil
         )
       }
