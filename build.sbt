@@ -76,20 +76,20 @@ lazy val roguelike =
     .settings(
       logo := rawLogo + "(v" + version.value.toString + ")",
       usefulTasks := Seq(
-        UsefulTask("", "runGame", "Run the game (requires Electron)"),
-        UsefulTask("", "buildGame", "Build web version"),
+        UsefulTask("r", "runGame", "Run the game (requires Electron)"),
+        UsefulTask("b", "buildGame", "Build web version"),
         UsefulTask(
-          "",
+          "rf",
           "runGameFull",
           "Run the fully optimised game (requires Electron)"
         ),
         UsefulTask(
-          "",
+          "bf",
           "buildGameFull",
           "Build the fully optimised web version"
         ),
-        UsefulTask("", "code", "Launch VSCode"),
-        UsefulTask("", "oni2", "Launch Onivim 2")
+        UsefulTask("c", "code", "Launch VSCode"),
+        UsefulTask("o", "oni2", "Launch Onivim 2")
       ),
       logoColor        := scala.Console.YELLOW,
       aliasColor       := scala.Console.BLUE,
