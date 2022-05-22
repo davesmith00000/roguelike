@@ -53,14 +53,14 @@ final case class MiniMap(
       MiniMap.shaderId,
       UniformBlock(
         "MiniMapData",
-        List(
+        Batch(
           Uniform("GRID_DIMENSIONS") -> vec2.fromSize(size),
           Uniform("PLAYER_POSITION") -> vec2.fromPoint(player)
         )
       ),
       UniformBlock(
         "MiniMapBlockData",
-        List(
+        Batch(
           Uniform("BLOCKS") -> wallArray
         )
       )

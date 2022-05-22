@@ -3,6 +3,7 @@ package roguelike.model
 import indigo.Dice
 import indigo.Outcome
 import indigo.RGB
+import indigo.syntax.*
 import io.circe._
 import io.circe.syntax._
 import roguelike.ColorScheme
@@ -30,7 +31,7 @@ final case class Equipment(weapon: Option[Melee], armour: Option[Armour]):
                 .map(m =>
                   GameEvent.Inventory(InventoryEvent.ReturnMeleeToInventory(m))
                 )
-                .toList
+                .toBatch
           )
 
       case a: Armour =>
@@ -41,7 +42,7 @@ final case class Equipment(weapon: Option[Melee], armour: Option[Armour]):
                 .map(a =>
                   GameEvent.Inventory(InventoryEvent.ReturnArmourToInventory(a))
                 )
-                .toList
+                .toBatch
           )
 
   def unequipArmour: Outcome[Equipment] =

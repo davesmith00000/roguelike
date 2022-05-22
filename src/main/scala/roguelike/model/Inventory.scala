@@ -1,8 +1,7 @@
 package roguelike.model
 
-import indigo.shared.Outcome
-import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGB
+import indigo.*
+import indigo.syntax.*
 import io.circe._
 import io.circe.syntax._
 import roguelike.ColorScheme
@@ -12,7 +11,7 @@ import roguelike.model.entity._
 import roguelike.model.gamedata._
 import roguelike.model.items.Item
 
-final case class Inventory(capacity: Int, items: List[Item]):
+final case class Inventory(capacity: Int, items: Batch[Item]):
 
   val isFull: Boolean =
     items.length >= capacity
@@ -100,7 +99,7 @@ object Inventory:
   val initial: Inventory =
     Inventory(
       10,
-      List(
+      Batch(
         Consumables.HealthPotion,
         Melee.Sword,
         Armour.ChainMail,

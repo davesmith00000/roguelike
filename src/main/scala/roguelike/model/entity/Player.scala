@@ -44,7 +44,7 @@ final case class Player(
 
   def drop(
       inventoryItemAt: Int,
-      worldCollectables: List[Collectable]
+      worldCollectables: Batch[Collectable]
   ): Outcome[Player] =
     if worldCollectables.exists(
         _.position == position
@@ -76,8 +76,8 @@ final case class Player(
     }
 
   def pickUp(
-      worldCollectables: List[Collectable]
-  ): Outcome[(Player, List[Collectable])] =
+      worldCollectables: Batch[Collectable]
+  ): Outcome[(Player, Batch[Collectable])] =
     worldCollectables.find(_.position == position) match
       case None =>
         Outcome((this, worldCollectables))
@@ -172,11 +172,11 @@ final case class Player(
         )
       ).createGlobalEvents(p =>
         if levelUp then
-          List(
+          Batch(
             GameEvent
               .Log(Message(s"You advance to level ${p.level}!", RGB.White))
           )
-        else Nil
+        else Batch.empty
       )
 
   def increaseMaxHp(amount: Int): Outcome[Player] =

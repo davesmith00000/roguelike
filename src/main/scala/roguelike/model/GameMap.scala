@@ -1,6 +1,7 @@
 package roguelike.model
 
 import indigo._
+import indigo.syntax._
 import io.circe._
 import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
@@ -14,11 +15,11 @@ import scala.scalajs.js.JSConverters._
 
 final case class GameMap(
     size: Size,
-    tileMap: js.Array[Option[GameTile]],
-    visible: List[Point],
+    tileMap: Batch[Option[GameTile]],
+    visible: Batch[Point],
     explored: Set[Point],
     hostiles: HostilesManager,
-    collectables: List[Collectable]
+    collectables: Batch[Collectable]
 ):
   val bounds: Rectangle =
     Rectangle(size)
@@ -50,12 +51,11 @@ final case class GameMap(
     }
 
   def exploredWalls: js.Array[Point] =
-    tileMap.zipWithIndex
-      .collect {
-        case (Some(tile), index)
-            if tile.isWall && explored.contains(pointFromIndex(index)) =>
-          pointFromIndex(index)
-      }
+    tileMap.zipWithIndex.collect {
+      case (Some(tile), index)
+          if tile.isWall && explored.contains(pointFromIndex(index)) =>
+        pointFromIndex(index)
+    }.toJSArray
 
   def update(
       dice: Dice,
@@ -77,7 +77,7 @@ final case class GameMap(
     updatedEntities.map { es =>
       this.copy(
         visible = newVisible,
-        explored = explored ++ newVisible,
+        explored = explored ++ newVisible.toSet,
         hostiles = es
       )
     }
@@ -86,8 +86,8 @@ final case class GameMap(
       dice: Dice,
       from: Point,
       to: Point,
-      additionalBlocked: List[Point]
-  ): List[Point] =
+      additionalBlocked: Batch[Point]
+  ): Batch[Point] =
     val area = Rectangle.fromPoints(from, to).expand(2)
     val filter: (GameTile, Point) => Boolean = (tile, _) =>
       tile match
@@ -106,18 +106,14 @@ final case class GameMap(
 
   def insert(coords: Point, tile: GameTile): GameMap =
     if bounds.contains(coords) then
-      tileMap(indexFromPoint(coords)) = Option(tile)
-      this
+      this.copy(tileMap = tileMap.update(indexFromPoint(coords), Option(tile)))
     else this
 
-  def insert(tiles: List[(Point, GameTile)]): GameMap =
-    tiles.foreach { case (pt, tile) =>
-      tileMap(indexFromPoint(pt)) = Option(tile)
-    }
-    this
+  def insert(tiles: Batch[(Point, GameTile)]): GameMap =
+    tiles.foldLeft(this) { case (acc, (pt, tile)) => acc.insert(pt, tile) }
 
   def insert(tiles: (Point, GameTile)*): GameMap =
-    insert(tiles.toList)
+    insert(tiles.toBatch)
 
   def lookUp(at: Point): Option[GameTile] =
     if bounds.contains(at) then tileMap(indexFromPoint(at))
@@ -186,28 +182,32 @@ object GameMap:
 
   def initial(
       size: Size,
-      hostiles: List[Hostile],
-      collectables: List[Collectable]
+      hostiles: Batch[Hostile],
+      collectables: Batch[Collectable]
   ): GameMap =
     GameMap(
       size,
-      List.fill(size.width * size.height)(None).toJSArray,
-      Nil,
+      Batch.fill(size.width * size.height)(None),
+      Batch.empty,
       Set(),
       HostilesManager(hostiles),
       collectables
     )
 
   def gen(size: Size, dungeon: Dungeon): GameMap =
-    initial(size, dungeon.hostiles, dungeon.collectables).insert(
-      dungeon.positionedTiles
+    initial(
+      size,
+      Batch.fromList(dungeon.hostiles),
+      Batch.fromList(dungeon.collectables)
+    ).insert(
+      dungeon.positionedTiles.toBatch
     )
 
   def calculateFOV(
       radius: Int,
       center: Point,
       gameMap: GameMap
-  ): List[Point] =
+  ): Batch[Point] =
     val bounds: Rectangle =
       Rectangle(
         (center - radius).max(0),
@@ -221,9 +221,9 @@ object GameMap:
 
     @tailrec
     def visibleTiles(
-        remaining: js.Array[Point],
-        acc: List[Point]
-    ): List[Point] =
+        remaining: Batch[Point],
+        acc: Batch[Point]
+    ): Batch[Point] =
       remaining match
         case l if l.isEmpty =>
           acc
@@ -241,15 +241,15 @@ object GameMap:
             )
           else visibleTiles(l.tail, acc)
 
-    visibleTiles(tiles.map(_._2), Nil)
+    visibleTiles(tiles.map(_._2), Batch.empty)
 
   def getPathTo(
       dice: Dice,
       from: Point,
       to: Point,
-      additionalBlocked: List[Point],
+      additionalBlocked: Batch[Point],
       gameMap: GameMap
-  ): List[Point] =
+  ): Batch[Point] =
     val area = Rectangle.fromPoints(from, to).expand(2)
     val filter: (GameTile, Point) => Boolean = (tile, _) =>
       tile match
@@ -269,18 +269,18 @@ object GameMap:
       dice: Dice,
       from: Point,
       to: Point,
-      walkable: js.Array[Point],
+      walkable: Batch[Point],
       area: Rectangle
-  ): List[Point] =
+  ): Batch[Point] =
     PathFinder
-      .fromWalkable(area.size, walkable.map(_ - area.position).toList)
+      .fromWalkable(area.size, walkable.map(_ - area.position))
       .locatePath(dice, from - area.position, to - area.position, _ => 1)
       .map(_ + area.position)
 
   def searchByBoundsWithPosition(
       gameMap: GameMap,
       bounds: Rectangle
-  ): js.Array[(Point, GameTile)] =
+  ): Batch[(Point, GameTile)] =
     gameMap.tileMap.zipWithIndex.collect {
       case (Some(tile), index)
           if bounds.contains(Indices.indexToPoint(index, gameMap.size.width)) =>

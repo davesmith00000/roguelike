@@ -33,11 +33,11 @@ sealed trait Hostile extends Entity:
         .markAsDead(if f.hp > 0 then false else true)
     ).addGlobalEvents(
       if f.hp <= 0 then
-        List(
+        Batch(
           GameEvent.Log(Message(s"You killed a $name", ColorScheme.enemyDie)),
           GameEvent.HostileGiveXP(xpGiven)
         )
-      else Nil
+      else Batch.empty
     )
 
 object Hostile:

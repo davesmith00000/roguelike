@@ -30,7 +30,7 @@ final case class Model(
     loadInfo: GameLoadInfo,
     currentFloor: Int,
     gamePhase: GamePhase,
-    autoMovePath: List[Point]
+    autoMovePath: Batch[Point]
 ):
   def entitiesList: js.Array[Entity] =
     gameMap.entitiesList
@@ -344,11 +344,11 @@ final case class Model(
       val p = player.takeDamage(damage)
 
       val msgs =
-        if p.isAlive then List(attackMessage)
+        if p.isAlive then Batch(attackMessage)
         else
           GameEvent.Log(
             Message("You died!", ColorScheme.playerDie)
-          ) :: attackMessage :: Nil
+          ) :: attackMessage :: Batch.empty
 
       Outcome(
         this.copy(
@@ -459,28 +459,30 @@ final case class Model(
 
     case GameEvent.PlayerMoveTowards(target) =>
       if autoMovePath.isEmpty then
-        gameMap.getPathTo(dice, player.position, target, Nil) match
-          case _ :: next :: remaining =>
-            performPlayerTurn(dice, next - player.position).map {
-              _.copy(
-                autoMovePath = remaining
-              )
-            }
-
-          case _ =>
-            Outcome(
-              this.copy(
-                autoMovePath = Nil
-              )
-            ).addGlobalEvents(
-              GameEvent.Log(
-                Message("No valid move found.", ColorScheme.invalid)
-              )
+        val p =
+          gameMap.getPathTo(dice, player.position, target, Batch.empty).tail
+        if p.nonEmpty then
+          val next      = p.head
+          val remaining = p.tail
+          performPlayerTurn(dice, next - player.position).map {
+            _.copy(
+              autoMovePath = remaining
             )
+          }
+        else
+          Outcome(
+            this.copy(
+              autoMovePath = Batch.empty
+            )
+          ).addGlobalEvents(
+            GameEvent.Log(
+              Message("No valid move found.", ColorScheme.invalid)
+            )
+          )
       else
         Outcome(
           this.copy(
-            autoMovePath = Nil
+            autoMovePath = Batch.empty
           )
         ).addGlobalEvents(
           GameEvent.Log(
@@ -489,22 +491,19 @@ final case class Model(
         )
 
     case GameEvent.PlayerContinueMove =>
-      autoMovePath match
-        case Nil =>
-          Outcome(this)
-
-        case next :: remaining =>
-          performPlayerTurn(dice, next - player.position).map {
-            _.copy(
-              autoMovePath = remaining
-            )
-          }
+      if autoMovePath.isEmpty then Outcome(this)
+      else
+        performPlayerTurn(dice, autoMovePath.head - player.position).map {
+          _.copy(
+            autoMovePath = autoMovePath.tail
+          )
+        }
 
     case GameEvent.NPCTurnComplete =>
       if gameMap.noHostilesVisible then
         val events =
-          if autoMovePath.isEmpty then List(GameEvent.Redraw)
-          else List(GameEvent.Redraw, GameEvent.PlayerContinueMove)
+          if autoMovePath.isEmpty then Batch(GameEvent.Redraw)
+          else Batch(GameEvent.Redraw, GameEvent.PlayerContinueMove)
 
         Outcome(this.copy(gamePhase = GamePhase.WaitForInput))
           .addGlobalEvents(events)
@@ -512,7 +511,7 @@ final case class Model(
         Outcome(
           this.copy(
             gamePhase = GamePhase.WaitForInput,
-            autoMovePath = Nil
+            autoMovePath = Batch.empty
           )
         ).addGlobalEvents(GameEvent.Redraw)
 
@@ -597,7 +596,7 @@ object Model:
       p,
       Point.zero,
       Point.zero,
-      GameMap.initial(screenSize, Nil, Nil),
+      GameMap.initial(screenSize, Batch.empty, Batch.empty),
       MessageLog.DefaultLimited,
       false,
       GameState.Game,
@@ -605,7 +604,7 @@ object Model:
       GameLoadInfo.initial,
       0,
       GamePhase.WaitForInput,
-      Nil
+      Batch.empty
     )
 
   def fromSaveData(saveData: ModelSaveData): Model =
@@ -651,7 +650,7 @@ object Model:
           GameLoadInfo.initial,
           0,
           GamePhase.WaitForInput,
-          Nil
+          Batch.empty
         )
       }
 

@@ -1,6 +1,7 @@
 package roguelike.model.entity
 
 import indigo.*
+import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.model.Message
@@ -59,11 +60,11 @@ object RangedHelper:
 
   def useFireballScroll(
       player: Player,
-      hostilesInRange: List[Hostile]
+      hostilesInRange: Batch[Hostile]
   ): Outcome[Boolean] =
     val events =
       hostilesInRange.flatMap { h =>
-        List(
+        Batch(
           GameEvent.Log(
             Message(
               s"The ${h.name} is engulfed in a fiery explosion, taking ${Ranged.FireballScroll.damage} damage!",
@@ -76,7 +77,7 @@ object RangedHelper:
             h.id
           )
         )
-      }.toList
+      }
 
     Outcome(true)
       .addGlobalEvents(events)

@@ -4,14 +4,15 @@ import indigo.Dice
 import indigo.Point
 import indigo.Rectangle
 import indigo.Size
+import indigo.shared.collections.Batch
 
 import scalajs.js
 import scalajs.js.JSConverters._
 
 class GameMapTests extends munit.FunSuite {
 
-  val walkable: js.Array[Point] =
-    List(
+  val walkable =
+    Batch(
       Point(4, 6),
       Point(3, 6),
       Point(4, 5),
@@ -38,7 +39,7 @@ class GameMapTests extends munit.FunSuite {
       Point(3, 0),
       Point(2, 1),
       Point(2, 0)
-    ).map(_ + Point(17, 21)).toJSArray
+    ).map(_ + Point(17, 21))
 
   test("getWalkablePathTo") {
     val actual =
@@ -68,13 +69,13 @@ class GameMapTests extends munit.FunSuite {
         )
       )
 
-    assert(possiblePaths.contains(actual))
+    assert(possiblePaths.contains(actual.toList))
   }
 
   test("searchByBoundsWithPosition - empty") {
     val mapSize = Size(10)
     val bounds  = Rectangle(1, 1, 3, 3)
-    val gameMap = GameMap.initial(mapSize, Nil, Nil)
+    val gameMap = GameMap.initial(mapSize, Batch.empty, Batch.empty)
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
@@ -90,7 +91,7 @@ class GameMapTests extends munit.FunSuite {
     val bounds  = Rectangle(1, 1, 3, 3)
 
     val gameMap =
-      GameMap.initial(mapSize, Nil, Nil)
+      GameMap.initial(mapSize, Batch.empty, Batch.empty)
         .insert(Point(1, 1), GameTile.Wall)
 
     val actual =
@@ -114,7 +115,7 @@ class GameMapTests extends munit.FunSuite {
 |_|_|X|_|X|
 */
     val gameMap =
-      GameMap.initial(mapSize, Nil, Nil)
+      GameMap.initial(mapSize, Batch.empty, Batch.empty)
         .insert(Point(0, 0), GameTile.Wall) // Out
         .insert(Point(0, 2), GameTile.Wall) // Out
         .insert(Point(1, 3), GameTile.Wall) // In

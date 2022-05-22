@@ -1,9 +1,7 @@
 package roguelike.model
 
-import indigo.shared.Outcome
-import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.Rectangle
-import indigo.shared.dice.Dice
+import indigo.*
+import indigo.syntax.*
 import roguelike.GameEvent
 import roguelike.model.entity.Hostile
 
@@ -11,7 +9,7 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-final case class HostilesManager(hostiles: List[Hostile]):
+final case class HostilesManager(hostiles: Batch[Hostile]):
 
   lazy val toJSArray: scalajs.js.Array[Hostile] =
     hostiles.toJSArray
@@ -40,7 +38,7 @@ final case class HostilesManager(hostiles: List[Hostile]):
           if dist < closestDistance then rec(xs, dist, Option(x))
           else rec(xs, closestDistance, acc)
 
-    rec(hostiles, maxDistance, None)
+    rec(hostiles.toList, maxDistance, None)
 
   def existsAt(position: Point): Boolean =
     hostiles.exists(_.position == position)
@@ -90,14 +88,14 @@ final case class HostilesManager(hostiles: List[Hostile]):
       playerPosition: Point,
       pause: Boolean,
       tileMap: GameMap,
-      newVisible: List[Point]
+      newVisible: Batch[Point]
   ): Outcome[HostilesManager] =
     @tailrec
     def rec(
         remaining: List[Hostile],
-        events: List[GameEvent],
-        acc: List[Hostile]
-    ): Outcome[List[Hostile]] =
+        events: Batch[GameEvent],
+        acc: Batch[Hostile]
+    ): Outcome[Batch[Hostile]] =
       remaining match
         case Nil =>
           Outcome(acc).addGlobalEvents(events)
@@ -119,8 +117,8 @@ final case class HostilesManager(hostiles: List[Hostile]):
         case x :: xs =>
           // Otherwise, move a little closer...
           val entityPositions =
-            (xs ++ acc).flatMap(e =>
-              if e.blocksMovement then List(e.position) else Nil
+            (xs.toBatch ++ acc).flatMap(e =>
+              if e.blocksMovement then Batch(e.position) else Batch.empty
             )
           val path =
             GameMap.getPathTo(
@@ -140,7 +138,7 @@ final case class HostilesManager(hostiles: List[Hostile]):
               rec(xs, events, x :: acc)
 
     if !pause then
-      val res = rec(hostiles, Nil, Nil)
+      val res = rec(hostiles.toList, Batch.empty, Batch.empty)
       res.map(hs => this.copy(hostiles = hs))
     else Outcome(this)
 

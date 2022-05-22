@@ -1,6 +1,7 @@
 package roguelike.game
 
-import indigo._
+import indigo.*
+import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameGraphics
@@ -33,7 +34,7 @@ object SceneView:
       viewModel: GameViewModel
   ): SceneUpdateFragment =
 
-    val gameGridData: Array[CloneTileData] =
+    val gameGridData: Batch[CloneTileData] =
       viewModel.tiles
         .map(p =>
           p._1 match
@@ -55,19 +56,19 @@ object SceneView:
             case GameTile.DownStairs =>
               GameGraphics.stairsInShadowTile(p._2 * viewModel.squareSize)
         )
-        .toArray
+        .toBatch
 
-    val gameGrid: List[CloneTiles] =
-      List(CloneTiles(GameGraphics.tileClone.id, gameGridData))
+    val gameGrid: Batch[CloneTiles] =
+      Batch(CloneTiles(GameGraphics.tileClone.id, gameGridData))
 
     val hover =
-      List(
+      Batch(
         GameGraphics.highlight
           .moveTo(viewModel.hoverSquare * viewModel.squareSize)
       )
 
-    val collectables: List[SceneNode] =
-      viewModel.collectables.map { collectable =>
+    val collectables: Batch[SceneNode] =
+      viewModel.collectables.toBatch.map { collectable =>
         collectable.item match
           case Ranged.LightningScroll =>
             GameGraphics.lightningScroll
@@ -102,7 +103,7 @@ object SceneView:
           case Melee.Sword =>
             GameGraphics.sword
               .moveTo(collectable.position * viewModel.squareSize)
-      }.toList
+      }
 
     val hostilesAndHealthBars: List[(SceneNode, List[SceneNode])] =
       viewModel.hostiles.map { hostile =>
@@ -160,8 +161,8 @@ object SceneView:
         )
       }.toList
 
-    val player: List[Shape.Circle] =
-      List(
+    val player: Batch[Shape.Circle] =
+      Batch(
         Shape.Circle(
           viewModel.playerPosition.display,
           (viewModel.squareSize.x / 2.5).toInt,
@@ -170,10 +171,10 @@ object SceneView:
         )
       )
 
-    val lookAround: List[SceneNode] =
+    val lookAround: Batch[SceneNode] =
       model.currentState match
         case GameState.LookAround(_) =>
-          List(
+          Batch(
             GameGraphics.target.moveTo(
               model.lookAtTarget * viewModel.squareSize
             ),
@@ -185,10 +186,10 @@ object SceneView:
           )
 
         case _ =>
-          Nil
+          Batch.empty
 
-    val hostiles   = hostilesAndHealthBars.map(_._1)
-    val healthBars = hostilesAndHealthBars.map(_._2).flatten
+    val hostiles   = hostilesAndHealthBars.toBatch.map(_._1)
+    val healthBars = hostilesAndHealthBars.map(_._2).flatten.toBatch
 
     val camera =
       model.currentState match

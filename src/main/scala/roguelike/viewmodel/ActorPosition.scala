@@ -39,7 +39,7 @@ final case class ActorPosition(
       modelPosition == target && time >= ActorPosition.DefaultMoveDuration && (next ~== target.toVector)
 
     val events =
-      if moveIsComplete then List(onCompleteEvent) else Nil
+      if moveIsComplete then Batch(onCompleteEvent) else Batch.empty
 
     Outcome(
       this.copy(
@@ -47,8 +47,9 @@ final case class ActorPosition(
         target = modelPosition,
         precise = next,
         travelTime = time
-      )
-    ).addGlobalEvents(events)
+      ),
+      events
+    )
 
 object ActorPosition:
   val DefaultMoveDuration: Seconds = Seconds(0.2)

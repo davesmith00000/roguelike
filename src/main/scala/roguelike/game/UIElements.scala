@@ -1,6 +1,7 @@
 package roguelike.game
 
-import indigo._
+import indigo.*
+import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.ColorScheme
@@ -19,7 +20,7 @@ import roguelike.model.gamedata.KeyMapping
 import roguelike.model.gamedata.Melee
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 object UIElements:
 
@@ -61,7 +62,7 @@ object UIElements:
       TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Red)
     )
 
-  val letters: List[String]             = ('a' to 'z').toList.map(_.toString)
+  val letters: Batch[String]             = ('a' to 'z').toBatch.map(_.toString)
   val letterPositions: Map[String, Int] = letters.zipWithIndex.toMap
 
   def renderBar(player: Player, totalWidth: Int, position: Point): Group =
@@ -122,16 +123,16 @@ object UIElements:
             tt.withText(entity.name.capitalize)
               .moveTo(Point(0, row * squareHeight) + offset)
         }
-        .toList
+        .toBatch
 
     val stairs =
       if hoverSquare == stairsPosition then
-        List(
+        Batch(
           toolTipNeutral
             .withText("Down stairs.")
             .moveTo(Point(0, tips.length * squareHeight) + offset)
         )
-      else Nil
+      else Batch.empty
 
     Group(tips ++ stairs)
 
