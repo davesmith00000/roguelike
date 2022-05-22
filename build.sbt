@@ -88,6 +88,7 @@ lazy val roguelike =
           "buildGameFull",
           "Build the fully optimised web version"
         ),
+        UsefulTask("p", "publishGame", "Publish game to ghpages"),
         UsefulTask("c", "code", "Launch VSCode"),
         UsefulTask("o", "oni2", "Launch Onivim 2")
       ),
