@@ -18,7 +18,7 @@ import roguelike.model.gamedata.Ranged
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
 
-object SceneView:
+object GameView:
 
   def present(
       context: FrameContext[Size],

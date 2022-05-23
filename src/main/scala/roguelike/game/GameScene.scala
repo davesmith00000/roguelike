@@ -44,4 +44,4 @@ object GameScene extends Scene[Size, Model, ViewModel]:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    SceneView.present(context, model, viewModel)
+    GameView.present(context, model, viewModel)
