@@ -114,7 +114,7 @@ final case class GameViewModel(
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
         this.copy(
-          playerPosition = ActorPosition.initial(
+          playerPosition = ActorPosition(
             model.player.position,
             GameViewModel.SquareSize
           )
@@ -167,7 +167,7 @@ object GameViewModel:
       viewportSize = initialViewportSize,
       squareSize = SquareSize,
       visibleGridSize = initialViewportSize / SquareSize.toSize,
-      playerPosition = ActorPosition.initial(player.position, SquareSize),
+      playerPosition = ActorPosition(player.position, SquareSize),
       lookAtPosition = Point.zero,
       hoverSquare = Point.zero,
       tiles = js.Array(),
@@ -223,7 +223,6 @@ object GameViewModel:
             .next(
               context.delta,
               model.player.position,
-              viewModel.squareSize,
               GameEvent.ViewModelPhaseComplete(
                 ViewModelEvent.PlayerMoveComplete
               )

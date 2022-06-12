@@ -29,9 +29,9 @@ lazy val roguelike =
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
       libraryDependencies ++= Seq(
-        "io.indigoengine" %%% "indigo-json-circe"    % "0.12.2-SNAPSHOT",
-        "io.indigoengine" %%% "indigo"               % "0.12.2-SNAPSHOT",
-        "io.indigoengine" %%% "indigo-extras"        % "0.12.2-SNAPSHOT",
+        "io.indigoengine" %%% "indigo-json-circe"    % "0.13.0",
+        "io.indigoengine" %%% "indigo"               % "0.13.0",
+        "io.indigoengine" %%% "indigo-extras"        % "0.13.0",
         "io.indigoengine" %%% "roguelike-starterkit" % "0.1.0-SNAPSHOT"
       ),
       scalafixOnCompile := true,

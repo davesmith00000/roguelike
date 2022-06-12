@@ -4,39 +4,54 @@ import indigo._
 import roguelike.GameEvent
 import roguelike.model.GamePhase
 
+/** ActorPosition is a view model helper to track the position actors should be
+  * rendered at on the screen.
+  * @param current
+  *   current position in pixels
+  * @param target
+  *   target position in pixels
+  * @param precise
+  *   is the precise position in sub-pixels, used to avoid lumpy movement
+  * @param travelTimeTaken
+  *   Amount of time this move has taken so far
+  * @param squareSize
+  *   Size of a tile in pixels
+  */
 final case class ActorPosition(
     current: Point,
     target: Point,
     precise: Vector2,
-    travelTime: Seconds
+    travelTimeTaken: Seconds,
+    squareSize: Point,
+    animationDuration: Seconds
 ):
-  val display: Point =
+  lazy val display: Point =
     if precise ~== target.toVector then target else precise.toPoint
 
-  // TODO: Write tests. Feels odd.
   def next(
       timeDelta: Seconds,
-      position: Point,
-      squareSize: Point,
+      gridDestination: Point,
       onCompleteEvent: GlobalEvent
   ): Outcome[ActorPosition] =
-    val modelPosition = (position * squareSize) + (squareSize.x / 2)
-    val elapsedTime   = travelTime + timeDelta
+    val destinationPosition =
+      ActorPosition.modelToMapSpaceTileCentered(gridDestination, squareSize)
+
+    val elapsedTime = travelTimeTaken + timeDelta
     val time =
-      if modelPosition == target then
-        if elapsedTime > ActorPosition.DefaultMoveDuration then
-          ActorPosition.DefaultMoveDuration
+      if destinationPosition == target then
+        if elapsedTime > animationDuration then
+          animationDuration
         else elapsedTime
       else Seconds.zero
 
     val next = ActorPosition.moveTowardsTarget(
       this,
-      travelTime,
-      ActorPosition.DefaultMoveDuration
+      travelTimeTaken,
+      animationDuration
     )
 
     val moveIsComplete =
-      modelPosition == target && time >= ActorPosition.DefaultMoveDuration && (next ~== target.toVector)
+      destinationPosition == target && time >= animationDuration && (next ~== target.toVector)
 
     val events =
       if moveIsComplete then Batch(onCompleteEvent) else Batch.empty
@@ -44,9 +59,9 @@ final case class ActorPosition(
     Outcome(
       this.copy(
         current = if moveIsComplete then target else current,
-        target = modelPosition,
+        target = destinationPosition,
         precise = next,
-        travelTime = time
+        travelTimeTaken = time
       ),
       events
     )
@@ -54,14 +69,25 @@ final case class ActorPosition(
 object ActorPosition:
   val DefaultMoveDuration: Seconds = Seconds(0.2)
 
-  def initial(mapPosition: Point, squareSize: Point): ActorPosition =
-    val modelPosition = (mapPosition * squareSize) + (squareSize.x / 2)
+  def apply(mapPosition: Point, squareSize: Point): ActorPosition =
+    initial(mapPosition, squareSize, DefaultMoveDuration)
+
+  def apply(mapPosition: Point, squareSize: Point, animationDuration: Seconds): ActorPosition =
+    initial(mapPosition, squareSize, animationDuration)
+
+  def initial(mapPosition: Point, squareSize: Point, animationDuration: Seconds): ActorPosition =
+    val modelPosition = modelToMapSpaceTileCentered(mapPosition, squareSize)
     ActorPosition(
       modelPosition,
       modelPosition,
       modelPosition.toVector,
-      DefaultMoveDuration
+      Seconds.zero,
+      squareSize,
+      animationDuration
     )
+
+  def modelToMapSpaceTileCentered(position: Point, squareSize: Point): Point =
+    (position * squareSize) + (squareSize.x / 2)
 
   def moveTowardsTarget(
       actorPosition: ActorPosition,
