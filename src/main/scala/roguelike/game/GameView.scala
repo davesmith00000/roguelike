@@ -6,6 +6,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameGraphics
 import roguelike.RogueLikeGame
+import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
 import roguelike.model.Model
@@ -230,50 +231,51 @@ object GameView:
     SceneUpdateFragment(
       Layer(
         RogueLikeGame.layerKeyUi,
-        UIElements.renderMiniMap(vpSize, viewModel.miniMap),
-        UIElements.renderBar(
-          model.player,
-          20,
-          Point(0, vpSize.height - 40)
-        ),
-        UIElements.renderLevel(
-          Point(0, vpSize.height - 20),
-          model.currentFloor
-        ),
-        UIElements.renderCharacterInfo(model.player),
-        UIElements.renderControls(
-          vpSize,
-          viewModel.helpControlsText
-        ),
-        UIElements.renderNameHints(
-          viewModel.squareSize,
-          context.mouse.position,
-          model.gameMap.entitiesList,
-          model.stairsPosition,
-          viewModel.hoverSquare
-        ),
-        UIElements.levelUpMenu(
-          model.currentState,
-          model.player.fighter,
-          vpSize
-        ),
-        UIElements.inventory(
-          model.currentState,
-          model.player.inventory,
-          model.player.equipment,
-          vpSize
-        ),
-        UIElements.dropMenu(
-          model.currentState,
-          model.player.inventory,
-          vpSize
-        ),
-        UIElements.equipMenu(
-          model.currentState,
-          model.player.equipment,
-          vpSize
-        ),
-        UIElements.quitMenu(model.currentState, vpSize)
+        Batch(
+          UIElements.renderMiniMap(vpSize, viewModel.miniMap),
+          UIElements.renderBar(
+            model.player,
+            20,
+            Point(0, vpSize.height - 40)
+          ),
+          UIElements.renderLevel(
+            Point(0, vpSize.height - 20),
+            model.currentFloor
+          ),
+          UIElements.renderCharacterInfo(model.player),
+          UIElements.renderControls(
+            vpSize,
+            viewModel.helpControlsText
+          ),
+          UIElements.renderNameHints(
+            viewModel.squareSize,
+            context.mouse.position,
+            model.gameMap.entitiesList,
+            model.stairsPosition,
+            viewModel.hoverSquare
+          ),
+          UIElements.levelUpMenu(
+            model.currentState,
+            model.player.fighter,
+            vpSize
+          ),
+          UIElements.inventory(
+            model.currentState,
+            model.player.inventory,
+            model.player.equipment,
+            vpSize
+          ),
+          UIElements.dropMenu(
+            model.currentState,
+            model.player.inventory,
+            vpSize
+          ),
+          UIElements.equipMenu(
+            model.currentState,
+            model.player.equipment,
+            vpSize
+          )
+        ) ++ WindowManager.present(model, viewModel)
       )
     ) |+| UIElements
       .historyViewer(

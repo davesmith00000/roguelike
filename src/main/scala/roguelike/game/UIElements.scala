@@ -199,36 +199,6 @@ object UIElements:
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
 
-  def quitMenu(gameState: GameState, viewportSize: Size): Group =
-    gameState match
-      case GameState.Quit =>
-        val text =
-          s"""Quit to main menu?
-          |
-          |[1] Save
-          |[2] Save and Quit
-          |[3] Quit
-          |""".stripMargin
-
-        val windowSize = Size(300, 150)
-
-        Group(
-          Shape.Box(
-            Rectangle(Point.zero, windowSize),
-            Fill.Color(RGBA.Black),
-            Stroke(2, RGBA.Blue)
-          ),
-          Text(
-            text,
-            RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
-          )
-            .moveTo(5, 5)
-        ).moveTo(((viewportSize - windowSize) / 2).toPoint)
-
-      case _ =>
-        Group.empty
-
   def levelUpMenu(
       gameState: GameState,
       playerFigher: Fighter,

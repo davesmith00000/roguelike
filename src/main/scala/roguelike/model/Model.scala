@@ -6,6 +6,8 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
+import roguelike.components.windows.ActiveWindow
+import roguelike.components.windows.WindowManager
 import roguelike.model.entity._
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
@@ -30,7 +32,8 @@ final case class Model(
     loadInfo: GameLoadInfo,
     currentFloor: Int,
     gamePhase: GamePhase,
-    autoMovePath: Batch[Point]
+    autoMovePath: Batch[Point],
+    windowManager: ActiveWindow
 ):
   def entitiesList: js.Array[Entity] =
     gameMap.entitiesList
@@ -72,12 +75,6 @@ final case class Model(
       currentState =
         if show then GameState.LookAround(radius) else GameState.Game,
       lookAtTarget = player.position
-    )
-
-  def toggleQuit: Model =
-    val show = !currentState.showingQuit
-    this.copy(
-      currentState = if show then GameState.Quit else GameState.Game
     )
 
   def toggleLevelUp: Model =
@@ -604,7 +601,8 @@ object Model:
       GameLoadInfo.initial,
       0,
       GamePhase.WaitForInput,
-      Batch.empty
+      Batch.empty,
+      WindowManager.initialModel
     )
 
   def fromSaveData(saveData: ModelSaveData): Model =
@@ -650,7 +648,8 @@ object Model:
           GameLoadInfo.initial,
           0,
           GamePhase.WaitForInput,
-          Batch.empty
+          Batch.empty,
+          WindowManager.initialModel
         )
       }
 
