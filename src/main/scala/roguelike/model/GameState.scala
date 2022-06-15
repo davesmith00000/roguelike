@@ -3,14 +3,13 @@ package roguelike.model
 import indigo._
 
 enum GameState:
-  case Game                    extends GameState
-  case History                 extends GameState
-  case Inventory               extends GameState
-  case Equipment               extends GameState
-  case Drop                    extends GameState
-  case LookAround(radius: Int) extends GameState
-  case Quit                    extends GameState
-  case LevelUp                 extends GameState
+  case Game
+  case History
+  case Inventory
+  case Equipment
+  case Drop
+  case LookAround(radius: Int)
+  case LevelUp
 
   def showingHistory: Boolean =
     this match
@@ -41,11 +40,6 @@ enum GameState:
     this match
       case GameState.LookAround(_) => true
       case _                       => false
-
-  def showingQuit: Boolean =
-    this match
-      case GameState.Quit => true
-      case _              => false
 
   def showingLevelUp: Boolean =
     this match

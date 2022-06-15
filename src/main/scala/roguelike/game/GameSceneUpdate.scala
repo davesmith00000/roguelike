@@ -5,6 +5,7 @@ import indigo.scenes.SceneEvent
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.MainMenuScene
+import roguelike.components.windows.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.GamePhase
 import roguelike.model.Message
@@ -30,34 +31,18 @@ object GameSceneUpdate:
     // Window close keys
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
         if !model.currentState.isRunning || !model.currentState.showingLevelUp =>
-      Outcome(model.closeAllWindows)
+      WindowManager
+        .updateModel(model, WindowManagerCommand.CloseAll)
+        .map(_.closeAllWindows)
 
-    // Quit window
-    // Save
-    case KeyboardEvent.KeyUp(Key.KEY_1)
-        if model.currentState.showingQuit && model.player.isAlive =>
-      val saveData = model.toSaveData
-      Outcome(model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)))
-        .addGlobalEvents(
-          StorageEvent.Save(
-            ModelSaveData.saveKey,
-            model.toSaveData.toJsonString
-          )
-        )
+    // Quit window toggle
+    case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
+        KeyboardEvent.KeyUp(KeyMapping.Quit2) if model.currentState.isRunning =>
+      WindowManager.updateModel(model, WindowManagerCommand.HandleQuitKeyPress)
 
-    // Save and Quit
-    case KeyboardEvent.KeyUp(Key.KEY_2)
-        if model.currentState.showingQuit && model.player.isAlive =>
-      val saveData = model.toSaveData
-      Outcome(model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)))
-        .addGlobalEvents(
-          StorageEvent.Save(ModelSaveData.saveKey, saveData.toJsonString),
-          SceneEvent.JumpTo(MainMenuScene.name)
-        )
-
-    // Quit
-    case KeyboardEvent.KeyUp(Key.KEY_3) if model.currentState.showingQuit =>
-      Outcome(model).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+    // Delegate input to WindowManager
+    case KeyboardEvent.KeyUp(key) if WindowManager.showingWindow(model) =>
+      WindowManager.updateModel(model, WindowManagerCommand.DelegateInput(key))
 
     // Level up window
     // Constitution
@@ -208,11 +193,6 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
         if model.currentState.isRunning || model.currentState.showingDropMenu =>
       Outcome(model.toggleDropMenu)
-
-    case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
-        KeyboardEvent.KeyUp(KeyMapping.Quit2)
-        if model.currentState.isRunning || model.currentState.showingQuit =>
-      Outcome(model.toggleQuit)
 
     // Look Around
     case KeyboardEvent.KeyUp(KeyMapping.LookAround)
