@@ -258,11 +258,6 @@ object GameView:
             model.currentState,
             model.player.inventory,
             vpSize
-          ),
-          UIElements.equipMenu(
-            model.currentState,
-            model.player.inventory.equipment,
-            vpSize
           )
         ) ++ WindowManager.present(model, viewModel)
       )

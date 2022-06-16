@@ -6,7 +6,6 @@ enum GameState:
   case Game
   case History
   case Inventory
-  case Equipment
   case LookAround(radius: Int)
   case ShowingWindow
 
@@ -18,11 +17,6 @@ enum GameState:
   def showingInventory: Boolean =
     this match
       case GameState.Inventory => true
-      case _                   => false
-
-  def showingEquipment: Boolean =
-    this match
-      case GameState.Equipment => true
       case _                   => false
 
   def isRunning: Boolean =
