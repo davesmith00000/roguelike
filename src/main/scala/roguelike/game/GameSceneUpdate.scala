@@ -77,17 +77,6 @@ object GameSceneUpdate:
         case _ =>
           Outcome(model)
 
-    // Drop window
-    case KeyboardEvent.KeyUp(key) if model.currentState.showingDropMenu =>
-      UIElements.letterPositions.get(key.key) match
-        case None =>
-          Outcome(model)
-
-        case Some(keyIndex) =>
-          model.player
-            .drop(keyIndex, model.gameMap.collectables)
-            .map(p => model.copy(player = p))
-
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
         if model.currentState.lookingAround =>
@@ -159,8 +148,9 @@ object GameSceneUpdate:
       Outcome(model.toggleEquipment)
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
-        if model.currentState.isRunning || model.currentState.showingDropMenu =>
-      Outcome(model.toggleDropMenu)
+        if model.currentState.isRunning ||
+          !WindowManager.showingWindow(model) =>
+      WindowManager.updateModel(model, WindowManagerCommand.ShowDropMenu)
 
     // Look Around
     case KeyboardEvent.KeyUp(KeyMapping.LookAround)

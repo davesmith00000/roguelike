@@ -259,11 +259,6 @@ object GameView:
             model.player.inventory,
             vpSize
           ),
-          UIElements.dropMenu(
-            model.currentState,
-            model.player.inventory,
-            vpSize
-          ),
           UIElements.equipMenu(
             model.currentState,
             model.player.inventory.equipment,

@@ -7,7 +7,6 @@ enum GameState:
   case History
   case Inventory
   case Equipment
-  case Drop
   case LookAround(radius: Int)
   case ShowingWindow
 
@@ -25,11 +24,6 @@ enum GameState:
     this match
       case GameState.Equipment => true
       case _                   => false
-
-  def showingDropMenu: Boolean =
-    this match
-      case GameState.Drop => true
-      case _              => false
 
   def isRunning: Boolean =
     this match

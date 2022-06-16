@@ -14,7 +14,7 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameViewModel
 
 object QuitMenu extends Component[Model, Size]:
-  type Command            = QuitMenu.HandleInput
+  type Command            = HandleInput
   type ComponentModel     = Model
   type ComponentViewModel = Size
 

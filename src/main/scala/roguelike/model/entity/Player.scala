@@ -37,23 +37,6 @@ final case class Player(
   def removeInventoryItem(inventoryItemAt: Int): Outcome[Player] =
     Outcome(this.copy(inventory = inventory.remove(inventoryItemAt)))
 
-  def drop(
-      inventoryItemAt: Int,
-      worldCollectables: Batch[Collectable]
-  ): Outcome[Player] =
-    if worldCollectables.exists(
-        _.position == position
-      ) && inventory.backpack.items.nonEmpty
-    then
-      Outcome(this)
-        .addGlobalEvents(
-          GameEvent.Log(Message("Cannot drop here.", ColorScheme.invalid))
-        )
-    else
-      inventory
-        .drop(inventoryItemAt, position)
-        .map(inv => this.copy(inventory = inv))
-
   def equip(newEquipment: Melee | Armour): Outcome[Player] =
     inventory.equip(newEquipment).map(i => this.copy(inventory = i))
 
