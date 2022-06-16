@@ -254,11 +254,6 @@ object GameView:
             model.stairsPosition,
             viewModel.hoverSquare
           ),
-          UIElements.levelUpMenu(
-            model.currentState,
-            model.player.fighter,
-            vpSize
-          ),
           UIElements.inventory(
             model.currentState,
             model.player.inventory,

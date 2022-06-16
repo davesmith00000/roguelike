@@ -9,7 +9,7 @@ enum GameState:
   case Equipment
   case Drop
   case LookAround(radius: Int)
-  case LevelUp
+  case ShowingWindow
 
   def showingHistory: Boolean =
     this match
@@ -40,8 +40,3 @@ enum GameState:
     this match
       case GameState.LookAround(_) => true
       case _                       => false
-
-  def showingLevelUp: Boolean =
-    this match
-      case GameState.LevelUp => true
-      case _                 => false

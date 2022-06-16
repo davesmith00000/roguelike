@@ -8,6 +8,7 @@ import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
+import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.entity._
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
@@ -45,6 +46,12 @@ final case class Model(
       currentState = GameState.Game
     )
 
+  def pauseForWindow: Model =
+    this.copy(
+      paused = true,
+      currentState = GameState.ShowingWindow
+    )
+
   def toggleMessageHistory: Model =
     val show = !currentState.showingHistory
     this.copy(
@@ -75,12 +82,6 @@ final case class Model(
       currentState =
         if show then GameState.LookAround(radius) else GameState.Game,
       lookAtTarget = player.position
-    )
-
-  def toggleLevelUp: Model =
-    val show = !currentState.showingLevelUp
-    this.copy(
-      currentState = if show then GameState.LevelUp else GameState.Game
     )
 
   def handleInventoryEvent(dice: Dice): InventoryEvent => Outcome[Model] = {
@@ -176,6 +177,9 @@ final case class Model(
   }
 
   def update(dice: Dice): GameEvent => Outcome[Model] =
+    case GameEvent.WindowEvent(command) =>
+      WindowManager.updateModel(this, command)
+
     case GameEvent.Log(message) =>
       Outcome(
         this.copy(
@@ -320,12 +324,14 @@ final case class Model(
     case GameEvent.HostileGiveXP(amount) =>
       player
         .addXp(amount)
+        .createGlobalEvents(p =>
+          if p.level > player.level then
+            Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
+          else Batch.empty
+        )
         .map { p =>
           this.copy(
-            player = p,
-            currentState =
-              if p.level > player.level then GameState.LevelUp
-              else GameState.Game
+            player = p
           )
         }
 

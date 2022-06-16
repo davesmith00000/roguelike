@@ -2,6 +2,7 @@ package roguelike
 
 import indigo.Point
 import indigo.shared.events.GlobalEvent
+import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
@@ -41,6 +42,7 @@ enum GameEvent extends GlobalEvent:
   case Redraw
   case RedrawHistoryLog
   case Targeted(position: Point)
+  case WindowEvent(command: WindowManagerCommand)
 
   // ViewModel events
   case CameraSnapToPlayer
