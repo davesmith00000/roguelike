@@ -253,11 +253,6 @@ object GameView:
             model.gameMap.entitiesList,
             model.stairsPosition,
             viewModel.hoverSquare
-          ),
-          UIElements.inventory(
-            model.currentState,
-            model.player.inventory,
-            vpSize
           )
         ) ++ WindowManager.present(model, viewModel)
       )
