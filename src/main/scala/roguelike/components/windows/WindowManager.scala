@@ -28,23 +28,32 @@ object WindowManager extends Component[Model, GameViewModel]:
       model: Model
   ): WindowManagerCommand => Outcome[Model] =
     case WindowManagerCommand.ShowQuit =>
-      Outcome(updateActive.set(model, ActiveWindow.Quit))
+      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.Quit))
+
+    case WindowManagerCommand.ShowLevelUp =>
+      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.LevelUp))
 
     case WindowManagerCommand.CloseAll =>
-      Outcome(updateActive.set(model, ActiveWindow.None))
+      Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
 
     case WindowManagerCommand.HandleQuitKeyPress =>
       model.windowManager match
         case ActiveWindow.Quit =>
-          Outcome(updateActive.set(model, ActiveWindow.None))
+          Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
 
         case ActiveWindow.None =>
-          Outcome(updateActive.set(model, ActiveWindow.Quit))
+          Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.Quit))
+
+        case _ =>
+          Outcome(model)
 
     case WindowManagerCommand.DelegateInput(key) =>
       model.windowManager match
         case ActiveWindow.Quit =>
           QuitMenu.updateModel(model, QuitMenu.HandleInput(key))
+
+        case ActiveWindow.LevelUp =>
+          LevelUp.updateModel(model, LevelUp.HandleInput(key))
 
         case ActiveWindow.None =>
           Outcome(model)
@@ -63,6 +72,9 @@ object WindowManager extends Component[Model, GameViewModel]:
       case ActiveWindow.Quit =>
         QuitMenu.present(model, viewModel)
 
+      case ActiveWindow.LevelUp =>
+        LevelUp.present(model, viewModel)
+
       case ActiveWindow.None =>
         Batch.empty
 
@@ -74,12 +86,26 @@ object WindowManager extends Component[Model, GameViewModel]:
       case ActiveWindow.None => false
       case _                 => true
 
+  def showingUnCloseableWindow(model: Model): Boolean =
+    showingWindow(model) && isUnCloseable(model)
+
+  def showingCloseableWindow(model: Model): Boolean =
+    showingWindow(model) && isCloseable(model)
+
+  def isCloseable(model: Model): Boolean =
+    modelLens.get(model).windowManager.closeable
+
+  def isUnCloseable(model: Model): Boolean =
+    !modelLens.get(model).windowManager.closeable
+
 enum WindowManagerCommand:
   case ShowQuit
+  case ShowLevelUp
   case CloseAll
   case HandleQuitKeyPress
   case DelegateInput(key: Key)
 
-enum ActiveWindow:
-  case None
-  case Quit
+enum ActiveWindow(val closeable: Boolean):
+  case None    extends ActiveWindow(true)
+  case Quit    extends ActiveWindow(true)
+  case LevelUp extends ActiveWindow(false)

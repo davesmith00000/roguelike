@@ -30,7 +30,8 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Window close keys
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
-        if !model.currentState.isRunning || !model.currentState.showingLevelUp =>
+        if !model.currentState.isRunning ||
+          WindowManager.showingCloseableWindow(model) =>
       WindowManager
         .updateModel(model, WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
@@ -43,39 +44,6 @@ object GameSceneUpdate:
     // Delegate input to WindowManager
     case KeyboardEvent.KeyUp(key) if WindowManager.showingWindow(model) =>
       WindowManager.updateModel(model, WindowManagerCommand.DelegateInput(key))
-
-    // Level up window
-    // Constitution
-    case KeyboardEvent.KeyUp(Key.KEY_1) if model.currentState.showingLevelUp =>
-      model.player
-        .increaseMaxHp(20)
-        .map { p =>
-          model.copy(player = p).toggleLevelUp
-        }
-
-    // Strength
-    case KeyboardEvent.KeyUp(Key.KEY_2) if model.currentState.showingLevelUp =>
-      model.player
-        .increasePower(1)
-        .map { p =>
-          model.copy(player = p).toggleLevelUp
-        }
-
-    // Agility
-    case KeyboardEvent.KeyUp(Key.KEY_3) if model.currentState.showingLevelUp =>
-      model.player
-        .increaseDefense(1)
-        .map { p =>
-          model.copy(player = p).toggleLevelUp
-        }
-
-    // Invalid level up selection
-    case KeyboardEvent.KeyUp(_) if model.currentState.showingLevelUp =>
-      Outcome(model).addGlobalEvents(
-        GameEvent.Log(
-          Message("Invalid, please press 1, 2, or 3.", ColorScheme.invalid)
-        )
-      )
 
     // Inventory window
     case KeyboardEvent.KeyUp(key) if model.currentState.showingInventory =>

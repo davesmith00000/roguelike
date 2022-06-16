@@ -199,42 +199,6 @@ object UIElements:
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
 
-  def levelUpMenu(
-      gameState: GameState,
-      playerFigher: Fighter,
-      viewportSize: Size
-  ): Group =
-    gameState match
-      case GameState.LevelUp =>
-        val text =
-          s"""Level Up!
-          |
-          |Congratulations! You level up!
-          |Select an attribute to increase.
-          |[1] Constitution (+20 HP, from ${playerFigher.maxHp})
-          |[2] Strength (+1 attack, from ${playerFigher.power})
-          |[3] Agility (+1 defense, from ${playerFigher.defense})
-          |""".stripMargin
-
-        val windowSize = Size(350, 100)
-
-        Group(
-          Shape.Box(
-            Rectangle(Point.zero, windowSize),
-            Fill.Color(RGBA.Black),
-            Stroke(2, RGBA.Magenta)
-          ),
-          Text(
-            text,
-            RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
-          )
-            .moveTo(5, 5)
-        ).moveTo(((viewportSize - windowSize) / 2).toPoint)
-
-      case _ =>
-        Group.empty
-
   def historyViewer(
       gameState: GameState,
       messageLog: MessageLog,
