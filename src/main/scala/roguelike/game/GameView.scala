@@ -262,7 +262,6 @@ object GameView:
           UIElements.inventory(
             model.currentState,
             model.player.inventory,
-            model.player.equipment,
             vpSize
           ),
           UIElements.dropMenu(
@@ -272,7 +271,7 @@ object GameView:
           ),
           UIElements.equipMenu(
             model.currentState,
-            model.player.equipment,
+            model.player.inventory.equipment,
             vpSize
           )
         ) ++ WindowManager.present(model, viewModel)

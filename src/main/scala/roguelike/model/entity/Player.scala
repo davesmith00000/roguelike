@@ -22,8 +22,7 @@ final case class Player(
     fighter: Fighter,
     inventory: Inventory,
     level: Int,
-    xp: Int,
-    equipment: Equipment
+    xp: Int
 ) extends Entity:
   val blocksMovement: Boolean = false
   val name: String            = "Player"
@@ -36,11 +35,7 @@ final case class Player(
       }
 
   def removeInventoryItem(inventoryItemAt: Int): Outcome[Player] =
-    inventory
-      .remove(inventoryItemAt)
-      .map { inv =>
-        this.copy(inventory = inv)
-      }
+    Outcome(this.copy(inventory = inventory.remove(inventoryItemAt)))
 
   def drop(
       inventoryItemAt: Int,
@@ -48,7 +43,7 @@ final case class Player(
   ): Outcome[Player] =
     if worldCollectables.exists(
         _.position == position
-      ) && inventory.items.nonEmpty
+      ) && inventory.backpack.items.nonEmpty
     then
       Outcome(this)
         .addGlobalEvents(
@@ -60,47 +55,50 @@ final case class Player(
         .map(inv => this.copy(inventory = inv))
 
   def equip(newEquipment: Melee | Armour): Outcome[Player] =
-    equipment.equip(newEquipment).map(e => this.copy(equipment = e))
+    inventory.equip(newEquipment).map(i => this.copy(inventory = i))
 
   def unequipArmour: Outcome[Player] =
-    equipment.unequipArmour.map(e => this.copy(equipment = e))
+    inventory.unequipArmour.map(i => this.copy(inventory = i))
 
   def unequipMelee: Outcome[Player] =
-    equipment.unequipWeapon.map(e => this.copy(equipment = e))
+    inventory.unequipWeapon.map(i => this.copy(inventory = i))
 
   /** Force player to take an item - used for swapping equipment
     */
   def take(item: Item): Outcome[Player] =
-    inventory.add(item).map { inv =>
-      this.copy(inventory = inv)
-    }
+    Outcome(
+      this.copy(inventory = inventory.add(item))
+    )
 
   def pickUp(
       worldCollectables: Batch[Collectable]
   ): Outcome[(Player, Batch[Collectable])] =
     worldCollectables.find(_.position == position) match
       case None =>
-        Outcome((this, worldCollectables))
-          .addGlobalEvents(GameEvent.Log(Message.thereIsNothingHereToPickUp))
+        Outcome(
+          (this, worldCollectables),
+          Batch(
+            GameEvent.Log(Message.thereIsNothingHereToPickUp)
+          )
+        )
 
-      case Some(collectable) if inventory.isFull =>
-        Outcome((this, worldCollectables))
-          .addGlobalEvents(
+      case Some(collectable) if inventory.backpack.isFull =>
+        Outcome(
+          (this, worldCollectables),
+          Batch(
             GameEvent.Log(
               Message("Your inventory is full.", ColorScheme.impossible)
             )
           )
+        )
 
       case Some(collectable) =>
-        inventory
-          .add(collectable.item)
-          .map { inv =>
-            (
-              this.copy(inventory = inv),
-              worldCollectables.filterNot(_.position == position)
-            )
-          }
-          .addGlobalEvents(
+        Outcome(
+          (
+            this.copy(inventory = inventory.add(collectable.item)),
+            worldCollectables.filterNot(_.position == position)
+          ),
+          Batch(
             GameEvent.Inventory(InventoryEvent.PickedUp(collectable.item)),
             GameEvent
               .Log(
@@ -111,6 +109,7 @@ final case class Player(
               ),
             GameEvent.PlayerTurnEnd
           )
+        )
 
   def bump(amount: Point, gameMap: GameMap): Outcome[Player] =
     gameMap.hostiles.findBlockingByPosition(position + amount) match
@@ -122,7 +121,7 @@ final case class Player(
           .addGlobalEvents(
             GameEvent.PlayerAttack(
               name,
-              (fighter.power + equipment.powerBonus),
+              (fighter.power + inventory.equipment.powerBonus),
               target.id
             ),
             GameEvent.PlayerTurnEnd
@@ -222,41 +221,43 @@ object Player:
       Fighter(30, 1, 2),
       Inventory.initial,
       1,
-      LevelUpBase,
-      Equipment.initial
+      LevelUpBase
     )
 
   import SharedCodecs.given
 
   given Encoder[Player] = new Encoder[Player] {
-    final def apply(data: Player): Json = Json.obj(
-      ("position", data.position.asJson),
-      ("isAlive", Json.fromBoolean(data.isAlive)),
-      ("fighter", data.fighter.asJson),
-      ("inventory", data.inventory.asJson),
-      ("level", data.level.asJson),
-      ("xp", data.xp.asJson),
-      ("equipment", data.equipment.asJson)
-    )
+    final def apply(data: Player): Json =
+      ???
+    // Json.obj(
+    //   ("position", data.position.asJson),
+    //   ("isAlive", Json.fromBoolean(data.isAlive)),
+    //   ("fighter", data.fighter.asJson),
+    //   ("inventory", data.inventory.asJson),
+    //   ("level", data.level.asJson),
+    //   ("xp", data.xp.asJson) // ,
+    //   // ("equipment", data.equipment.asJson)
+    // )
   }
 
   given Decoder[Player] = new Decoder[Player] {
     final def apply(c: HCursor): Decoder.Result[Player] =
-      for {
-        position  <- c.downField("position").as[Point]
-        isAlive   <- c.downField("isAlive").as[Boolean]
-        fighter   <- c.downField("fighter").as[Fighter]
-        inventory <- c.downField("inventory").as[Inventory]
-        level     <- c.downField("level").as[Int]
-        xp        <- c.downField("xp").as[Int]
-        equipment <- c.downField("equipment").as[Equipment]
-      } yield Player(
-        position,
-        isAlive,
-        fighter,
-        inventory,
-        level,
-        xp,
-        equipment
-      )
+      // for {
+      //   position  <- c.downField("position").as[Point]
+      //   isAlive   <- c.downField("isAlive").as[Boolean]
+      //   fighter   <- c.downField("fighter").as[Fighter]
+      //   inventory <- c.downField("inventory").as[Inventory]
+      //   level     <- c.downField("level").as[Int]
+      //   xp        <- c.downField("xp").as[Int]
+      //   equipment <- c.downField("equipment").as[Equipment]
+      // } yield Player(
+      //   position,
+      //   isAlive,
+      //   fighter,
+      //   inventory,
+      //   level,
+      //   xp,
+      //   equipment
+      // )
+      ???
   }
