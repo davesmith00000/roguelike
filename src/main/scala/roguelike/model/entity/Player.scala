@@ -37,15 +37,6 @@ final case class Player(
   def removeInventoryItem(inventoryItemAt: Int): Outcome[Player] =
     Outcome(this.copy(inventory = inventory.remove(inventoryItemAt)))
 
-  def equip(newEquipment: Melee | Armour): Outcome[Player] =
-    inventory.equip(newEquipment).map(i => this.copy(inventory = i))
-
-  def unequipArmour: Outcome[Player] =
-    inventory.unequipArmour.map(i => this.copy(inventory = i))
-
-  def unequipMelee: Outcome[Player] =
-    inventory.unequipWeapon.map(i => this.copy(inventory = i))
-
   /** Force player to take an item - used for swapping equipment
     */
   def take(item: Item): Outcome[Player] =

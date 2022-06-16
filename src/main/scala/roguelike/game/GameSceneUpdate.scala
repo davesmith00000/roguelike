@@ -60,23 +60,6 @@ object GameSceneUpdate:
               )
             }
 
-    // Equipment window
-    case KeyboardEvent.KeyUp(key) if model.currentState.showingEquipment =>
-      UIElements.letterPositions.get(key.key) match
-        case None =>
-          Outcome(model)
-
-        case Some(0) =>
-          model.player.unequipArmour
-            .map(p => model.copy(player = p))
-
-        case Some(1) =>
-          model.player.unequipMelee
-            .map(p => model.copy(player = p))
-
-        case _ =>
-          Outcome(model)
-
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
         if model.currentState.lookingAround =>
@@ -144,8 +127,9 @@ object GameSceneUpdate:
       Outcome(model.toggleInventory)
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
-        if model.currentState.isRunning || model.currentState.showingEquipment =>
-      Outcome(model.toggleEquipment)
+        if model.currentState.isRunning ||
+          !WindowManager.showingWindow(model) =>
+      WindowManager.updateModel(model, WindowManagerCommand.ShowEquipMenu)
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
         if model.currentState.isRunning ||

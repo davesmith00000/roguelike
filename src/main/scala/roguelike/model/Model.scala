@@ -64,12 +64,6 @@ final case class Model(
       currentState = if show then GameState.Inventory else GameState.Game
     )
 
-  def toggleEquipment: Model =
-    val show = !currentState.showingEquipment
-    this.copy(
-      currentState = if show then GameState.Equipment else GameState.Game
-    )
-
   def toggleLookAround(radius: Int): Model =
     val show = !currentState.lookingAround
     this.copy(
