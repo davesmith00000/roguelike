@@ -164,12 +164,12 @@ object UIElements:
 
   def renderCharacterInfo(player: Player): Text[TerminalText] =
     val powerBonus: String =
-      if player.equipment.powerBonus == 0 then ""
-      else s" + ${player.equipment.powerBonus}"
+      if player.inventory.equipment.powerBonus == 0 then ""
+      else s" + ${player.inventory.equipment.powerBonus}"
 
     val defenseBonus: String =
-      if player.equipment.defenseBonus == 0 then ""
-      else s" + ${player.equipment.defenseBonus}"
+      if player.inventory.equipment.defenseBonus == 0 then ""
+      else s" + ${player.inventory.equipment.defenseBonus}"
 
     val text =
       s"""Level: ${player.level}
@@ -177,8 +177,8 @@ object UIElements:
       |XP for next level: ${player.experienceToNextLevel}
       |Attack: ${player.fighter.power}$powerBonus
       |Defense: ${player.fighter.defense}$defenseBonus
-      |Weapon: ${player.equipment.weapon.map(_.name).getOrElse("--none--")}
-      |Armour: ${player.equipment.armour.map(_.name).getOrElse("--none--")}
+      |Weapon: ${player.inventory.equipment.weapon.map(_.name).getOrElse("--none--")}
+      |Armour: ${player.inventory.equipment.armour.map(_.name).getOrElse("--none--")}
       |""".stripMargin
 
     Text(
@@ -261,15 +261,14 @@ object UIElements:
   def inventory(
       gameState: GameState,
       inventory: Inventory,
-      equipment: Equipment,
       viewportSize: Size
   ): Group =
     val windowSize = Size(350, 200)
 
     gameState match
-      case GameState.Inventory if inventory.items.length > 0 =>
+      case GameState.Inventory if inventory.backpack.items.length > 0 =>
         val items: String =
-          inventory.items
+          inventory.backpack.items
             .map { case item =>
               item.name
             }
@@ -367,9 +366,9 @@ object UIElements:
     val windowSize = Size(350, 200)
 
     gameState match
-      case GameState.Drop if inventory.items.length > 0 =>
+      case GameState.Drop if inventory.backpack.items.length > 0 =>
         val collectables: String =
-          inventory.items
+          inventory.backpack.items
             .map(_.name)
             .zip(letters)
             .foldLeft(("", 0)) { case ((str, r), (collectableName, letter)) =>

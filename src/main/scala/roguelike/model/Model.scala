@@ -110,42 +110,6 @@ final case class Model(
         .take(c)
         .map(p => this.copy(player = p))
 
-    case InventoryEvent.EquipArmour(a: Armour) =>
-      player.equip(a).map { p =>
-        this.copy(player = p)
-      }
-
-    case InventoryEvent.UnequipArmour =>
-      player.unequipArmour.map { p =>
-        this.copy(player = p)
-      }
-
-    case InventoryEvent.EquipMelee(m: Melee) =>
-      player.equip(m).map { p =>
-        this.copy(player = p)
-      }
-
-    case InventoryEvent.UnequipMelee =>
-      player.unequipMelee.map { p =>
-        this.copy(player = p)
-      }
-
-    case InventoryEvent.ReturnArmourToInventory(a: Armour) =>
-      val msg =
-        Message(s"Returned ${a.name} to your inventory", ColorScheme.white)
-      player
-        .take(a)
-        .map(p => this.copy(player = p))
-        .addGlobalEvents(GameEvent.Log(msg), GameEvent.PlayerTurnEnd)
-
-    case InventoryEvent.ReturnMeleeToInventory(m: Melee) =>
-      val msg =
-        Message(s"Returned ${m.name} to your inventory", ColorScheme.white)
-      player
-        .take(m)
-        .map(p => this.copy(player = p))
-        .addGlobalEvents(GameEvent.Log(msg), GameEvent.PlayerTurnEnd)
-
     case InventoryEvent.DropItem(item, mapPosition) =>
       Outcome(
         this.copy(gameMap =
@@ -321,7 +285,7 @@ final case class Model(
     case GameEvent.HostileMeleeAttack(name, power) =>
       val damage = Math.max(
         0,
-        power - (player.fighter.defense + player.equipment.defenseBonus)
+        power - (player.fighter.defense + player.inventory.equipment.defenseBonus)
       )
 
       val attackMessage =

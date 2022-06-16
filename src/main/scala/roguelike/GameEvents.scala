@@ -52,12 +52,6 @@ enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
   case ReturnConsumablesToInventory(consumables: Consumables)
 
-  case EquipArmour(armour: Armour)
-  case UnequipArmour
-  case ReturnArmourToInventory(armour: Armour)
-  case EquipMelee(melee: Melee)
-  case UnequipMelee
-  case ReturnMeleeToInventory(melee: Melee)
   case DropItem(item: Item, mapPosition: Point)
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
