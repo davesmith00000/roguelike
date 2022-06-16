@@ -7,6 +7,7 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
+import roguelike.components.windows.WindowManager
 import roguelike.game.MiniMap
 import roguelike.model.GameMap
 import roguelike.model.GamePhase
@@ -131,7 +132,7 @@ final case class GameViewModel(
     case FrameTick =>
       GameViewModel.nextViewModel(context, model, this)
 
-    case MouseEvent.Click(_) =>
+    case MouseEvent.Click(_) if !WindowManager.showingWindow(model) =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
