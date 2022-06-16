@@ -5,7 +5,6 @@ import indigo._
 enum GameState:
   case Game
   case History
-  case Inventory
   case LookAround(radius: Int)
   case ShowingWindow
 
@@ -13,11 +12,6 @@ enum GameState:
     this match
       case GameState.History => true
       case _                 => false
-
-  def showingInventory: Boolean =
-    this match
-      case GameState.Inventory => true
-      case _                   => false
 
   def isRunning: Boolean =
     this match

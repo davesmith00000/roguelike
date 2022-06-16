@@ -39,6 +39,11 @@ object WindowManager extends Component[Model, GameViewModel]:
     case WindowManagerCommand.ShowEquipMenu =>
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.EquipMenu))
 
+    case WindowManagerCommand.ShowInventoryMenu =>
+      Outcome(
+        updateActive.set(model.pauseForWindow, ActiveWindow.InventoryMenu)
+      )
+
     case WindowManagerCommand.CloseAll =>
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
 
@@ -67,6 +72,9 @@ object WindowManager extends Component[Model, GameViewModel]:
         case ActiveWindow.EquipMenu =>
           EquipMenu.updateModel(model, EquipMenu.HandleInput(key))
 
+        case ActiveWindow.InventoryMenu =>
+          InventoryMenu.updateModel(model, InventoryMenu.HandleInput(key))
+
         case ActiveWindow.None =>
           Outcome(model)
 
@@ -92,6 +100,9 @@ object WindowManager extends Component[Model, GameViewModel]:
 
       case ActiveWindow.EquipMenu =>
         EquipMenu.present(model, viewModel)
+
+      case ActiveWindow.InventoryMenu =>
+        InventoryMenu.present(model, viewModel)
 
       case ActiveWindow.None =>
         Batch.empty
@@ -121,13 +132,15 @@ enum WindowManagerCommand:
   case ShowLevelUp
   case ShowDropMenu
   case ShowEquipMenu
+  case ShowInventoryMenu
   case CloseAll
   case HandleQuitKeyPress
   case DelegateInput(key: Key)
 
 enum ActiveWindow(val closeable: Boolean):
-  case None      extends ActiveWindow(true)
-  case Quit      extends ActiveWindow(true)
-  case LevelUp   extends ActiveWindow(false)
-  case DropMenu  extends ActiveWindow(true)
-  case EquipMenu extends ActiveWindow(true)
+  case None          extends ActiveWindow(true)
+  case Quit          extends ActiveWindow(true)
+  case LevelUp       extends ActiveWindow(false)
+  case DropMenu      extends ActiveWindow(true)
+  case EquipMenu     extends ActiveWindow(true)
+  case InventoryMenu extends ActiveWindow(true)

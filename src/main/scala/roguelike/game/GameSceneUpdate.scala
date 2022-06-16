@@ -45,21 +45,6 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(key) if WindowManager.showingWindow(model) =>
       WindowManager.updateModel(model, WindowManagerCommand.DelegateInput(key))
 
-    // Inventory window
-    case KeyboardEvent.KeyUp(key) if model.currentState.showingInventory =>
-      UIElements.letterPositions.get(key.key) match
-        case None =>
-          Outcome(model)
-
-        case Some(keyIndex) =>
-          model.player
-            .useInventoryItem(keyIndex)
-            .map { p =>
-              model.copy(
-                player = p
-              )
-            }
-
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
         if model.currentState.lookingAround =>
@@ -123,8 +108,9 @@ object GameSceneUpdate:
         .addGlobalEvents(GameEvent.RedrawHistoryLog)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
-        if model.currentState.isRunning || model.currentState.showingInventory =>
-      Outcome(model.toggleInventory)
+        if model.currentState.isRunning ||
+          !WindowManager.showingWindow(model) =>
+      WindowManager.updateModel(model, WindowManagerCommand.ShowInventoryMenu)
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
         if model.currentState.isRunning ||
