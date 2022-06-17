@@ -25,7 +25,6 @@ final case class Model(
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
-    paused: Boolean,
     currentState: GameState,
     targetingWithRangedAt: Option[
       (Ranged, Int)
@@ -42,13 +41,11 @@ final case class Model(
 
   def closeAllWindows: Model =
     this.copy(
-      paused = false,
       currentState = GameState.Game
     )
 
   def pauseForWindow: Model =
     this.copy(
-      paused = true,
       currentState = GameState.ShowingWindow
     )
 
@@ -485,7 +482,7 @@ final case class Model(
       // view model again for the next round of presentation.
       // What we actually do is the entire NPC moves, and immediately complete.
       gameMap
-        .update(context.dice, player.position, paused)
+        .update(context.dice, player.position)
         .map { gm =>
           this.copy(gameMap = gm, gamePhase = GamePhase.MovingNPC)
         }
@@ -544,7 +541,6 @@ object Model:
       Point.zero,
       GameMap.initial(screenSize, Batch.empty, Batch.empty),
       MessageLog.DefaultLimited,
-      false,
       GameState.Game,
       None,
       GameLoadInfo.initial,
@@ -582,7 +578,7 @@ object Model:
 
     GameMap
       .gen(screenSize, dungeon)
-      .update(dice, dungeon.playerStart, true)
+      .update(dice, dungeon.playerStart)
       .map { gm =>
         Model(
           screenSize,
@@ -591,7 +587,6 @@ object Model:
           Point.zero,
           gm,
           MessageLog.DefaultLimited,
-          false,
           GameState.Game,
           None,
           GameLoadInfo.initial,
@@ -619,7 +614,7 @@ object Model:
 
     GameMap
       .gen(currentModel.screenSize, dungeon)
-      .update(dice, dungeon.playerStart, true)
+      .update(dice, dungeon.playerStart)
       .map { gm =>
         currentModel.copy(
           player = currentModel.player.copy(position = dungeon.playerStart),
