@@ -18,9 +18,9 @@ import roguelike.model.gamedata.Ranged
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-final case class Model(
+final case class Model( // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
     player: Player,
-    stairsPosition: Point,
+    stairsPosition: Point, // TODO: Move into game map?
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
@@ -29,8 +29,8 @@ final case class Model(
       (Ranged, Int)
     ], // TODO - is this really an 'active' inventory slot?
     loadInfo: GameLoadInfo,
-    currentFloor: Int,
-    gamePhase: GamePhase,
+    currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
+    gamePhase: GamePhase, // TODO: Should this be part of GameState?
     autoMovePath: Batch[Point],
     windowManager: ActiveWindow
 ):
