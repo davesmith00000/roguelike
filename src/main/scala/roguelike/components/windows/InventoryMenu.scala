@@ -11,7 +11,7 @@ import roguelike.model.Inventory
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 
-object InventoryMenu extends Component[Model, GameViewModel]:
+object InventoryMenu extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Inventory
   type ComponentViewModel = Size
@@ -24,7 +24,10 @@ object InventoryMenu extends Component[Model, GameViewModel]:
 
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
-  def nextModel(inventory: Inventory): HandleInput => Outcome[Inventory] =
+  def nextModel(
+      context: FrameContext[Size],
+      inventory: Inventory
+  ): HandleInput => Outcome[Inventory] =
     case HandleInput(key) =>
       UIElements.letterPositions.get(key.key) match
         case None =>
@@ -38,12 +41,14 @@ object InventoryMenu extends Component[Model, GameViewModel]:
             )
 
   def nextViewModel(
+      context: FrameContext[Size],
       inventory: Inventory,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       inventory: Inventory,
       viewportSize: Size
   ): Batch[SceneNode] =

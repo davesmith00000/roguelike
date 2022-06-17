@@ -7,7 +7,7 @@ import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 
-object WindowManager extends Component[Model, GameViewModel]:
+object WindowManager extends Component[Size, Model, GameViewModel]:
   type Command            = WindowManagerCommand
   type ComponentModel     = Model
   type ComponentViewModel = GameViewModel
@@ -25,6 +25,7 @@ object WindowManager extends Component[Model, GameViewModel]:
     )
 
   def nextModel(
+      context: FrameContext[Size],
       model: Model
   ): WindowManagerCommand => Outcome[Model] =
     case WindowManagerCommand.ShowQuit =>
@@ -64,19 +65,23 @@ object WindowManager extends Component[Model, GameViewModel]:
     case WindowManagerCommand.DelegateInput(key) =>
       model.windowManager match
         case ActiveWindow.Quit =>
-          QuitMenu.updateModel(model, QuitMenu.HandleInput(key))
+          QuitMenu.updateModel(context, model, QuitMenu.HandleInput(key))
 
         case ActiveWindow.LevelUp =>
-          LevelUp.updateModel(model, LevelUp.HandleInput(key))
+          LevelUp.updateModel(context, model, LevelUp.HandleInput(key))
 
         case ActiveWindow.DropMenu =>
-          DropMenu.updateModel(model, DropMenu.HandleInput(key))
+          DropMenu.updateModel(context, model, DropMenu.HandleInput(key))
 
         case ActiveWindow.EquipMenu =>
-          EquipMenu.updateModel(model, EquipMenu.HandleInput(key))
+          EquipMenu.updateModel(context, model, EquipMenu.HandleInput(key))
 
         case ActiveWindow.InventoryMenu =>
-          InventoryMenu.updateModel(model, InventoryMenu.HandleInput(key))
+          InventoryMenu.updateModel(
+            context,
+            model,
+            InventoryMenu.HandleInput(key)
+          )
 
         case ActiveWindow.History =>
           Outcome(model)
@@ -85,33 +90,35 @@ object WindowManager extends Component[Model, GameViewModel]:
           Outcome(model)
 
   def nextViewModel(
+      context: FrameContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): WindowManagerCommand => Outcome[GameViewModel] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): Batch[SceneNode] =
     model.windowManager match
       case ActiveWindow.Quit =>
-        QuitMenu.present(model, viewModel)
+        QuitMenu.present(context, model, viewModel)
 
       case ActiveWindow.LevelUp =>
-        LevelUp.present(model, viewModel)
+        LevelUp.present(context, model, viewModel)
 
       case ActiveWindow.DropMenu =>
-        DropMenu.present(model, viewModel)
+        DropMenu.present(context, model, viewModel)
 
       case ActiveWindow.EquipMenu =>
-        EquipMenu.present(model, viewModel)
+        EquipMenu.present(context, model, viewModel)
 
       case ActiveWindow.InventoryMenu =>
-        InventoryMenu.present(model, viewModel)
+        InventoryMenu.present(context, model, viewModel)
 
       case ActiveWindow.History =>
-        History.present(model, viewModel)
+        History.present(context, model, viewModel)
 
       case ActiveWindow.None =>
         Batch.empty

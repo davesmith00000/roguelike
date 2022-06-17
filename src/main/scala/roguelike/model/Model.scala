@@ -152,9 +152,9 @@ final case class Model(
       )
   }
 
-  def update(dice: Dice): GameEvent => Outcome[Model] =
+  def update(context: FrameContext[Size]): GameEvent => Outcome[Model] =
     case GameEvent.WindowEvent(command) =>
-      WindowManager.updateModel(this, command)
+      WindowManager.updateModel(context, this, command)
 
     case GameEvent.Log(message) =>
       Outcome(
@@ -164,7 +164,7 @@ final case class Model(
       )
 
     case GameEvent.Inventory(e) =>
-      handleInventoryEvent(dice)(e)
+      handleInventoryEvent(context.dice)(e)
 
     case GameEvent.Targeted(position) =>
       targetingWithRangedAt match
@@ -403,11 +403,13 @@ final case class Model(
     case GameEvent.PlayerMoveTowards(target) =>
       if autoMovePath.isEmpty then
         val p =
-          gameMap.getPathTo(dice, player.position, target, Batch.empty).tail
+          gameMap
+            .getPathTo(context.dice, player.position, target, Batch.empty)
+            .tail
         if p.nonEmpty then
           val next      = p.head
           val remaining = p.tail
-          performPlayerTurn(dice, next - player.position).map {
+          performPlayerTurn(context.dice, next - player.position).map {
             _.copy(
               autoMovePath = remaining
             )
@@ -436,11 +438,12 @@ final case class Model(
     case GameEvent.PlayerContinueMove =>
       if autoMovePath.isEmpty then Outcome(this)
       else
-        performPlayerTurn(dice, autoMovePath.head - player.position).map {
-          _.copy(
-            autoMovePath = autoMovePath.tail
-          )
-        }
+        performPlayerTurn(context.dice, autoMovePath.head - player.position)
+          .map {
+            _.copy(
+              autoMovePath = autoMovePath.tail
+            )
+          }
 
     case GameEvent.NPCTurnComplete =>
       if gameMap.noHostilesVisible then
@@ -482,7 +485,7 @@ final case class Model(
       // view model again for the next round of presentation.
       // What we actually do is the entire NPC moves, and immediately complete.
       gameMap
-        .update(dice, player.position, paused)
+        .update(context.dice, player.position, paused)
         .map { gm =>
           this.copy(gameMap = gm, gamePhase = GamePhase.MovingNPC)
         }

@@ -13,7 +13,7 @@ import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameViewModel
 
-object QuitMenu extends Component[Model, GameViewModel]:
+object QuitMenu extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Model
   type ComponentViewModel = Size
@@ -21,7 +21,10 @@ object QuitMenu extends Component[Model, GameViewModel]:
   def modelLens: Lens[Model, Model]            = Lens.identity
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
-  def nextModel(model: Model): HandleInput => Outcome[Model] =
+  def nextModel(
+      context: FrameContext[Size],
+      model: Model
+  ): HandleInput => Outcome[Model] =
     // Save
     case HandleInput(Key.KEY_1) if model.player.isAlive =>
       val saveData = model.toSaveData
@@ -54,12 +57,14 @@ object QuitMenu extends Component[Model, GameViewModel]:
       Outcome(model)
 
   def nextViewModel(
+      context: FrameContext[Size],
       model: Model,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       model: Model,
       viewportSize: Size
   ): Batch[SceneNode] =
