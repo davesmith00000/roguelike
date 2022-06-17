@@ -52,12 +52,6 @@ final case class Model(
       currentState = GameState.ShowingWindow
     )
 
-  def toggleMessageHistory: Model =
-    val show = !currentState.showingHistory
-    this.copy(
-      currentState = if show then GameState.History else GameState.Game
-    )
-
   def toggleLookAround(radius: Int): Model =
     val show = !currentState.lookingAround
     this.copy(

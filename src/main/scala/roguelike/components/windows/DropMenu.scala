@@ -2,24 +2,19 @@ package roguelike.components.windows
 
 import indigo.*
 import indigo.scenes.Lens
-import indigo.scenes.SceneEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.MainMenuScene
 import roguelike.components.Component
 import roguelike.game.UIElements
-import roguelike.model.GameLoadInfo
-import roguelike.model.GameState
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.ModelSaveData
 import roguelike.model.entity.Collectable
 import roguelike.viewmodel.GameViewModel
 
-object DropMenu extends Component[Model, Size]:
+object DropMenu extends Component[Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = DropMenuModel
   type ComponentViewModel = Size
@@ -36,7 +31,7 @@ object DropMenu extends Component[Model, Size]:
         model.copy(player = model.player.copy(inventory = drop.inventory))
     )
 
-  def viewModelLens: Lens[Size, Size] = Lens.identity
+  def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(model: DropMenuModel): HandleInput => Outcome[DropMenuModel] =
     case HandleInput(key) =>

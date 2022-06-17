@@ -256,11 +256,6 @@ object GameView:
           )
         ) ++ WindowManager.present(model, viewModel)
       )
-    ) |+| UIElements
-      .historyViewer(
-        model.currentState,
-        model.messageLog,
-        viewModel.terminals.history,
-        vpSize
-      )
-      .addCloneBlanks(GameGraphics.tileClone)
+    ).addCloneBlanks(
+      GameGraphics.tileClone :: viewModel.terminals.history.blanks
+    )
