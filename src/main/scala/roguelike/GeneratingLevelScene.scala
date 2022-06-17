@@ -35,7 +35,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
   ): GlobalEvent => Outcome[Model] =
     case GenerateLevel =>
       Model
-        .gen(context.dice, RogueLikeGame.screenSize)
+        .gen(context.dice)
         .map(_.copy(loadInfo = model.loadInfo))
         .addGlobalEvents(
           SceneEvent.JumpTo(GameScene.name),
