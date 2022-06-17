@@ -63,7 +63,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     )
 
   def initialModel(startupData: Size): Outcome[Model] =
-    Outcome(Model.blank(Dice.fromSeed(0), screenSize))
+    Outcome(Model.blank(Dice.fromSeed(0)))
 
   def initialViewModel(startupData: Size, model: Model): Outcome[ViewModel] =
     Outcome(ViewModel.initial(model.player, startupData))

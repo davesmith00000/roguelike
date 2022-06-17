@@ -19,7 +19,6 @@ import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
 final case class Model(
-    screenSize: Size,
     player: Player,
     stairsPosition: Point,
     lookAtTarget: Point,
@@ -516,7 +515,6 @@ final case class Model(
 
   def toSaveData: ModelSaveData =
     ModelSaveData(
-      screenSize,
       player,
       stairsPosition,
       gameMap,
@@ -531,14 +529,13 @@ object Model:
   val DropWindowSize: Size      = Size(30, 10)
   val QuitWindowSize: Size      = Size(30, 10)
 
-  def blank(dice: Dice, screenSize: Size): Model =
+  def blank(dice: Dice): Model =
     val p = Player.initial(dice, Point.zero)
     Model(
-      screenSize,
       p,
       Point.zero,
       Point.zero,
-      GameMap.initial(screenSize, Batch.empty, Batch.empty),
+      GameMap.initial(RogueLikeGame.screenSize, Batch.empty, Batch.empty),
       MessageLog.DefaultLimited,
       GameState.Game,
       None,
@@ -551,7 +548,7 @@ object Model:
 
   def fromSaveData(saveData: ModelSaveData): Model =
     // Can use Dice.fromSeed(0) here since player is overwritten with saved data.
-    blank(Dice.fromSeed(0), saveData.screenSize).copy(
+    blank(Dice.fromSeed(0)).copy(
       player = saveData.player,
       stairsPosition = saveData.stairsPosition,
       gameMap = saveData.gameMap,
@@ -560,14 +557,14 @@ object Model:
       currentFloor = saveData.currentFloor
     )
 
-  def gen(dice: Dice, screenSize: Size): Outcome[Model] =
+  def gen(dice: Dice): Outcome[Model] =
     val dungeon =
       DungeonGen.makeMap(
         dice,
         DungeonGen.MaxRooms,
         DungeonGen.RoomMinSize,
         DungeonGen.RoomMaxSize,
-        screenSize - Size(0, 5),
+        RogueLikeGame.screenSize - Size(0, 5),
         DungeonGen.maxMonstersPerRoom(0),
         DungeonGen.maxCollectablesPerRoom(0),
         0
@@ -576,11 +573,10 @@ object Model:
     val p = Player.initial(dice, dungeon.playerStart)
 
     GameMap
-      .gen(screenSize, dungeon)
+      .gen(RogueLikeGame.screenSize, dungeon)
       .update(dice, dungeon.playerStart)
       .map { gm =>
         Model(
-          screenSize,
           p,
           dungeon.stairsPosition,
           Point.zero,
@@ -605,14 +601,14 @@ object Model:
         DungeonGen.MaxRooms,
         DungeonGen.RoomMinSize,
         DungeonGen.RoomMaxSize,
-        currentModel.screenSize - Size(0, 5),
+        RogueLikeGame.screenSize - Size(0, 5),
         DungeonGen.maxMonstersPerRoom(nextFloor),
         DungeonGen.maxCollectablesPerRoom(nextFloor),
         nextFloor
       )
 
     GameMap
-      .gen(currentModel.screenSize, dungeon)
+      .gen(RogueLikeGame.screenSize, dungeon)
       .update(dice, dungeon.playerStart)
       .map { gm =>
         currentModel.copy(
