@@ -30,7 +30,7 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Window close keys
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
-        if !model.currentState.isRunning ||
+        if !model.gameState.isRunning ||
           WindowManager.showingCloseableWindow(model) =>
       WindowManager
         .updateModel(context, model, WindowManagerCommand.CloseAll)
@@ -38,7 +38,7 @@ object GameSceneUpdate:
 
     // Quit window toggle
     case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
-        KeyboardEvent.KeyUp(KeyMapping.Quit2) if model.currentState.isRunning =>
+        KeyboardEvent.KeyUp(KeyMapping.Quit2) if model.gameState.isRunning =>
       WindowManager.updateModel(
         context,
         model,
@@ -55,44 +55,44 @@ object GameSceneUpdate:
 
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
-        if model.currentState.lookingAround =>
+        if model.gameState.lookingAround =>
       model.lookUp
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveDown)
-        if model.currentState.lookingAround =>
+        if model.gameState.lookingAround =>
       model.lookDown
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveLeft)
-        if model.currentState.lookingAround =>
+        if model.gameState.lookingAround =>
       model.lookLeft
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveRight)
-        if model.currentState.lookingAround =>
+        if model.gameState.lookingAround =>
       model.lookRight
 
     // Game controls
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       model.moveUp(context.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveDown)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       model.moveDown(context.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveLeft)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       model.moveLeft(context.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveRight)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       model.moveRight(context.dice)
 
     case KeyboardEvent.KeyUp(KeyMapping.PickUp)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       model.pickUp
 
     case KeyboardEvent.KeyUp(KeyMapping.Descend)
-        if model.currentState.isRunning && model.player.isAlive =>
+        if model.gameState.isRunning && model.player.isAlive =>
       if model.player.position == model.stairsPosition then
         Model
           .genNextFloor(context.dice, model)
@@ -111,14 +111,14 @@ object GameSceneUpdate:
 
     // Window toggles
     case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-        if model.currentState.isRunning ||
+        if model.gameState.isRunning ||
           !WindowManager.showingWindow(model) =>
       WindowManager
         .updateModel(context, model, WindowManagerCommand.ShowHistory)
         .addGlobalEvents(GameEvent.RedrawHistoryLog)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
-        if model.currentState.isRunning ||
+        if model.gameState.isRunning ||
           !WindowManager.showingWindow(model) =>
       WindowManager.updateModel(
         context,
@@ -127,7 +127,7 @@ object GameSceneUpdate:
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
-        if model.currentState.isRunning ||
+        if model.gameState.isRunning ||
           !WindowManager.showingWindow(model) =>
       WindowManager.updateModel(
         context,
@@ -136,7 +136,7 @@ object GameSceneUpdate:
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
-        if model.currentState.isRunning ||
+        if model.gameState.isRunning ||
           !WindowManager.showingWindow(model) =>
       WindowManager.updateModel(
         context,
@@ -146,11 +146,11 @@ object GameSceneUpdate:
 
     // Look Around
     case KeyboardEvent.KeyUp(KeyMapping.LookAround)
-        if model.currentState.isRunning || model.currentState.lookingAround =>
+        if model.gameState.isRunning || model.gameState.lookingAround =>
       Outcome(model.toggleLookAround(0))
 
     case KeyboardEvent.KeyUp(KeyMapping.Target)
-        if model.currentState.lookingAround =>
+        if model.gameState.lookingAround =>
       Outcome(model.toggleLookAround(0))
         .addGlobalEvents(GameEvent.Targeted(model.lookAtTarget))
 

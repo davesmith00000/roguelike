@@ -169,7 +169,7 @@ object GameView:
       }.toList
 
     val lookAround: Batch[SceneNode] =
-      model.currentState match
+      model.gameState match
         case GameState.LookAround(_) =>
           Batch(
             GameGraphics.target.moveTo(
@@ -178,7 +178,7 @@ object GameView:
             UIElements.renderAreaOfEffect(
               viewModel.squareSize,
               model.lookAtTarget * viewModel.squareSize,
-              model.currentState
+              model.gameState
             )
           )
 
@@ -189,7 +189,7 @@ object GameView:
     val healthBars = hostilesAndHealthBars.map(_._2).flatten.toBatch
 
     val camera =
-      model.currentState match
+      model.gameState match
         case GameState.LookAround(_) =>
           val offset =
             (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
