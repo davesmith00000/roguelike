@@ -33,17 +33,25 @@ object GameSceneUpdate:
         if !model.currentState.isRunning ||
           WindowManager.showingCloseableWindow(model) =>
       WindowManager
-        .updateModel(model, WindowManagerCommand.CloseAll)
+        .updateModel(context, model, WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
 
     // Quit window toggle
     case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
         KeyboardEvent.KeyUp(KeyMapping.Quit2) if model.currentState.isRunning =>
-      WindowManager.updateModel(model, WindowManagerCommand.HandleQuitKeyPress)
+      WindowManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.HandleQuitKeyPress
+      )
 
     // Delegate input to WindowManager
     case KeyboardEvent.KeyUp(key) if WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(model, WindowManagerCommand.DelegateInput(key))
+      WindowManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.DelegateInput(key)
+      )
 
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
@@ -106,23 +114,35 @@ object GameSceneUpdate:
         if model.currentState.isRunning ||
           !WindowManager.showingWindow(model) =>
       WindowManager
-        .updateModel(model, WindowManagerCommand.ShowHistory)
+        .updateModel(context, model, WindowManagerCommand.ShowHistory)
         .addGlobalEvents(GameEvent.RedrawHistoryLog)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.currentState.isRunning ||
           !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(model, WindowManagerCommand.ShowInventoryMenu)
+      WindowManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.ShowInventoryMenu
+      )
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
         if model.currentState.isRunning ||
           !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(model, WindowManagerCommand.ShowEquipMenu)
+      WindowManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.ShowEquipMenu
+      )
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
         if model.currentState.isRunning ||
           !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(model, WindowManagerCommand.ShowDropMenu)
+      WindowManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.ShowDropMenu
+      )
 
     // Look Around
     case KeyboardEvent.KeyUp(KeyMapping.LookAround)
@@ -136,7 +156,7 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.update(context.dice)(e)
+      model.update(context)(e)
 
     case _ =>
       Outcome(model)
@@ -147,7 +167,7 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Other
     case e: GameEvent =>
-      model.update(context.dice)(e)
+      model.update(context)(e)
 
     case _ =>
       Outcome(model)

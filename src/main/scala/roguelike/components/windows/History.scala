@@ -8,7 +8,7 @@ import roguelike.components.Component
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 
-object History extends Component[Model, GameViewModel]:
+object History extends Component[Size, Model, GameViewModel]:
   type Command            = Unit
   type ComponentModel     = Model
   type ComponentViewModel = HistoryViewModel
@@ -22,16 +22,21 @@ object History extends Component[Model, GameViewModel]:
       )
     }
 
-  def nextModel(model: Model): Unit => Outcome[Model] =
+  def nextModel(
+      context: FrameContext[Size],
+      model: Model
+  ): Unit => Outcome[Model] =
     _ => Outcome(model)
 
   def nextViewModel(
+      context: FrameContext[Size],
       model: Model,
       viewModel: HistoryViewModel
   ): Unit => Outcome[HistoryViewModel] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       model: Model,
       viewModel: HistoryViewModel
   ): Batch[SceneNode] =

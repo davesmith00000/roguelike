@@ -6,6 +6,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameGraphics
 import roguelike.RogueLikeGame
+import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
@@ -27,10 +28,15 @@ object GameView:
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
     Outcome(
-      drawGameLayer(model, viewModel) |+| drawUiLayer(context, model, viewModel)
+      drawGameLayer(context, model, viewModel) |+| drawUiLayer(
+        context,
+        model,
+        viewModel
+      )
     )
 
   def drawGameLayer(
+      context: FrameContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): SceneUpdateFragment =
@@ -162,16 +168,6 @@ object GameView:
         )
       }.toList
 
-    val player: Batch[Shape.Circle] =
-      Batch(
-        Shape.Circle(
-          viewModel.playerPosition.display,
-          (viewModel.squareSize.x / 2.5).toInt,
-          Fill.Color(RGBA.White),
-          Stroke(2, RGBA.Black)
-        )
-      )
-
     val lookAround: Batch[SceneNode] =
       model.currentState match
         case GameState.LookAround(_) =>
@@ -211,7 +207,7 @@ object GameView:
           hover ++
           collectables ++
           hostiles ++
-          player ++
+          PlayerComponent.present(context, model, viewModel) ++
           healthBars ++
           lookAround
       ).withCamera(camera)
@@ -254,7 +250,7 @@ object GameView:
             model.stairsPosition,
             viewModel.hoverSquare
           )
-        ) ++ WindowManager.present(model, viewModel)
+        ) ++ WindowManager.present(context, model, viewModel)
       )
     ).addCloneBlanks(
       GameGraphics.tileClone :: viewModel.terminals.history.blanks

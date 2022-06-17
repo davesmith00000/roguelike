@@ -14,7 +14,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Collectable
 import roguelike.viewmodel.GameViewModel
 
-object DropMenu extends Component[Model, GameViewModel]:
+object DropMenu extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = DropMenuModel
   type ComponentViewModel = Size
@@ -33,7 +33,10 @@ object DropMenu extends Component[Model, GameViewModel]:
 
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
-  def nextModel(model: DropMenuModel): HandleInput => Outcome[DropMenuModel] =
+  def nextModel(
+      context: FrameContext[Size],
+      model: DropMenuModel
+  ): HandleInput => Outcome[DropMenuModel] =
     case HandleInput(key) =>
       UIElements.letterPositions.get(key.key) match
         case None =>
@@ -57,12 +60,14 @@ object DropMenu extends Component[Model, GameViewModel]:
               )
 
   def nextViewModel(
+      context: FrameContext[Size],
       model: DropMenuModel,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       model: DropMenuModel,
       viewportSize: Size
   ): Batch[SceneNode] =

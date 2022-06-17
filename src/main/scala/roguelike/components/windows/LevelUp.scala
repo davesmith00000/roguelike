@@ -12,7 +12,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.viewmodel.GameViewModel
 
-object LevelUp extends Component[Model, GameViewModel]:
+object LevelUp extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Player
   type ComponentViewModel = Size
@@ -25,7 +25,10 @@ object LevelUp extends Component[Model, GameViewModel]:
 
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
-  def nextModel(player: Player): HandleInput => Outcome[Player] =
+  def nextModel(
+      context: FrameContext[Size],
+      player: Player
+  ): HandleInput => Outcome[Player] =
     // Constitution
     case HandleInput(Key.KEY_1) =>
       player
@@ -58,12 +61,14 @@ object LevelUp extends Component[Model, GameViewModel]:
       )
 
   def nextViewModel(
+      context: FrameContext[Size],
       model: Player,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
+      context: FrameContext[Size],
       player: Player,
       viewportSize: Size
   ): Batch[SceneNode] =

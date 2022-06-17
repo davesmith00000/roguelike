@@ -7,6 +7,7 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
+import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.game.MiniMap
 import roguelike.model.GameMap
@@ -218,19 +219,7 @@ object GameViewModel:
         .filter(h => viewModel.tilePositions.contains(h.position))
 
     val nextPlayerPosition =
-      viewModel.phase match
-        case GameViewModelPhase.MovingPlayer =>
-          viewModel.playerPosition
-            .next(
-              context.delta,
-              model.player.position,
-              GameEvent.ViewModelPhaseComplete(
-                ViewModelEvent.PlayerMoveComplete
-              )
-            )
-
-        case GameViewModelPhase.Idle =>
-          Outcome(viewModel.playerPosition)
+      PlayerComponent.updateViewModel(context, model, viewModel, ())
 
     val nextMiniMap =
       val gm = model.gameMap
@@ -242,7 +231,7 @@ object GameViewModel:
     nextPlayerPosition.map { pp =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
-        playerPosition = pp,
+        playerPosition = pp.playerPosition,
         lookAtPosition =
           (model.lookAtTarget * viewModel.squareSize) + (viewModel.squareSize.x / 2),
         hoverSquare = hoverSquare,
