@@ -9,10 +9,10 @@ import roguelike.GameEvent
 import roguelike.components.Component
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.entity.Fighter
 import roguelike.model.entity.Player
+import roguelike.viewmodel.GameViewModel
 
-object LevelUp extends Component[Model, Size]:
+object LevelUp extends Component[Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Player
   type ComponentViewModel = Size
@@ -23,7 +23,7 @@ object LevelUp extends Component[Model, Size]:
       (m, p) => m.copy(player = p)
     )
 
-  def viewModelLens: Lens[Size, Size] = Lens.identity
+  def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(player: Player): HandleInput => Outcome[Player] =
     // Constitution

@@ -13,13 +13,13 @@ import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameViewModel
 
-object QuitMenu extends Component[Model, Size]:
+object QuitMenu extends Component[Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Model
   type ComponentViewModel = Size
 
-  def modelLens: Lens[Model, Model]   = Lens.identity
-  def viewModelLens: Lens[Size, Size] = Lens.identity
+  def modelLens: Lens[Model, Model]            = Lens.identity
+  def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(model: Model): HandleInput => Outcome[Model] =
     // Save

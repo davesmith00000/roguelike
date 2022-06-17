@@ -10,13 +10,13 @@ import roguelike.viewmodel.GameViewModel
 object WindowManager extends Component[Model, GameViewModel]:
   type Command            = WindowManagerCommand
   type ComponentModel     = Model
-  type ComponentViewModel = Size
+  type ComponentViewModel = GameViewModel
 
   def modelLens: Lens[Model, Model] =
     Lens.keepLatest
 
-  def viewModelLens: Lens[GameViewModel, Size] =
-    Lens.readOnly(_.viewportSize)
+  def viewModelLens: Lens[GameViewModel, GameViewModel] =
+    Lens.keepLatest
 
   val updateActive: Lens[Model, ActiveWindow] =
     Lens(
@@ -43,6 +43,9 @@ object WindowManager extends Component[Model, GameViewModel]:
       Outcome(
         updateActive.set(model.pauseForWindow, ActiveWindow.InventoryMenu)
       )
+
+    case WindowManagerCommand.ShowHistory =>
+      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
 
     case WindowManagerCommand.CloseAll =>
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
@@ -75,18 +78,21 @@ object WindowManager extends Component[Model, GameViewModel]:
         case ActiveWindow.InventoryMenu =>
           InventoryMenu.updateModel(model, InventoryMenu.HandleInput(key))
 
+        case ActiveWindow.History =>
+          Outcome(model)
+
         case ActiveWindow.None =>
           Outcome(model)
 
   def nextViewModel(
       model: Model,
-      viewModel: Size
-  ): WindowManagerCommand => Outcome[Size] =
+      viewModel: GameViewModel
+  ): WindowManagerCommand => Outcome[GameViewModel] =
     _ => Outcome(viewModel)
 
   def view(
       model: Model,
-      viewModel: Size
+      viewModel: GameViewModel
   ): Batch[SceneNode] =
     model.windowManager match
       case ActiveWindow.Quit =>
@@ -103,6 +109,9 @@ object WindowManager extends Component[Model, GameViewModel]:
 
       case ActiveWindow.InventoryMenu =>
         InventoryMenu.present(model, viewModel)
+
+      case ActiveWindow.History =>
+        History.present(model, viewModel)
 
       case ActiveWindow.None =>
         Batch.empty
@@ -133,6 +142,7 @@ enum WindowManagerCommand:
   case ShowDropMenu
   case ShowEquipMenu
   case ShowInventoryMenu
+  case ShowHistory
   case CloseAll
   case HandleQuitKeyPress
   case DelegateInput(key: Key)
@@ -143,4 +153,5 @@ enum ActiveWindow(val closeable: Boolean):
   case LevelUp       extends ActiveWindow(false)
   case DropMenu      extends ActiveWindow(true)
   case EquipMenu     extends ActiveWindow(true)
+  case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)

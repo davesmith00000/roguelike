@@ -62,7 +62,7 @@ object UIElements:
       TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Red)
     )
 
-  val letters: Batch[String]             = ('a' to 'z').toBatch.map(_.toString)
+  val letters: Batch[String]            = ('a' to 'z').toBatch.map(_.toString)
   val letterPositions: Map[String, Int] = letters.zipWithIndex.toMap
 
   def renderBar(player: Player, totalWidth: Int, position: Point): Group =
@@ -177,8 +177,12 @@ object UIElements:
       |XP for next level: ${player.experienceToNextLevel}
       |Attack: ${player.fighter.power}$powerBonus
       |Defense: ${player.fighter.defense}$defenseBonus
-      |Weapon: ${player.inventory.equipment.weapon.map(_.name).getOrElse("--none--")}
-      |Armour: ${player.inventory.equipment.armour.map(_.name).getOrElse("--none--")}
+      |Weapon: ${player.inventory.equipment.weapon
+        .map(_.name)
+        .getOrElse("--none--")}
+      |Armour: ${player.inventory.equipment.armour
+        .map(_.name)
+        .getOrElse("--none--")}
       |""".stripMargin
 
     Text(
@@ -198,26 +202,3 @@ object UIElements:
       TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
-
-  def historyViewer(
-      gameState: GameState,
-      messageLog: MessageLog,
-      historyClones: TerminalClones,
-      viewportSize: Size
-  ): SceneUpdateFragment =
-    gameState match
-      case GameState.History =>
-        val windowSize = Size(500, 310)
-
-        SceneUpdateFragment(
-          Group(
-            Shape.Box(
-              Rectangle(Point.zero, windowSize),
-              Fill.Color(RGBA.Black),
-              Stroke(2, RGBA.Orange)
-            ) :: historyClones.clones
-          ).moveTo(((viewportSize - windowSize) / 2).toPoint)
-        ).addCloneBlanks(historyClones.blanks)
-
-      case _ =>
-        SceneUpdateFragment.empty

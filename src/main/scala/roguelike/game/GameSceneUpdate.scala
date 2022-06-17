@@ -103,8 +103,10 @@ object GameSceneUpdate:
 
     // Window toggles
     case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-        if model.currentState.isRunning || model.currentState.showingHistory =>
-      Outcome(model.toggleMessageHistory)
+        if model.currentState.isRunning ||
+          !WindowManager.showingWindow(model) =>
+      WindowManager
+        .updateModel(model, WindowManagerCommand.ShowHistory)
         .addGlobalEvents(GameEvent.RedrawHistoryLog)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
