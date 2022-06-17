@@ -86,7 +86,6 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
   def updateAllHostiles(
       dice: Dice,
       playerPosition: Point,
-      pause: Boolean,
       tileMap: GameMap,
       newVisible: Batch[Point]
   ): Outcome[HostilesManager] =
@@ -137,10 +136,8 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
             case None =>
               rec(xs, events, x :: acc)
 
-    if !pause then
-      val res = rec(hostiles.toList, Batch.empty, Batch.empty)
-      res.map(hs => this.copy(hostiles = hs))
-    else Outcome(this)
+    val res = rec(hostiles.toList, Batch.empty, Batch.empty)
+    res.map(hs => this.copy(hostiles = hs))
 
   def getRandomDirection(
       dice: Dice,

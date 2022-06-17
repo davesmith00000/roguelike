@@ -59,8 +59,7 @@ final case class GameMap(
 
   def update(
       dice: Dice,
-      playerPosition: Point,
-      pause: Boolean
+      playerPosition: Point
   ): Outcome[GameMap] =
     val newVisible =
       GameMap.calculateFOV(GameMap.FOVRadius, playerPosition, this)
@@ -69,7 +68,6 @@ final case class GameMap(
       hostiles.updateAllHostiles(
         dice,
         playerPosition,
-        pause,
         this,
         newVisible
       )
