@@ -25,7 +25,7 @@ final case class Model(
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
-    currentState: GameState,
+    gameState: GameState,
     targetingWithRangedAt: Option[
       (Ranged, Int)
     ], // TODO - is this really an 'active' inventory slot?
@@ -41,19 +41,18 @@ final case class Model(
 
   def closeAllWindows: Model =
     this.copy(
-      currentState = GameState.Game
+      gameState = GameState.Game
     )
 
   def pauseForWindow: Model =
     this.copy(
-      currentState = GameState.ShowingWindow
+      gameState = GameState.ShowingWindow
     )
 
   def toggleLookAround(radius: Int): Model =
-    val show = !currentState.lookingAround
+    val show = !gameState.lookingAround
     this.copy(
-      currentState =
-        if show then GameState.LookAround(radius) else GameState.Game,
+      gameState = if show then GameState.LookAround(radius) else GameState.Game,
       lookAtTarget = player.position
     )
 
@@ -128,7 +127,7 @@ final case class Model(
         ) =>
       Outcome(
         this.copy(
-          currentState = GameState.LookAround(Ranged.ConfusionScroll.radius),
+          gameState = GameState.LookAround(Ranged.ConfusionScroll.radius),
           lookAtTarget = player.position,
           targetingWithRangedAt =
             Option((Ranged.ConfusionScroll, inventoryPosition))
@@ -141,7 +140,7 @@ final case class Model(
         ) =>
       Outcome(
         this.copy(
-          currentState = GameState.LookAround(Ranged.FireballScroll.radius),
+          gameState = GameState.LookAround(Ranged.FireballScroll.radius),
           lookAtTarget = player.position,
           targetingWithRangedAt =
             Option((Ranged.FireballScroll, inventoryPosition))
