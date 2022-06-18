@@ -146,59 +146,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
   }
 
-  def handleHostileEvent(
-      context: FrameContext[Size]
-  ): HostileEvent => Outcome[Model] = {
-    case HostileEvent.HostileMeleeAttack(name, power) =>
-      val damage = Math.max(
-        0,
-        power - (player.fighter.defense + player.inventory.equipment.defenseBonus)
-      )
-
-      val attackMessage =
-        GameEvent.Log(
-          if damage > 0 then
-            Message(
-              s"${name.capitalize} attacks for $damage hit points.",
-              ColorScheme.enemyAttack
-            )
-          else
-            Message(
-              s"${name.capitalize} attacks but does no damage",
-              ColorScheme.enemyAttack
-            )
-        )
-
-      val p = player.takeDamage(damage)
-
-      val msgs =
-        if p.isAlive then Batch(attackMessage)
-        else
-          GameEvent.Log(
-            Message("You died!", ColorScheme.playerDie)
-          ) :: attackMessage :: Batch.empty
-
-      Outcome(
-        this.copy(
-          player = p
-        )
-      ).addGlobalEvents(msgs)
-
-    case HostileEvent.HostileGiveXP(amount) =>
-      player
-        .addXp(amount)
-        .createGlobalEvents(p =>
-          if p.level > player.level then
-            Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
-          else Batch.empty
-        )
-        .map { p =>
-          this.copy(
-            player = p
-          )
-        }
-  }
-
   def update(context: FrameContext[Size]): GameEvent => Outcome[Model] =
     case GameEvent.WindowEvent(command) =>
       WindowManager.updateModel(context, this, command)
@@ -214,7 +161,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       handleInventoryEvent(context)(e)
 
     case GameEvent.Hostile(e) =>
-      handleHostileEvent(context)(e)
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.HostileInteraction(e)
+      )
 
     case GameEvent.Targeted(position) =>
       targetingWithRangedAt match

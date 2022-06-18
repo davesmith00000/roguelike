@@ -4,8 +4,10 @@ import indigo.*
 import indigo.scenes.Lens
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.HostileEvent
 import roguelike.ViewModelEvent
 import roguelike.components.Component
+import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.Model
@@ -76,6 +78,9 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
           )
         )
 
+    case Cmds.HostileInteraction(e) =>
+      handleHostileEvent(context, player)(e)
+
     case Cmds.Update =>
       Outcome(player)
 
@@ -121,6 +126,51 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       )
     )
 
+  def handleHostileEvent(
+      context: FrameContext[Size],
+      player: Player
+  ): HostileEvent => Outcome[Player] = {
+    case HostileEvent.HostileMeleeAttack(name, power) =>
+      val damage = Math.max(
+        0,
+        power - (player.fighter.defense + player.inventory.equipment.defenseBonus)
+      )
+
+      val attackMessage =
+        GameEvent.Log(
+          if damage > 0 then
+            Message(
+              s"${name.capitalize} attacks for $damage hit points.",
+              ColorScheme.enemyAttack
+            )
+          else
+            Message(
+              s"${name.capitalize} attacks but does no damage",
+              ColorScheme.enemyAttack
+            )
+        )
+
+      val p = player.takeDamage(damage)
+
+      val msgs =
+        if p.isAlive then Batch(attackMessage)
+        else
+          GameEvent.Log(
+            Message("You died!", ColorScheme.playerDie)
+          ) :: attackMessage :: Batch.empty
+
+      Outcome(p, msgs)
+
+    case HostileEvent.HostileGiveXP(amount) =>
+      player
+        .addXp(amount)
+        .createGlobalEvents(p =>
+          if p.level > player.level then
+            Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
+          else Batch.empty
+        )
+  }
+
   final case class PlayerVM(
       playerPosition: ActorPosition,
       squareSize: Point,
@@ -132,3 +182,4 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     case RemoveFromInvetory(at: Int)
     case GiveToPlayer(item: Item)
     case UseConsumable(c: Consumables)
+    case HostileInteraction(e: HostileEvent)
