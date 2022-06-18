@@ -6,6 +6,7 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
+import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
 import roguelike.components.windows.WindowManagerCommand
@@ -55,32 +56,23 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       lookAtTarget = player.position
     )
 
-  def handleInventoryEvent(dice: Dice): InventoryEvent => Outcome[Model] = {
-    case InventoryEvent.UseConsumables(c @ Consumables.HealthPotion) =>
-      val possibleAmount  = player.fighter.maxHp - player.fighter.hp
-      val amountRecovered = Math.min(possibleAmount, c.amount)
+  def handleInventoryEvent(
+      context: FrameContext[Size]
+  ): InventoryEvent => Outcome[Model] = {
+    case InventoryEvent.RemoveFromInventory(at) =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.RemoveFromInvetory(at)
+      )
 
-      if amountRecovered <= 0 then
-        val msg =
-          Message("Your health is already full.", ColorScheme.impossible)
-        Outcome(this).addGlobalEvents(
-          GameEvent.Log(msg),
-          GameEvent.Inventory(InventoryEvent.ReturnConsumablesToInventory(c))
+    case InventoryEvent.UseConsumables(c) =>
+      PlayerComponent
+        .updateModel(
+          context,
+          this,
+          PlayerComponent.Cmds.UseConsumable(c)
         )
-      else
-        val msg = Message(
-          s"You consume the ${c.name}, and recover $amountRecovered",
-          ColorScheme.healthRecovered
-        )
-        Outcome(this.copy(player = player.heal(amountRecovered)))
-          .addGlobalEvents(GameEvent.Log(msg), GameEvent.PlayerTurnEnd)
-
-    case InventoryEvent.ReturnConsumablesToInventory(
-          c @ Consumables.HealthPotion
-        ) =>
-      player
-        .take(c)
-        .map(p => this.copy(player = p))
 
     case InventoryEvent.DropItem(item, mapPosition) =>
       Outcome(
@@ -99,14 +91,20 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           gameMap.hostiles
             .findClosest(player.position, Ranged.LightningScroll.maxRange + 1)
         )
-        .flatMap { consumed =>
-          if consumed then
-            player.removeInventoryItem(inventoryPosition).map { nextPlayer =>
-              this.copy(player = nextPlayer)
-            }
-          else Outcome(this)
+        .createGlobalEvents { consumed =>
+          val maybeRemove =
+            if consumed then
+              Batch(
+                GameEvent.Inventory(
+                  InventoryEvent
+                    .RemoveFromInventory(inventoryPosition)
+                )
+              )
+            else Batch.empty
+
+          maybeRemove ++ Batch(GameEvent.PlayerTurnEnd)
         }
-        .addGlobalEvents(GameEvent.PlayerTurnEnd)
+        .map(_ => this)
 
     case InventoryEvent.UseRanged(inventoryPosition, Ranged.ConfusionScroll) =>
       Outcome(this) // Shouldn't happen
@@ -159,7 +157,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.Inventory(e) =>
-      handleInventoryEvent(context.dice)(e)
+      handleInventoryEvent(context)(e)
 
     case GameEvent.Targeted(position) =>
       targetingWithRangedAt match
@@ -228,15 +226,20 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                 case Ranged.ConfusionScroll =>
                   RangedHelper
                     .useConfusionScroll(player, target)
-                    .flatMap { consumed =>
-                      if consumed then
-                        player.removeInventoryItem(inventoryPosition).map {
-                          nextPlayer =>
-                            this.copy(player = nextPlayer).closeAllWindows
-                        }
-                      else Outcome(this)
+                    .createGlobalEvents { consumed =>
+                      val maybeRemove =
+                        if consumed then
+                          Batch(
+                            GameEvent.Inventory(
+                              InventoryEvent
+                                .RemoveFromInventory(inventoryPosition)
+                            )
+                          )
+                        else Batch.empty
+
+                      maybeRemove ++ Batch(GameEvent.PlayerTurnEnd)
                     }
-                    .addGlobalEvents(GameEvent.PlayerTurnEnd)
+                    .map(_ => this)
 
                 case Ranged.FireballScroll =>
                   RangedHelper
@@ -247,15 +250,20 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                         Ranged.FireballScroll.radius
                       )
                     )
-                    .flatMap { consumed =>
-                      if consumed then
-                        player.removeInventoryItem(inventoryPosition).map {
-                          nextPlayer =>
-                            this.copy(player = nextPlayer).closeAllWindows
-                        }
-                      else Outcome(this)
+                    .createGlobalEvents { consumed =>
+                      val maybeRemove =
+                        if consumed then
+                          Batch(
+                            GameEvent.Inventory(
+                              InventoryEvent
+                                .RemoveFromInventory(inventoryPosition)
+                            )
+                          )
+                        else Batch.empty
+
+                      maybeRemove ++ Batch(GameEvent.PlayerTurnEnd)
                     }
-                    .addGlobalEvents(GameEvent.PlayerTurnEnd)
+                    .map(_ => this)
 
     case GameEvent.HostileMeleeAttack(name, power) =>
       val damage = Math.max(
