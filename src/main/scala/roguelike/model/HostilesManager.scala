@@ -3,6 +3,7 @@ package roguelike.model
 import indigo.*
 import indigo.syntax.*
 import roguelike.GameEvent
+import roguelike.HostileEvent
 import roguelike.model.entity.Hostile
 
 import scala.annotation.tailrec
@@ -105,7 +106,9 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
 
         case x :: xs if playerPosition.distanceTo(x.position) <= 1 =>
           // Close enough to attack!
-          val event = GameEvent.HostileMeleeAttack(x.name, x.fighter.power)
+          val event = GameEvent.Hostile(
+            HostileEvent.HostileMeleeAttack(x.name, x.fighter.power)
+          )
           rec(xs, event :: events, x :: acc)
 
         case x :: xs if x.isConfused =>
