@@ -27,23 +27,6 @@ final case class Player(
   val blocksMovement: Boolean = false
   val name: String            = "Player"
 
-  def useInventoryItem(inventoryItemAt: Int): Outcome[Player] =
-    inventory
-      .use(inventoryItemAt)
-      .map { inv =>
-        this.copy(inventory = inv)
-      }
-
-  def removeInventoryItem(inventoryItemAt: Int): Outcome[Player] =
-    Outcome(this.copy(inventory = inventory.remove(inventoryItemAt)))
-
-  /** Force player to take an item - used for swapping equipment
-    */
-  def take(item: Item): Outcome[Player] =
-    Outcome(
-      this.copy(inventory = inventory.add(item))
-    )
-
   def pickUp(
       worldCollectables: Batch[Collectable]
   ): Outcome[(Player, Batch[Collectable])] =

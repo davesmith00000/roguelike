@@ -52,12 +52,11 @@ enum GameEvent extends GlobalEvent:
 
 enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
-  case ReturnConsumablesToInventory(consumables: Consumables)
-
   case DropItem(item: Item, mapPosition: Point)
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)
+  case RemoveFromInventory(inventoryPosition: Int)
 
 enum ViewModelEvent:
   case MovePlayer

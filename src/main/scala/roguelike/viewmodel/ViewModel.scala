@@ -219,7 +219,12 @@ object GameViewModel:
         .filter(h => viewModel.tilePositions.contains(h.position))
 
     val nextPlayerPosition =
-      PlayerComponent.updateViewModel(context, model, viewModel, ())
+      PlayerComponent.updateViewModel(
+        context,
+        model,
+        viewModel,
+        PlayerComponent.Cmds.Update
+      )
 
     val nextMiniMap =
       val gm = model.gameMap
