@@ -34,8 +34,7 @@ enum GameEvent extends GlobalEvent:
   case NPCTurnComplete
 
   // Hostile events
-  case HostileMeleeAttack(attackerName: String, power: Int)
-  case HostileGiveXP(amount: Int)
+  case Hostile(event: HostileEvent)
 
   // System events
   case Log(message: Message)
@@ -49,6 +48,10 @@ enum GameEvent extends GlobalEvent:
   case ViewModelHandOff(event: ViewModelEvent)
   case ModelHandOff(event: ViewModelEvent)
   case ViewModelPhaseComplete(event: ViewModelEvent)
+
+enum HostileEvent:
+  case HostileMeleeAttack(attackerName: String, power: Int)
+  case HostileGiveXP(amount: Int)
 
 enum InventoryEvent:
   case UseConsumables(consumables: Consumables)

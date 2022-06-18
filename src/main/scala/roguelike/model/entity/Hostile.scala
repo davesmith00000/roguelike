@@ -6,6 +6,7 @@ import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.HostileEvent
 import roguelike.model.GameMap
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
@@ -35,7 +36,7 @@ sealed trait Hostile extends Entity:
       if f.hp <= 0 then
         Batch(
           GameEvent.Log(Message(s"You killed a $name", ColorScheme.enemyDie)),
-          GameEvent.HostileGiveXP(xpGiven)
+          GameEvent.Hostile(HostileEvent.HostileGiveXP(xpGiven))
         )
       else Batch.empty
     )
