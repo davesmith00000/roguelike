@@ -18,8 +18,7 @@ final case class GameMap(
     tileMap: Batch[Option[GameTile]],
     visible: Batch[Point],
     explored: Set[Point],
-    hostiles: HostilesPool,
-    collectables: Batch[Collectable]
+    hostiles: HostilesPool
 ):
   val bounds: Rectangle =
     Rectangle(size)
@@ -27,8 +26,8 @@ final case class GameMap(
   def noHostilesVisible: Boolean =
     visibleHostiles.isEmpty
 
-  def entitiesList: js.Array[Entity] =
-    (collectables.toJSArray ++ hostiles.toJSArray.sortBy(_.isAlive)).filter(e =>
+  def entitiesList: js.Array[Hostile] =
+    (hostiles.toJSArray.sortBy(_.isAlive)).filter(e =>
       visible.contains(e.position)
     )
 
@@ -117,11 +116,6 @@ final case class GameMap(
     if bounds.contains(at) then tileMap(indexFromPoint(at))
     else None
 
-  def dropCollectable(collectable: Collectable): GameMap =
-    this.copy(
-      collectables = collectable :: collectables
-    )
-
   def toLocalExplored(center: Point, size: Size): js.Array[(GameTile, Point)] =
     val topLeft: Point = center - (size.toPoint / 2)
     val bounds: Rectangle =
@@ -180,23 +174,20 @@ object GameMap:
 
   def initial(
       size: Size,
-      hostiles: Batch[Hostile],
-      collectables: Batch[Collectable]
+      hostiles: Batch[Hostile]
   ): GameMap =
     GameMap(
       size,
       Batch.fill(size.width * size.height)(None),
       Batch.empty,
       Set(),
-      HostilesPool(hostiles),
-      collectables
+      HostilesPool(hostiles)
     )
 
   def gen(size: Size, dungeon: Dungeon): GameMap =
     initial(
       size,
-      Batch.fromList(dungeon.hostiles),
-      Batch.fromList(dungeon.collectables)
+      Batch.fromList(dungeon.hostiles)
     ).insert(
       dungeon.positionedTiles.toBatch
     )
