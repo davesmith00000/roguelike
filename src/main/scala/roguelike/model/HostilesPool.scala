@@ -112,7 +112,7 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
 
         case x :: xs if x.isConfused =>
           // Is confused!
-          val randomMove = getRandomDirection(dice, x.position, gameMap)
+          val randomMove = HostilesPool.getRandomDirection(dice, x.position, gameMap)
           rec(xs, events, x.nextState.moveTo(randomMove) :: acc)
 
         case x :: xs =>
@@ -140,6 +140,8 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
 
     val res = rec(hostiles.toList, Batch.empty, Batch.empty)
     res.map(hs => this.copy(hostiles = hs))
+
+object HostilesPool:
 
   def getRandomDirection(
       dice: Dice,
