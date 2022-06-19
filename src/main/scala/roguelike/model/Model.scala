@@ -62,14 +62,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       lookAtTarget = player.position
     )
 
-  def noHostilesVisible: Boolean =
-    visibleHostiles.isEmpty
-
-  def visibleHostiles: js.Array[Hostile] =
-    hostiles.toJSArray.filter(e =>
-      e.isAlive && gameMap.visible.contains(e.position)
-    )
-
   def visibleSortedHostiles: js.Array[Hostile] =
     hostiles.toJSArray
       .filter(e => gameMap.visible.contains(e.position))
@@ -417,6 +409,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           }
 
     case GameEvent.NPCTurnComplete =>
+      val noHostilesVisible: Boolean =
+        hostiles.toJSArray
+          .filter(e => e.isAlive && gameMap.visible.contains(e.position))
+          .isEmpty
+
       if noHostilesVisible then
         val events =
           if autoMovePath.isEmpty then Batch(GameEvent.Redraw)
