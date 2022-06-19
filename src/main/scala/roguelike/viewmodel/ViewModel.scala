@@ -215,7 +215,7 @@ object GameViewModel:
         )
 
     val hostiles =
-      model.gameMap.visibleSortedHostiles
+      model.visibleSortedHostiles
         .filter(h => viewModel.tilePositions.contains(h.position))
 
     val nextPlayerPosition =

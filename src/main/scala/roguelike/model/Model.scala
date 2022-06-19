@@ -35,14 +35,15 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     gamePhase: GamePhase, // TODO: Should this be part of GameState?
     autoMovePath: Batch[Point],
     windowManager: ActiveWindow,
-    collectables: Batch[Collectable]
+    collectables: Batch[Collectable],
+    hostiles: HostilesPool
 ):
   def entitiesList: js.Array[Entity] =
-    collectables.toJSArray.filter(e => gameMap.visible.contains(e.position)) ++
-      gameMap.entitiesList
-        .filterNot(
-          _.position == stairsPosition
-        ) :+ player
+    (collectables.toJSArray ++
+      hostiles.toJSArray.sortBy(_.isAlive))
+      .filter(e =>
+        gameMap.visible.contains(e.position) && e.position != stairsPosition
+      ) :+ player
 
   def closeAllWindows: Model =
     this.copy(
@@ -60,6 +61,29 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       gameState = if show then GameState.LookAround(radius) else GameState.Game,
       lookAtTarget = player.position
     )
+
+  def noHostilesVisible: Boolean =
+    visibleHostiles.isEmpty
+
+  def visibleHostiles: js.Array[Hostile] =
+    hostiles.toJSArray.filter(e =>
+      e.isAlive && gameMap.visible.contains(e.position)
+    )
+
+  def visibleSortedHostiles: js.Array[Hostile] =
+    hostiles.toJSArray
+      .filter(e => gameMap.visible.contains(e.position))
+      .sortBy(_.isAlive)
+
+  def damageHostile(id: Int, damage: Int): Outcome[Model] =
+    hostiles.damageHostile(id, damage).map { hm =>
+      this.copy(hostiles = hm)
+    }
+
+  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[Model] =
+    hostiles.confuseHostile(id, numberOfTurns).map { hm =>
+      this.copy(hostiles = hm)
+    }
 
   def handleInventoryEvent(
       context: FrameContext[Size]
@@ -93,7 +117,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       RangedHelper
         .useLightningScroll(
           player,
-          gameMap.hostiles
+          hostiles
             .findClosest(player.position, Ranged.LightningScroll.maxRange + 1)
         )
         .createGlobalEvents { consumed =>
@@ -198,7 +222,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
               )
             )
 
-        case Some(_) if !gameMap.hostiles.existsAt(position) =>
+        case Some(_) if !hostiles.existsAt(position) =>
           Outcome(this)
             .addGlobalEvents(
               GameEvent.Log(
@@ -210,7 +234,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             )
 
         case Some((ranged, inventoryPosition)) =>
-          gameMap.hostiles.findByPosition(position) match
+          hostiles.findByPosition(position) match
             case None =>
               Outcome(this)
                 .addGlobalEvents(
@@ -257,7 +281,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                   RangedHelper
                     .useFireballScroll(
                       player,
-                      gameMap.hostiles.findAllInRange(
+                      hostiles.findAllInRange(
                         target.position,
                         Ranged.FireballScroll.radius
                       )
@@ -278,7 +302,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                     .map(_ => this)
 
     case GameEvent.PlayerAttack(name, power, id) =>
-      gameMap.hostiles.findById(id) match
+      hostiles.findById(id) match
         case None =>
           Outcome(this.closeAllWindows)
             .addGlobalEvents(
@@ -305,23 +329,16 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                 ColorScheme.playerAttack
               )
 
-          val res = gameMap
-            .damageHostile(target.id, damage)
+          val res = damageHostile(target.id, damage)
 
           val events = GameEvent.Log(msg) :: res.globalEventsOrNil.reverse
 
           res.clearGlobalEvents
-            .map(gm =>
-              this
-                .copy(
-                  gameMap = gm
-                )
-                .closeAllWindows
-            )
+            .map(_.closeAllWindows)
             .addGlobalEvents(events)
 
     case GameEvent.PlayerCastsConfusion(name, numberOfTurns, id) =>
-      gameMap.hostiles.findById(id) match
+      hostiles.findById(id) match
         case None =>
           Outcome(this)
             .addGlobalEvents(
@@ -332,17 +349,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             )
 
         case Some(target) =>
-          gameMap
-            .confuseHostile(target.id, numberOfTurns)
-            .map(gm =>
-              this.copy(
-                gameMap = gm
-              )
-            )
+          confuseHostile(target.id, numberOfTurns)
             .addGlobalEvents(GameEvent.PlayerTurnEnd)
 
     case GameEvent.PlayerCastsFireball(name, damage, id) =>
-      gameMap.hostiles.findById(id) match
+      hostiles.findById(id) match
         case None =>
           Outcome(this)
             .addGlobalEvents(
@@ -353,13 +364,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             )
 
         case Some(target) =>
-          gameMap
-            .damageHostile(target.id, damage)
-            .map(gm =>
-              this.copy(
-                gameMap = gm
-              )
-            )
+          damageHostile(target.id, damage)
             .addGlobalEvents(GameEvent.PlayerTurnEnd)
 
     case GameEvent.PlayerTurnEnd =>
@@ -412,7 +417,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           }
 
     case GameEvent.NPCTurnComplete =>
-      if gameMap.noHostilesVisible then
+      if noHostilesVisible then
         val events =
           if autoMovePath.isEmpty then Batch(GameEvent.Redraw)
           else Batch(GameEvent.Redraw, GameEvent.PlayerContinueMove)
@@ -450,15 +455,23 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       // other things the player is doing, like attacking, then hand off to the
       // view model again for the next round of presentation.
       // What we actually do is the entire NPC moves, and immediately complete.
-      gameMap
-        .update(context.dice, player.position)
-        .map { gm =>
-          this.copy(gameMap = gm, gamePhase = GamePhase.MovingNPC)
-        }
-        .addGlobalEvents(GameEvent.NPCTurnComplete)
+      val res = for {
+        gm <- gameMap.update(player.position)
+        hs <- hostiles.updateAllHostiles(
+          context.dice,
+          player.position,
+          gm
+        )
+      } yield this.copy(
+        gameMap = gm,
+        gamePhase = GamePhase.MovingNPC,
+        hostiles = hs
+      )
+
+      res.addGlobalEvents(GameEvent.NPCTurnComplete)
 
   def performPlayerTurn(dice: Dice, by: Point): Outcome[Model] =
-    player.bump(by, gameMap).map(p => this.copy(player = p))
+    player.bump(by, gameMap, hostiles).map(p => this.copy(player = p))
 
   def moveUp(dice: Dice): Outcome[Model] = performPlayerTurn(dice, Point(0, -1))
   def moveDown(dice: Dice): Outcome[Model] =
@@ -506,7 +519,7 @@ object Model:
       p,
       Point.zero,
       Point.zero,
-      GameMap.initial(RogueLikeGame.screenSize, Batch.empty),
+      GameMap.initial(RogueLikeGame.screenSize),
       MessageLog.DefaultLimited,
       GameState.Game,
       None,
@@ -515,7 +528,8 @@ object Model:
       GamePhase.WaitForInput,
       Batch.empty,
       WindowManager.initialModel,
-      Batch.empty
+      Batch.empty,
+      HostilesPool(Batch.empty)
     )
 
   def fromSaveData(saveData: ModelSaveData): Model =
@@ -544,26 +558,31 @@ object Model:
 
     val p = Player.initial(dice, dungeon.playerStart)
 
-    GameMap
-      .gen(RogueLikeGame.screenSize, dungeon)
-      .update(dice, dungeon.playerStart)
-      .map { gm =>
-        Model(
-          p,
-          dungeon.stairsPosition,
-          Point.zero,
-          gm,
-          MessageLog.DefaultLimited,
-          GameState.Game,
-          None,
-          GameLoadInfo.initial,
-          0,
-          GamePhase.WaitForInput,
-          Batch.empty,
-          WindowManager.initialModel,
-          Batch.fromList(dungeon.collectables)
-        )
-      }
+    for {
+      gm <- GameMap
+        .gen(RogueLikeGame.screenSize, dungeon)
+        .update(dungeon.playerStart)
+      hs <- HostilesPool(Batch.fromList(dungeon.hostiles)).updateAllHostiles(
+        dice,
+        p.position,
+        gm
+      )
+    } yield Model(
+      p,
+      dungeon.stairsPosition,
+      Point.zero,
+      gm,
+      MessageLog.DefaultLimited,
+      GameState.Game,
+      None,
+      GameLoadInfo.initial,
+      0,
+      GamePhase.WaitForInput,
+      Batch.empty,
+      WindowManager.initialModel,
+      Batch.fromList(dungeon.collectables),
+      hs
+    )
 
   def genNextFloor(dice: Dice, currentModel: Model): Outcome[Model] =
     val nextFloor = currentModel.currentFloor + 1
@@ -580,14 +599,19 @@ object Model:
         nextFloor
       )
 
-    GameMap
-      .gen(RogueLikeGame.screenSize, dungeon)
-      .update(dice, dungeon.playerStart)
-      .map { gm =>
-        currentModel.copy(
-          player = currentModel.player.copy(position = dungeon.playerStart),
-          stairsPosition = dungeon.stairsPosition,
-          gameMap = gm,
-          currentFloor = nextFloor
-        )
-      }
+    for {
+      gm <- GameMap
+        .gen(RogueLikeGame.screenSize, dungeon)
+        .update(dungeon.playerStart)
+      hs <- HostilesPool(Batch.fromList(dungeon.hostiles)).updateAllHostiles(
+        dice,
+        dungeon.playerStart,
+        gm
+      )
+    } yield currentModel.copy(
+      player = currentModel.player.copy(position = dungeon.playerStart),
+      stairsPosition = dungeon.stairsPosition,
+      gameMap = gm,
+      currentFloor = nextFloor,
+      hostiles = hs
+    )

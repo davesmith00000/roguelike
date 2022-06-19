@@ -75,7 +75,7 @@ class GameMapTests extends munit.FunSuite {
   test("searchByBoundsWithPosition - empty") {
     val mapSize = Size(10)
     val bounds  = Rectangle(1, 1, 3, 3)
-    val gameMap = GameMap.initial(mapSize, Batch.empty)
+    val gameMap = GameMap.initial(mapSize)
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
@@ -91,7 +91,8 @@ class GameMapTests extends munit.FunSuite {
     val bounds  = Rectangle(1, 1, 3, 3)
 
     val gameMap =
-      GameMap.initial(mapSize, Batch.empty)
+      GameMap
+        .initial(mapSize)
         .insert(Point(1, 1), GameTile.Wall)
 
     val actual =
@@ -107,28 +108,32 @@ class GameMapTests extends munit.FunSuite {
     val mapSize = Size(5)
     val bounds  = Rectangle(1, 2, 3, 2)
 
-/*
+    /*
 |X|_|_|_|_|
 |_|_|_|X|_|
 |X|_|X|_|_|
 |_|X|_|_|_|
 |_|_|X|_|X|
-*/
+     */
     val gameMap =
-      GameMap.initial(mapSize, Batch.empty)
-        .insert(Point(0, 0), GameTile.Wall) // Out
-        .insert(Point(0, 2), GameTile.Wall) // Out
-        .insert(Point(1, 3), GameTile.Wall) // In
+      GameMap
+        .initial(mapSize)
+        .insert(Point(0, 0), GameTile.Wall)   // Out
+        .insert(Point(0, 2), GameTile.Wall)   // Out
+        .insert(Point(1, 3), GameTile.Wall)   // In
         .insert(Point(2, 2), GameTile.Ground) // In
-        .insert(Point(2, 4), GameTile.Wall) // Out
-        .insert(Point(3, 1), GameTile.Wall) // Out
-        .insert(Point(4, 4), GameTile.Wall) // Out
+        .insert(Point(2, 4), GameTile.Wall)   // Out
+        .insert(Point(3, 1), GameTile.Wall)   // Out
+        .insert(Point(4, 4), GameTile.Wall)   // Out
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
 
     val expected =
-      js.Array[(Point, GameTile)]((Point(1, 3), GameTile.Wall), (Point(2, 2), GameTile.Ground))
+      js.Array[(Point, GameTile)](
+        (Point(1, 3), GameTile.Wall),
+        (Point(2, 2), GameTile.Ground)
+      )
 
     assert(actual.length == expected.length)
     assert(actual.forall(a => expected.contains(a)))

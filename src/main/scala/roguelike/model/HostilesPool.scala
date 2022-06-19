@@ -87,8 +87,7 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
   def updateAllHostiles(
       dice: Dice,
       playerPosition: Point,
-      tileMap: GameMap,
-      newVisible: Batch[Point]
+      gameMap: GameMap
   ): Outcome[HostilesPool] =
     @tailrec
     def rec(
@@ -100,7 +99,7 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
         case Nil =>
           Outcome(acc).addGlobalEvents(events)
 
-        case x :: xs if !x.isAlive || !newVisible.contains(x.position) =>
+        case x :: xs if !x.isAlive || !gameMap.visible.contains(x.position) =>
           // Filter out the dead and the unseen
           rec(xs, events, x :: acc)
 
@@ -113,7 +112,7 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
 
         case x :: xs if x.isConfused =>
           // Is confused!
-          val randomMove = getRandomDirection(dice, x.position, tileMap)
+          val randomMove = getRandomDirection(dice, x.position, gameMap)
           rec(xs, events, x.nextState.moveTo(randomMove) :: acc)
 
         case x :: xs =>
@@ -128,7 +127,7 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
               x.position,
               playerPosition,
               entityPositions,
-              tileMap
+              gameMap
             )
 
           // First path result is current location, we want the next one if it exists.
