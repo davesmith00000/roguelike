@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-final case class HostilesManager(hostiles: Batch[Hostile]):
+final case class HostilesPool(hostiles: Batch[Hostile]):
 
   lazy val toJSArray: scalajs.js.Array[Hostile] =
     hostiles.toJSArray
@@ -60,7 +60,7 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
         e
     }
 
-  def damageHostile(id: Int, damage: Int): Outcome[HostilesManager] =
+  def damageHostile(id: Int, damage: Int): Outcome[HostilesPool] =
     Outcome
       .sequence(
         hostiles.map {
@@ -72,7 +72,7 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
       )
       .map(es => this.copy(hostiles = es))
 
-  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[HostilesManager] =
+  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[HostilesPool] =
     Outcome
       .sequence(
         hostiles.map {
@@ -89,7 +89,7 @@ final case class HostilesManager(hostiles: Batch[Hostile]):
       playerPosition: Point,
       tileMap: GameMap,
       newVisible: Batch[Point]
-  ): Outcome[HostilesManager] =
+  ): Outcome[HostilesPool] =
     @tailrec
     def rec(
         remaining: List[Hostile],

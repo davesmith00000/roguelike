@@ -18,7 +18,7 @@ final case class GameMap(
     tileMap: Batch[Option[GameTile]],
     visible: Batch[Point],
     explored: Set[Point],
-    hostiles: HostilesManager,
+    hostiles: HostilesPool,
     collectables: Batch[Collectable]
 ):
   val bounds: Rectangle =
@@ -188,7 +188,7 @@ object GameMap:
       Batch.fill(size.width * size.height)(None),
       Batch.empty,
       Set(),
-      HostilesManager(hostiles),
+      HostilesPool(hostiles),
       collectables
     )
 
