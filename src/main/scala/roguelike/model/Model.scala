@@ -38,10 +38,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     collectables: Batch[Collectable]
 ):
   def entitiesList: js.Array[Entity] =
-    gameMap.entitiesList
-      .filterNot(
-        _.position == stairsPosition
-      ) ++ collectables.toJSArray :+ player
+    collectables.toJSArray.filter(e => gameMap.visible.contains(e.position)) ++
+      gameMap.entitiesList
+        .filterNot(
+          _.position == stairsPosition
+        ) :+ player
 
   def closeAllWindows: Model =
     this.copy(
