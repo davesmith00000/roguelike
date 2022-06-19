@@ -9,6 +9,7 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.model.Equipment
 import roguelike.model.GameMap
+import roguelike.model.HostilesPool
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
@@ -68,8 +69,12 @@ final case class Player(
           )
         )
 
-  def bump(amount: Point, gameMap: GameMap): Outcome[Player] =
-    gameMap.hostiles.findBlockingByPosition(position + amount) match
+  def bump(
+      amount: Point,
+      gameMap: GameMap,
+      hostiles: HostilesPool
+  ): Outcome[Player] =
+    hostiles.findBlockingByPosition(position + amount) match
       case None =>
         moveBy(amount, gameMap)
 

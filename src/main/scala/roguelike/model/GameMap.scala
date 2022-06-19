@@ -17,37 +17,10 @@ final case class GameMap(
     size: Size,
     tileMap: Batch[Option[GameTile]],
     visible: Batch[Point],
-    explored: Set[Point],
-    hostiles: HostilesPool
+    explored: Set[Point]
 ):
   val bounds: Rectangle =
     Rectangle(size)
-
-  def noHostilesVisible: Boolean =
-    visibleHostiles.isEmpty
-
-  def entitiesList: js.Array[Hostile] =
-    (hostiles.toJSArray.sortBy(_.isAlive)).filter(e =>
-      visible.contains(e.position)
-    )
-
-  def visibleHostiles: js.Array[Hostile] =
-    hostiles.toJSArray.filter(e => e.isAlive && visible.contains(e.position))
-
-  def visibleSortedHostiles: js.Array[Hostile] =
-    hostiles.toJSArray
-      .filter(e => visible.contains(e.position))
-      .sortBy(_.isAlive)
-
-  def damageHostile(id: Int, damage: Int): Outcome[GameMap] =
-    hostiles.damageHostile(id, damage).map { hm =>
-      this.copy(hostiles = hm)
-    }
-
-  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[GameMap] =
-    hostiles.confuseHostile(id, numberOfTurns).map { hm =>
-      this.copy(hostiles = hm)
-    }
 
   def exploredWalls: js.Array[Point] =
     tileMap.zipWithIndex.collect {
@@ -56,28 +29,16 @@ final case class GameMap(
         pointFromIndex(index)
     }.toJSArray
 
-  def update(
-      dice: Dice,
-      playerPosition: Point
-  ): Outcome[GameMap] =
+  def update(playerPosition: Point): Outcome[GameMap] =
     val newVisible =
       GameMap.calculateFOV(GameMap.FOVRadius, playerPosition, this)
 
-    val updatedEntities =
-      hostiles.updateAllHostiles(
-        dice,
-        playerPosition,
-        this,
-        newVisible
-      )
-
-    updatedEntities.map { es =>
+    Outcome(
       this.copy(
         visible = newVisible,
-        explored = explored ++ newVisible.toSet,
-        hostiles = es
+        explored = explored ++ newVisible.toSet
       )
-    }
+    )
 
   def getPathTo(
       dice: Dice,
@@ -172,25 +133,16 @@ object GameMap:
     // ).insert(tiles)
   }
 
-  def initial(
-      size: Size,
-      hostiles: Batch[Hostile]
-  ): GameMap =
+  def initial(size: Size): GameMap =
     GameMap(
       size,
       Batch.fill(size.width * size.height)(None),
       Batch.empty,
-      Set(),
-      HostilesPool(hostiles)
+      Set()
     )
 
   def gen(size: Size, dungeon: Dungeon): GameMap =
-    initial(
-      size,
-      Batch.fromList(dungeon.hostiles)
-    ).insert(
-      dungeon.positionedTiles.toBatch
-    )
+    initial(size).insert(dungeon.positionedTiles.toBatch)
 
   def calculateFOV(
       radius: Int,
