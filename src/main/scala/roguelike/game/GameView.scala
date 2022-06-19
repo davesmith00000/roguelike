@@ -246,7 +246,7 @@ object GameView:
           UIElements.renderNameHints(
             viewModel.squareSize,
             context.mouse.position,
-            model.gameMap.entitiesList,
+            model.entitiesList,
             model.stairsPosition,
             viewModel.hoverSquare
           )

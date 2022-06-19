@@ -75,7 +75,7 @@ class GameMapTests extends munit.FunSuite {
   test("searchByBoundsWithPosition - empty") {
     val mapSize = Size(10)
     val bounds  = Rectangle(1, 1, 3, 3)
-    val gameMap = GameMap.initial(mapSize, Batch.empty, Batch.empty)
+    val gameMap = GameMap.initial(mapSize, Batch.empty)
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
@@ -91,7 +91,7 @@ class GameMapTests extends munit.FunSuite {
     val bounds  = Rectangle(1, 1, 3, 3)
 
     val gameMap =
-      GameMap.initial(mapSize, Batch.empty, Batch.empty)
+      GameMap.initial(mapSize, Batch.empty)
         .insert(Point(1, 1), GameTile.Wall)
 
     val actual =
@@ -115,7 +115,7 @@ class GameMapTests extends munit.FunSuite {
 |_|_|X|_|X|
 */
     val gameMap =
-      GameMap.initial(mapSize, Batch.empty, Batch.empty)
+      GameMap.initial(mapSize, Batch.empty)
         .insert(Point(0, 0), GameTile.Wall) // Out
         .insert(Point(0, 2), GameTile.Wall) // Out
         .insert(Point(1, 3), GameTile.Wall) // In

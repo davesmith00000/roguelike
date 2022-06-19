@@ -34,11 +34,14 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
     gamePhase: GamePhase, // TODO: Should this be part of GameState?
     autoMovePath: Batch[Point],
-    windowManager: ActiveWindow
+    windowManager: ActiveWindow,
+    collectables: Batch[Collectable]
 ):
   def entitiesList: js.Array[Entity] =
     gameMap.entitiesList
-      .filterNot(_.position == stairsPosition) :+ player
+      .filterNot(
+        _.position == stairsPosition
+      ) ++ collectables.toJSArray :+ player
 
   def closeAllWindows: Model =
     this.copy(
@@ -77,8 +80,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
 
     case InventoryEvent.DropItem(item, mapPosition) =>
       Outcome(
-        this.copy(gameMap =
-          gameMap.dropCollectable(Collectable(mapPosition, item))
+        this.copy(
+          collectables = Collectable(mapPosition, item) :: collectables
         )
       )
 
@@ -473,10 +476,10 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def lookRight: Outcome[Model] = performMoveLookAtTarget(Point(1, 0))
 
   def pickUp: Outcome[Model] =
-    player.pickUp(gameMap.collectables).map { case (p, updatedCollectables) =>
+    player.pickUp(collectables).map { case (p, updatedCollectables) =>
       this.copy(
         player = p,
-        gameMap = gameMap.copy(collectables = updatedCollectables)
+        collectables = updatedCollectables
       )
     }
 
@@ -502,7 +505,7 @@ object Model:
       p,
       Point.zero,
       Point.zero,
-      GameMap.initial(RogueLikeGame.screenSize, Batch.empty, Batch.empty),
+      GameMap.initial(RogueLikeGame.screenSize, Batch.empty),
       MessageLog.DefaultLimited,
       GameState.Game,
       None,
@@ -510,7 +513,8 @@ object Model:
       0,
       GamePhase.WaitForInput,
       Batch.empty,
-      WindowManager.initialModel
+      WindowManager.initialModel,
+      Batch.empty
     )
 
   def fromSaveData(saveData: ModelSaveData): Model =
@@ -555,7 +559,8 @@ object Model:
           0,
           GamePhase.WaitForInput,
           Batch.empty,
-          WindowManager.initialModel
+          WindowManager.initialModel,
+          Batch.fromList(dungeon.collectables)
         )
       }
 

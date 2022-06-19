@@ -208,7 +208,7 @@ object GameViewModel:
         .toLocalExplored(model.player.position, visibleMapSize)
 
     val collectables =
-      model.gameMap.collectables.toJSArray
+      model.collectables.toJSArray
         .filter(collectable =>
           viewModel.tilePositions.contains(collectable.position) &&
             model.gameMap.visible.contains(collectable.position)

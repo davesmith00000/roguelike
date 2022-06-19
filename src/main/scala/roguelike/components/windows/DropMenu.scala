@@ -25,7 +25,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
         DropMenuModel(
           model.player.inventory,
           model.player.position,
-          model.gameMap.collectables
+          model.collectables
         ),
       (model, drop) =>
         model.copy(player = model.player.copy(inventory = drop.inventory))
