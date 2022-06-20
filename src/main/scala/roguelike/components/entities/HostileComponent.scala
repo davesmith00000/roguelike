@@ -4,8 +4,10 @@ import indigo.*
 import indigo.scenes.Lens
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.HostileEvent
 import roguelike.components.Component
 import roguelike.components.windows.WindowManagerCommand
+import roguelike.model.GameMap
 import roguelike.model.HostilesPool
 import roguelike.model.Message
 import roguelike.model.entity.Hostile
@@ -27,6 +29,31 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
       context: FrameContext[Size],
       hostile: Hostile
   ): Cmds => Outcome[Hostile] =
+    case Cmds.Update(playerPosition, randomDirection, getPathTo) =>
+      hostile match
+        case x if playerPosition.distanceTo(x.position) <= 1 =>
+          // Close enough to attack!
+          val event = GameEvent.Hostile(
+            HostileEvent.HostileMeleeAttack(x.name, x.fighter.power)
+          )
+          Outcome(x, Batch(event))
+
+        case x if x.isConfused =>
+          // Is confused!
+          Outcome(x.nextState.moveTo(randomDirection()))
+
+        case x =>
+          // Otherwise, move a little closer...
+          val path = getPathTo(context.dice, x.position, playerPosition)
+
+          // First path result is current location, we want the next one if it exists.
+          path.drop(1).headOption match
+            case Some(nextPosition) =>
+              Outcome(x.moveTo(nextPosition))
+
+            case None =>
+              Outcome(x)
+
     case Cmds.ConfuseFor(numOfTurns) =>
       hostile.confuseFor(numOfTurns)
 
@@ -126,5 +153,10 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
     case ConfuseFor(numberOfTurns: Int)
     case DamageBy(amount: Int)
     case TakeDamage(attackerName: String, attackPower: Int)
+    case Update(
+        playerPosition: Point,
+        randomDirection: () => Point,
+        getPathTo: (Dice, Point, Point) => Batch[Point]
+    )
 
   final case class HostileVM(squareSize: Point)

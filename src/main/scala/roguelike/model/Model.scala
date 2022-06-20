@@ -397,15 +397,14 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       // What we actually do is the entire NPC moves, and immediately complete.
       val res = for {
         gm <- gameMap.update(player.position)
-        hs <- hostiles.updateAllHostiles(
-          context.dice,
-          player.position,
-          gm
+        um <- HostilesManager.updateModel(
+          context,
+          this,
+          HostilesManager.Cmds.Update(gm)
         )
-      } yield this.copy(
+      } yield um.copy(
         gameMap = gm,
-        gamePhase = GamePhase.MovingNPC,
-        hostiles = hs
+        gamePhase = GamePhase.MovingNPC
       )
 
       res.addGlobalEvents(GameEvent.NPCTurnComplete)
@@ -498,31 +497,27 @@ object Model:
 
     val p = Player.initial(dice, dungeon.playerStart)
 
-    for {
-      gm <- GameMap
-        .gen(RogueLikeGame.screenSize, dungeon)
-        .update(dungeon.playerStart)
-      hs <- HostilesPool(Batch.fromList(dungeon.hostiles)).updateAllHostiles(
-        dice,
-        p.position,
-        gm
-      )
-    } yield Model(
-      p,
-      dungeon.stairsPosition,
-      Point.zero,
-      gm,
-      MessageLog.DefaultLimited,
-      GameState.Game,
-      None,
-      GameLoadInfo.initial,
-      0,
-      GamePhase.WaitForInput,
-      Batch.empty,
-      WindowManager.initialModel,
-      Batch.fromList(dungeon.collectables),
-      hs
-    )
+    GameMap
+      .gen(RogueLikeGame.screenSize, dungeon)
+      .update(dungeon.playerStart)
+      .map { gm =>
+        Model(
+          p,
+          dungeon.stairsPosition,
+          Point.zero,
+          gm,
+          MessageLog.DefaultLimited,
+          GameState.Game,
+          None,
+          GameLoadInfo.initial,
+          0,
+          GamePhase.WaitForInput,
+          Batch.empty,
+          WindowManager.initialModel,
+          Batch.fromList(dungeon.collectables),
+          HostilesPool(Batch.fromList(dungeon.hostiles))
+        )
+      }
 
   def genNextFloor(dice: Dice, currentModel: Model): Outcome[Model] =
     val nextFloor = currentModel.currentFloor + 1
@@ -539,19 +534,15 @@ object Model:
         nextFloor
       )
 
-    for {
-      gm <- GameMap
-        .gen(RogueLikeGame.screenSize, dungeon)
-        .update(dungeon.playerStart)
-      hs <- HostilesPool(Batch.fromList(dungeon.hostiles)).updateAllHostiles(
-        dice,
-        dungeon.playerStart,
-        gm
-      )
-    } yield currentModel.copy(
-      player = currentModel.player.copy(position = dungeon.playerStart),
-      stairsPosition = dungeon.stairsPosition,
-      gameMap = gm,
-      currentFloor = nextFloor,
-      hostiles = hs
-    )
+    GameMap
+      .gen(RogueLikeGame.screenSize, dungeon)
+      .update(dungeon.playerStart)
+      .map { gm =>
+        currentModel.copy(
+          player = currentModel.player.copy(position = dungeon.playerStart),
+          stairsPosition = dungeon.stairsPosition,
+          gameMap = gm,
+          currentFloor = nextFloor,
+          hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
+        )
+      }

@@ -65,64 +65,6 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
         e
     }
 
-  def updateAllHostiles(
-      dice: Dice,
-      playerPosition: Point,
-      gameMap: GameMap
-  ): Outcome[HostilesPool] =
-    @tailrec
-    def rec(
-        remaining: List[Hostile],
-        events: Batch[GameEvent],
-        acc: Batch[Hostile]
-    ): Outcome[Batch[Hostile]] =
-      remaining match
-        case Nil =>
-          Outcome(acc).addGlobalEvents(events)
-
-        case x :: xs if !x.isAlive || !gameMap.visible.contains(x.position) =>
-          // Filter out the dead and the unseen
-          rec(xs, events, x :: acc)
-
-        case x :: xs if playerPosition.distanceTo(x.position) <= 1 =>
-          // Close enough to attack!
-          val event = GameEvent.Hostile(
-            HostileEvent.HostileMeleeAttack(x.name, x.fighter.power)
-          )
-          rec(xs, event :: events, x :: acc)
-
-        case x :: xs if x.isConfused =>
-          // Is confused!
-          val randomMove =
-            HostilesPool.getRandomDirection(dice, x.position, gameMap)
-          rec(xs, events, x.nextState.moveTo(randomMove) :: acc)
-
-        case x :: xs =>
-          // Otherwise, move a little closer...
-          val entityPositions =
-            (xs.toBatch ++ acc).flatMap(e =>
-              if e.blocksMovement then Batch(e.position) else Batch.empty
-            )
-          val path =
-            GameMap.getPathTo(
-              dice,
-              x.position,
-              playerPosition,
-              entityPositions,
-              gameMap
-            )
-
-          // First path result is current location, we want the next one if it exists.
-          path.drop(1).headOption match
-            case Some(nextPosition) =>
-              rec(xs, events, x.moveTo(nextPosition) :: acc)
-
-            case None =>
-              rec(xs, events, x :: acc)
-
-    val res = rec(hostiles.toList, Batch.empty, Batch.empty)
-    res.map(hs => this.copy(hostiles = hs))
-
 object HostilesPool:
 
   def getRandomDirection(
