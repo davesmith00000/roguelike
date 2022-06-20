@@ -2,8 +2,12 @@ package roguelike.components.entities
 
 import indigo.*
 import indigo.scenes.Lens
+import roguelike.ColorScheme
+import roguelike.GameEvent
 import roguelike.components.Component
+import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.HostilesPool
+import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
@@ -25,6 +29,36 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
   ): Cmds => Outcome[Hostile] =
     case Cmds.ConfuseFor(numOfTurns) =>
       hostile.confuseFor(numOfTurns)
+
+    case Cmds.DamageBy(amount) =>
+      hostile.takeDamage(amount)
+
+    case Cmds.TakeDamage(attackerName, attackPower) =>
+      val damage = Math.max(0, attackPower - hostile.fighter.defense)
+
+      val msg =
+        if damage > 0 then
+          Message(
+            s"${attackerName.capitalize} attacks for $damage hit points.",
+            ColorScheme.playerAttack
+          )
+        else
+          Message(
+            s"${attackerName.capitalize} attacks but does no damage",
+            ColorScheme.playerAttack
+          )
+
+      val res = hostile.takeDamage(damage)
+
+      val events =
+        Batch(
+          GameEvent.WindowEvent(WindowManagerCommand.CloseAll),
+          GameEvent.Log(msg)
+        ) ++
+          res.globalEventsOrNil.reverse
+
+      res.clearGlobalEvents
+        .addGlobalEvents(events)
 
   def nextViewModel(
       context: FrameContext[Size],
@@ -90,5 +124,7 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
 
   enum Cmds:
     case ConfuseFor(numberOfTurns: Int)
+    case DamageBy(amount: Int)
+    case TakeDamage(attackerName: String, attackPower: Int)
 
   final case class HostileVM(squareSize: Point)

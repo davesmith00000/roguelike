@@ -65,18 +65,6 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
         e
     }
 
-  def damageHostile(id: Int, damage: Int): Outcome[HostilesPool] =
-    Outcome
-      .sequence(
-        hostiles.map {
-          case e if e.id == id && e.isAlive =>
-            e.takeDamage(damage)
-
-          case e => Outcome(e)
-        }
-      )
-      .map(es => this.copy(hostiles = es))
-
   def updateAllHostiles(
       dice: Dice,
       playerPosition: Point,

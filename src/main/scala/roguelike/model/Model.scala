@@ -65,11 +65,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       lookAtTarget = player.position
     )
 
-  def damageHostile(id: Int, damage: Int): Outcome[Model] =
-    hostiles.damageHostile(id, damage).map { hm =>
-      this.copy(hostiles = hm)
-    }
-
   def handleInventoryEvent(
       context: FrameContext[Size]
   ): InventoryEvent => Outcome[Model] = {
@@ -287,40 +282,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
                     .map(_ => this)
 
     case GameEvent.PlayerAttack(name, power, id) =>
-      hostiles.findById(id) match
-        case None =>
-          Outcome(this.closeAllWindows)
-            .addGlobalEvents(
-              GameEvent.Log(
-                Message(
-                  s"${name.capitalize} swings and misses!",
-                  ColorScheme.playerAttack
-                )
-              )
-            )
-
-        case Some(target) =>
-          val damage = Math.max(0, power - target.fighter.defense)
-
-          val msg =
-            if damage > 0 then
-              Message(
-                s"${name.capitalize} attacks for $damage hit points.",
-                ColorScheme.playerAttack
-              )
-            else
-              Message(
-                s"${name.capitalize} attacks but does no damage",
-                ColorScheme.playerAttack
-              )
-
-          val res = damageHostile(target.id, damage)
-
-          val events = GameEvent.Log(msg) :: res.globalEventsOrNil.reverse
-
-          res.clearGlobalEvents
-            .map(_.closeAllWindows)
-            .addGlobalEvents(events)
+      HostilesManager.updateModel(
+        context,
+        this,
+        HostilesManager.Cmds.AttackHostileMelee(name, id, power)
+      )
 
     case GameEvent.PlayerCastsConfusion(name, numberOfTurns, id) =>
       HostilesManager.updateModel(
@@ -330,19 +296,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.PlayerCastsFireball(name, damage, id) =>
-      hostiles.findById(id) match
-        case None =>
-          Outcome(this)
-            .addGlobalEvents(
-              GameEvent.Log(
-                Message(s"${name.capitalize} misses!", ColorScheme.playerAttack)
-              ),
-              GameEvent.PlayerTurnEnd
-            )
-
-        case Some(target) =>
-          damageHostile(target.id, damage)
-            .addGlobalEvents(GameEvent.PlayerTurnEnd)
+      HostilesManager.updateModel(
+        context,
+        this,
+        HostilesManager.Cmds.AttackHostileRanged(name, id, damage)
+      )
 
     case GameEvent.PlayerTurnEnd =>
       Outcome(this.copy(gamePhase = GamePhase.MovingPlayer))

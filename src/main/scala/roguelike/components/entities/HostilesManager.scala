@@ -68,6 +68,50 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
           )
       }
 
+    case Cmds.AttackHostileRanged(playerName, id, damage) =>
+      updateHostile(id, model) { hostile =>
+        HostileComponent
+          .updateModel(
+            context,
+            hostile,
+            HostileComponent.Cmds.DamageBy(damage)
+          )
+          .addGlobalEvents(GameEvent.PlayerTurnEnd)
+      } {
+        Outcome(model)
+          .addGlobalEvents(
+            GameEvent.Log(
+              Message(
+                s"${playerName.capitalize} misses!",
+                ColorScheme.playerAttack
+              )
+            ),
+            GameEvent.PlayerTurnEnd
+          )
+      }
+
+    case Cmds.AttackHostileMelee(playerName, id, attackPower) =>
+      updateHostile(id, model) { hostile =>
+        HostileComponent
+          .updateModel(
+            context,
+            hostile,
+            HostileComponent.Cmds.TakeDamage(playerName, attackPower)
+          )
+          .addGlobalEvents(GameEvent.PlayerTurnEnd)
+      } {
+        Outcome(model)
+          .addGlobalEvents(
+            GameEvent.Log(
+              Message(
+                s"${playerName.capitalize} swings and misses!",
+                ColorScheme.playerAttack
+              )
+            ),
+            GameEvent.PlayerTurnEnd
+          )
+      }
+
   def nextViewModel(
       context: FrameContext[Size],
       model: HostilesM,
@@ -96,6 +140,8 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
 
   enum Cmds:
     case ConfuseHostile(playerName: String, id: Int, numberOfTurns: Int)
+    case AttackHostileMelee(playerName: String, id: Int, attackPower: Int)
+    case AttackHostileRanged(playerName: String, id: Int, damage: Int)
 
   final case class HostilesM(pool: HostilesPool, visibleTiles: Batch[Point])
   final case class HostilesVM(tilePositions: Batch[Point], squareSize: Point)
