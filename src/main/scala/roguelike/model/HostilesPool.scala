@@ -49,6 +49,11 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
       case e: Hostile if id == e.id => e
     }
 
+  def findAliveById(id: Int): Option[Hostile] =
+    hostiles.toList.collectFirst {
+      case e: Hostile if id == e.id && e.isAlive => e
+    }
+
   def findByPosition(position: Point): Option[Hostile] =
     hostiles.toList.collectFirst {
       case e: Hostile if e.position == position => e
@@ -66,18 +71,6 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
         hostiles.map {
           case e if e.id == id && e.isAlive =>
             e.takeDamage(damage)
-
-          case e => Outcome(e)
-        }
-      )
-      .map(es => this.copy(hostiles = es))
-
-  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[HostilesPool] =
-    Outcome
-      .sequence(
-        hostiles.map {
-          case e if e.id == id && e.isAlive =>
-            e.confuseFor(numberOfTurns)
 
           case e => Outcome(e)
         }
@@ -112,7 +105,8 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
 
         case x :: xs if x.isConfused =>
           // Is confused!
-          val randomMove = HostilesPool.getRandomDirection(dice, x.position, gameMap)
+          val randomMove =
+            HostilesPool.getRandomDirection(dice, x.position, gameMap)
           rec(xs, events, x.nextState.moveTo(randomMove) :: acc)
 
         case x :: xs =>

@@ -7,6 +7,7 @@ import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.ViewModelEvent
+import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
@@ -71,11 +72,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
 
   def damageHostile(id: Int, damage: Int): Outcome[Model] =
     hostiles.damageHostile(id, damage).map { hm =>
-      this.copy(hostiles = hm)
-    }
-
-  def confuseHostile(id: Int, numberOfTurns: Int): Outcome[Model] =
-    hostiles.confuseHostile(id, numberOfTurns).map { hm =>
       this.copy(hostiles = hm)
     }
 
@@ -332,19 +328,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             .addGlobalEvents(events)
 
     case GameEvent.PlayerCastsConfusion(name, numberOfTurns, id) =>
-      hostiles.findById(id) match
-        case None =>
-          Outcome(this)
-            .addGlobalEvents(
-              GameEvent.Log(
-                Message(s"${name.capitalize} misses!", ColorScheme.playerAttack)
-              ),
-              GameEvent.PlayerTurnEnd
-            )
-
-        case Some(target) =>
-          confuseHostile(target.id, numberOfTurns)
-            .addGlobalEvents(GameEvent.PlayerTurnEnd)
+      HostilesManager.updateModel(
+        context,
+        this,
+        HostilesManager.Cmds.ConfuseHostile(name, id, numberOfTurns)
+      )
 
     case GameEvent.PlayerCastsFireball(name, damage, id) =>
       hostiles.findById(id) match
