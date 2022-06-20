@@ -47,7 +47,9 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
 
   def closeAllWindows: Model =
     this.copy(
-      gameState = GameState.Game
+      gameState =
+        if gameState == GameState.ShowingWindow then GameState.Game
+        else gameState
     )
 
   def pauseForWindow: Model =
