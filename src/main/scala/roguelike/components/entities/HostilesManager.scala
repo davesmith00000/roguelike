@@ -13,42 +13,41 @@ import roguelike.viewmodel.GameViewModel
 
 object HostilesManager extends Component[Size, Model, GameViewModel]:
   type Command            = Cmds
-  type ComponentModel     = HostilesPool
+  type ComponentModel     = HostilesM
   type ComponentViewModel = HostilesVM
 
-  def modelLens: Lens[Model, HostilesPool] =
+  def modelLens: Lens[Model, HostilesM] =
     Lens(
-      _.hostiles,
-      (m, hp) => m.copy(hostiles = hp)
+      model => HostilesM(model.hostiles, model.gameMap.visible),
+      (m, hp) => m.copy(hostiles = hp.pool)
     )
 
   def viewModelLens: Lens[GameViewModel, HostilesVM] =
-    Lens(
-      viewModel => HostilesVM(),
-      (viewModel, hostileVM) => viewModel
+    Lens.readOnly(viewModel =>
+      HostilesVM(viewModel.tilePositions, viewModel.squareSize)
     )
 
-  def updateHostile(id: Int, hostilesPool: HostilesPool)(
+  def updateHostile(id: Int, model: HostilesM)(
       modify: Hostile => Outcome[Hostile]
-  )(default: => Outcome[HostilesPool]): Outcome[HostilesPool] =
-    hostilesPool.findAliveById(id) match
+  )(default: => Outcome[HostilesM]): Outcome[HostilesM] =
+    model.pool.findAliveById(id) match
       case None => default
       case Some(hostile) =>
         Outcome
           .sequence(
-            hostilesPool.hostiles.map {
+            model.pool.hostiles.map {
               case h if h.id == id && h.isAlive => modify(h)
               case h                            => Outcome(h)
             }
           )
-          .map(es => hostilesPool.copy(hostiles = es))
+          .map(es => model.copy(pool = model.pool.copy(hostiles = es)))
 
   def nextModel(
       context: FrameContext[Size],
-      hostilesPool: HostilesPool
-  ): Cmds => Outcome[HostilesPool] =
+      model: HostilesM
+  ): Cmds => Outcome[HostilesM] =
     case Cmds.ConfuseHostile(playerName, id, numberOfTurns) =>
-      updateHostile(id, hostilesPool) { hostile =>
+      updateHostile(id, model) { hostile =>
         HostileComponent
           .updateModel(
             context,
@@ -57,7 +56,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
           )
           .addGlobalEvents(GameEvent.PlayerTurnEnd)
       } {
-        Outcome(hostilesPool)
+        Outcome(model)
           .addGlobalEvents(
             GameEvent.Log(
               Message(
@@ -71,19 +70,32 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
 
   def nextViewModel(
       context: FrameContext[Size],
-      hostilesPool: HostilesPool,
+      model: HostilesM,
       viewModel: HostilesVM
   ): Cmds => Outcome[HostilesVM] =
     _ => Outcome(viewModel)
 
   def view(
       context: FrameContext[Size],
-      hostilesPool: HostilesPool,
+      model: HostilesM,
       viewModel: HostilesVM
   ): Batch[SceneNode] =
-    Batch()
+    model.pool.hostiles
+      .filter(h =>
+        model.visibleTiles.contains(h.position) & viewModel.tilePositions
+          .contains(h.position)
+      )
+      .sortBy(_.isAlive)
+      .flatMap { hostile =>
+        HostileComponent.view(
+          context,
+          hostile,
+          HostileComponent.HostileVM(viewModel.squareSize)
+        )
+      }
 
   enum Cmds:
     case ConfuseHostile(playerName: String, id: Int, numberOfTurns: Int)
 
-  final case class HostilesVM()
+  final case class HostilesM(pool: HostilesPool, visibleTiles: Batch[Point])
+  final case class HostilesVM(tilePositions: Batch[Point], squareSize: Point)

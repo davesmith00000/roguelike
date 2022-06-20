@@ -42,10 +42,9 @@ final case class GameViewModel(
     playerPosition: ActorPosition,
     lookAtPosition: Point,
     hoverSquare: Point,
-    tiles: js.Array[(GameTile, Point)],
-    tilePositions: js.Array[Point],
+    tiles: Batch[(GameTile, Point)],
+    tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
-    hostiles: js.Array[Hostile],
     terminals: CachedTerminals,
     helpControlsText: String,
     miniMap: MiniMap
@@ -172,10 +171,9 @@ object GameViewModel:
       playerPosition = ActorPosition(player.position, SquareSize),
       lookAtPosition = Point.zero,
       hoverSquare = Point.zero,
-      tiles = js.Array(),
-      tilePositions = js.Array(),
+      tiles = Batch.empty,
+      tilePositions = Batch.empty,
       collectables = js.Array(),
-      hostiles = js.Array(),
       terminals = CachedTerminals.initial,
       helpControlsText,
       miniMap = MiniMap.initial(Point.zero, RogueLikeGame.screenSize)
@@ -214,10 +212,6 @@ object GameViewModel:
             model.gameMap.visible.contains(collectable.position)
         )
 
-    val hostiles =
-      model.visibleSortedHostiles
-        .filter(h => viewModel.tilePositions.contains(h.position))
-
     val nextPlayerPosition =
       PlayerComponent.updateViewModel(
         context,
@@ -243,7 +237,6 @@ object GameViewModel:
         tiles = tiles,
         tilePositions = tiles.map(_._2),
         collectables = collectables,
-        hostiles = hostiles,
         miniMap = nextMiniMap
       )
     }

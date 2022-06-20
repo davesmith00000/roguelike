@@ -77,14 +77,13 @@ final case class GameMap(
     if bounds.contains(at) then tileMap(indexFromPoint(at))
     else None
 
-  def toLocalExplored(center: Point, size: Size): js.Array[(GameTile, Point)] =
+  def toLocalExplored(center: Point, size: Size): Batch[(GameTile, Point)] =
     val topLeft: Point = center - (size.toPoint / 2)
     val bounds: Rectangle =
       Rectangle.fromPoints(topLeft, topLeft + size.toPoint)
 
     GameMap
       .searchByBoundsWithPosition(this, bounds)
-      .toJSArray
       .map(p => (p._2, p._1))
       .filter((_, pos) => explored.contains(pos))
 

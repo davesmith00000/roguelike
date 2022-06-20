@@ -65,11 +65,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       lookAtTarget = player.position
     )
 
-  def visibleSortedHostiles: js.Array[Hostile] =
-    hostiles.toJSArray
-      .filter(e => gameMap.visible.contains(e.position))
-      .sortBy(_.isAlive)
-
   def damageHostile(id: Int, damage: Int): Outcome[Model] =
     hostiles.damageHostile(id, damage).map { hm =>
       this.copy(hostiles = hm)

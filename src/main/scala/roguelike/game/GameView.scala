@@ -6,6 +6,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.Assets
 import roguelike.GameGraphics
 import roguelike.RogueLikeGame
+import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
@@ -63,7 +64,6 @@ object GameView:
             case GameTile.DownStairs =>
               GameGraphics.stairsInShadowTile(p._2 * viewModel.squareSize)
         )
-        .toBatch
 
     val gameGrid: Batch[CloneTiles] =
       Batch(CloneTiles(GameGraphics.tileClone.id, gameGridData))
@@ -112,62 +112,6 @@ object GameView:
               .moveTo(collectable.position * viewModel.squareSize)
       }
 
-    val hostilesAndHealthBars: List[(SceneNode, List[SceneNode])] =
-      viewModel.hostiles.map { hostile =>
-        val color =
-          hostile match
-            case h: Orc if h.isAlive   => RGBA(0.2, 0.8, 0.0, 1.0)
-            case _: Orc                => RGBA(1.0, 0.1, 0.1, 0.75)
-            case h: Troll if h.isAlive => RGBA(0.3, 0.6, 0.0, 1.0)
-            case _: Troll              => RGBA(0.1, 0.2, 1.0, 0.75)
-
-        val size: Int =
-          hostile match
-            case h: Orc if h.isAlive   => (viewModel.squareSize.x * 0.25).toInt
-            case _: Orc                => (viewModel.squareSize.x * 0.35).toInt
-            case h: Troll if h.isAlive => (viewModel.squareSize.x * 0.4).toInt
-            case _: Troll              => (viewModel.squareSize.x * 0.5).toInt
-
-        val position = hostile.position * viewModel.squareSize
-
-        val halfSquareWidth = viewModel.squareSize.x / 2
-
-        val healthbar: List[SceneNode] =
-          if !hostile.isAlive then Nil
-          else
-            List(
-              Shape.Box(
-                Rectangle(
-                  position + Point(halfSquareWidth / 2, -6),
-                  Size(halfSquareWidth, 5)
-                ),
-                Fill.Color(RGBA.Red),
-                Stroke(1, RGBA.Black)
-              ),
-              Shape.Box(
-                Rectangle(
-                  position + Point(halfSquareWidth / 2, -6),
-                  Size(
-                    (halfSquareWidth * hostile.fighter.hpAsMultiplier).toInt,
-                    5
-                  )
-                ),
-                Fill.Color(RGBA.Green),
-                Stroke(1, RGBA.Black)
-              )
-            )
-
-        (
-          Shape.Circle(
-            position + halfSquareWidth,
-            size,
-            Fill.Color(color),
-            Stroke(2, color.mix(RGBA.Black, 0.5))
-          ),
-          healthbar
-        )
-      }.toList
-
     val lookAround: Batch[SceneNode] =
       model.gameState match
         case GameState.LookAround(_) =>
@@ -185,8 +129,12 @@ object GameView:
         case _ =>
           Batch.empty
 
-    val hostiles   = hostilesAndHealthBars.toBatch.map(_._1)
-    val healthBars = hostilesAndHealthBars.map(_._2).flatten.toBatch
+    val hostiles =
+      HostilesManager.view(
+        context,
+        HostilesManager.modelLens.get(model),
+        HostilesManager.viewModelLens.get(viewModel)
+      )
 
     val camera =
       model.gameState match
@@ -208,7 +156,6 @@ object GameView:
           collectables ++
           hostiles ++
           PlayerComponent.present(context, model, viewModel) ++
-          healthBars ++
           lookAround
       ).withCamera(camera)
         .withMagnification(viewModel.magnification),
