@@ -11,7 +11,6 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.game.MiniMap
 import roguelike.model.GameMap
-import roguelike.model.GamePhase
 import roguelike.model.GameTile
 import roguelike.model.Model
 import roguelike.model.entity.Collectable

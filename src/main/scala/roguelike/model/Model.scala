@@ -409,10 +409,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
 
       res.addGlobalEvents(GameEvent.NPCTurnComplete)
 
+  // TODO: Move all the player movement stuff to the PlayerComponent.
   def performPlayerTurn(dice: Dice, by: Point): Outcome[Model] =
     player.bump(by, gameMap, hostiles).map(p => this.copy(player = p))
-
-  def moveUp(dice: Dice): Outcome[Model] = performPlayerTurn(dice, Point(0, -1))
+  def moveUp(dice: Dice): Outcome[Model] =
+    performPlayerTurn(dice, Point(0, -1))
   def moveDown(dice: Dice): Outcome[Model] =
     performPlayerTurn(dice, Point(0, 1))
   def moveLeft(dice: Dice): Outcome[Model] =
