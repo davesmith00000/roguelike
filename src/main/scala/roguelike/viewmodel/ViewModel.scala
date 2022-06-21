@@ -231,7 +231,7 @@ object GameViewModel:
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
         lookAtPosition =
-          (model.lookAtTarget * viewModel.squareSize) + (viewModel.squareSize.x / 2),
+          (model.lookAtTarget * viewModel.squareSize) - (viewModel.squareSize.x / 2),
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),

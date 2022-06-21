@@ -118,12 +118,14 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
     val halfSquareWidth = viewModel.squareSize.x / 2
 
     val healthbar: Batch[SceneNode] =
+      val barPos = position + Point(-(halfSquareWidth / 2), -halfSquareWidth)
+
       if !hostile.isAlive then Batch.empty
       else
         Batch(
           Shape.Box(
             Rectangle(
-              position + Point(halfSquareWidth / 2, -6),
+              barPos,
               Size(halfSquareWidth, 5)
             ),
             Fill.Color(RGBA.Red),
@@ -131,7 +133,7 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
           ),
           Shape.Box(
             Rectangle(
-              position + Point(halfSquareWidth / 2, -6),
+              barPos,
               Size(
                 (halfSquareWidth * hostile.fighter.hpAsMultiplier).toInt,
                 5
@@ -143,7 +145,7 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
         )
 
     Shape.Circle(
-      position + halfSquareWidth,
+      position,
       size,
       Fill.Color(color),
       Stroke(2, color.mix(RGBA.Black, 0.5))

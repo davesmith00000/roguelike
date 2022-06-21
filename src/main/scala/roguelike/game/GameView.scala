@@ -44,26 +44,27 @@ object GameView:
 
     val gameGridData: Batch[CloneTileData] =
       viewModel.tiles
-        .map(p =>
+        .map { p =>
+          val pos = (p._2 * viewModel.squareSize) - (viewModel.squareSize / 2)
           p._1 match
             case GameTile.Wall if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.wallTile(p._2 * viewModel.squareSize)
+              GameGraphics.wallTile(pos)
 
             case GameTile.Wall =>
-              GameGraphics.wallInShadowTile(p._2 * viewModel.squareSize)
+              GameGraphics.wallInShadowTile(pos)
 
             case GameTile.Ground if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.floorTile(p._2 * viewModel.squareSize)
+              GameGraphics.floorTile(pos)
 
             case GameTile.Ground =>
-              GameGraphics.floorInShadowTile(p._2 * viewModel.squareSize)
+              GameGraphics.floorInShadowTile(pos)
 
             case GameTile.DownStairs if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.stairsTile(p._2 * viewModel.squareSize)
+              GameGraphics.stairsTile(pos)
 
             case GameTile.DownStairs =>
-              GameGraphics.stairsInShadowTile(p._2 * viewModel.squareSize)
-        )
+              GameGraphics.stairsInShadowTile(pos)
+        }
 
     val gameGrid: Batch[CloneTiles] =
       Batch(CloneTiles(GameGraphics.tileClone.id, gameGridData))
@@ -71,7 +72,9 @@ object GameView:
     val hover =
       Batch(
         GameGraphics.highlight
-          .moveTo(viewModel.hoverSquare * viewModel.squareSize)
+          .moveTo(
+            (viewModel.hoverSquare * viewModel.squareSize) - (viewModel.squareSize / 2)
+          )
       )
 
     val collectables: Batch[SceneNode] =
@@ -113,15 +116,16 @@ object GameView:
       }
 
     val lookAround: Batch[SceneNode] =
+      val pos = viewModel.lookAtPosition
       model.gameState match
         case GameState.LookAround(_) =>
           Batch(
             GameGraphics.target.moveTo(
-              model.lookAtTarget * viewModel.squareSize
+              pos
             ),
             UIElements.renderAreaOfEffect(
               viewModel.squareSize,
-              model.lookAtTarget * viewModel.squareSize,
+              pos,
               model.gameState
             )
           )
@@ -141,7 +145,9 @@ object GameView:
         case GameState.LookAround(_) =>
           val offset =
             (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-          Camera.Fixed(viewModel.lookAtPosition - offset)
+          Camera.Fixed(
+            viewModel.lookAtPosition - offset + (viewModel.squareSize / 2)
+          )
 
         case _ =>
           val offset =

@@ -40,8 +40,7 @@ final case class ActorPosition(
     val elapsedTime = travelTimeTaken + timeDelta
     val time =
       if destinationPosition == target then
-        if elapsedTime > animationDuration then
-          animationDuration
+        if elapsedTime > animationDuration then animationDuration
         else elapsedTime
       else Seconds.zero
 
@@ -73,10 +72,18 @@ object ActorPosition:
   def apply(mapPosition: Point, squareSize: Point): ActorPosition =
     initial(mapPosition, squareSize, DefaultMoveDuration)
 
-  def apply(mapPosition: Point, squareSize: Point, animationDuration: Seconds): ActorPosition =
+  def apply(
+      mapPosition: Point,
+      squareSize: Point,
+      animationDuration: Seconds
+  ): ActorPosition =
     initial(mapPosition, squareSize, animationDuration)
 
-  def initial(mapPosition: Point, squareSize: Point, animationDuration: Seconds): ActorPosition =
+  def initial(
+      mapPosition: Point,
+      squareSize: Point,
+      animationDuration: Seconds
+  ): ActorPosition =
     val modelPosition = modelToMapSpaceTileCentered(mapPosition, squareSize)
     ActorPosition(
       modelPosition,
@@ -88,7 +95,7 @@ object ActorPosition:
     )
 
   def modelToMapSpaceTileCentered(position: Point, squareSize: Point): Point =
-    (position * squareSize) + (squareSize.x / 2)
+    position * squareSize
 
   def moveTowardsTarget(
       actorPosition: ActorPosition,
