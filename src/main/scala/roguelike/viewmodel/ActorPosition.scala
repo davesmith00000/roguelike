@@ -15,6 +15,8 @@ import roguelike.GameEvent
   *   Amount of time this move has taken so far
   * @param squareSize
   *   Size of a tile in pixels
+  * @param animationDuration
+  *   Total time allowed for animation
   */
 final case class ActorPosition(
     current: Point,
