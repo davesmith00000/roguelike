@@ -36,9 +36,6 @@ object InventoryMenu extends Component[Size, Model, GameViewModel]:
         case Some(keyIndex) =>
           inventory
             .use(keyIndex)
-            .addGlobalEvents(
-              GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
-            )
 
   def nextViewModel(
       context: FrameContext[Size],
