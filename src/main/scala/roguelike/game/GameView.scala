@@ -79,40 +79,41 @@ object GameView:
 
     val collectables: Batch[SceneNode] =
       viewModel.collectables.toBatch.map { collectable =>
+        val pos = (collectable.position * viewModel.squareSize) - (viewModel.squareSize / 2)
         collectable.item match
           case Ranged.LightningScroll =>
             GameGraphics.lightningScroll
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Ranged.FireballScroll =>
             GameGraphics.fireScroll
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Ranged.ConfusionScroll =>
             GameGraphics.confusionScroll
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           // TODO: Scroll in shadow - currently not in list as not visible.
 
           case Consumables.HealthPotion =>
             GameGraphics.healthPotion
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Armour.LeatherArmor =>
             GameGraphics.leatherArmour
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Armour.ChainMail =>
             GameGraphics.chainmail
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Melee.Dagger =>
             GameGraphics.dagger
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
 
           case Melee.Sword =>
             GameGraphics.sword
-              .moveTo(collectable.position * viewModel.squareSize)
+              .moveTo(pos)
       }
 
     val lookAround: Batch[SceneNode] =
