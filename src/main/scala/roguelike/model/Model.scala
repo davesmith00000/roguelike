@@ -155,6 +155,9 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   }
 
   def update(context: FrameContext[Size]): GameEvent => Outcome[Model] =
+    case GameEvent.PlayerTryPickUp =>
+      pickUp
+
     case GameEvent.WindowEvent(command) =>
       WindowManager.updateModel(context, this, command)
 

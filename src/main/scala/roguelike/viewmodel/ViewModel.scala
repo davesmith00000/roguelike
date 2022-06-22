@@ -128,6 +128,12 @@ final case class GameViewModel(
     case FrameTick =>
       GameViewModel.nextViewModel(context, model, this)
 
+    case MouseEvent.Click(_)
+        if !WindowManager.showingWindow(model) &&
+          model.player.position == hoverSquare =>
+      Outcome(this)
+        .addGlobalEvents(GameEvent.PlayerTryPickUp)
+
     case MouseEvent.Click(_) if !WindowManager.showingWindow(model) =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))

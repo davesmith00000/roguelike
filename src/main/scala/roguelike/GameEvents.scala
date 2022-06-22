@@ -26,6 +26,7 @@ enum GameEvent extends GlobalEvent:
   case PlayerTurnEnd
   case PlayerMoveTowards(target: Point) // Move towards tile on click.
   case PlayerContinueMove               // Continue moving towards the target.
+  case PlayerTryPickUp
 
   // Inventory events
   case Inventory(event: InventoryEvent)

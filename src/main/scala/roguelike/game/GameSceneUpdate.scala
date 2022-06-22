@@ -89,7 +89,7 @@ object GameSceneUpdate:
 
     case KeyboardEvent.KeyUp(KeyMapping.PickUp)
         if model.gameState.isRunning && model.player.isAlive =>
-      model.pickUp
+      Outcome(model, Batch(GameEvent.PlayerTryPickUp))
 
     case KeyboardEvent.KeyUp(KeyMapping.Descend)
         if model.gameState.isRunning && model.player.isAlive =>
