@@ -152,7 +152,7 @@ object GameView:
         case _ =>
           val offset =
             (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-          Camera.Fixed(viewModel.playerPosition.display - offset)
+          Camera.Fixed(viewModel.playerPosition.display(viewModel.squareSize) - offset)
 
     SceneUpdateFragment(
       Layer(

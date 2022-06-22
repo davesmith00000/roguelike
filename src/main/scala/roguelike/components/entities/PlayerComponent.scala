@@ -119,7 +119,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
   ): Batch[SceneNode] =
     Batch(
       Shape.Circle(
-        viewModel.playerPosition.display,
+        viewModel.playerPosition.display(viewModel.squareSize),
         (viewModel.squareSize.x / 2.5).toInt,
         Fill.Color(RGBA.White),
         Stroke(2, RGBA.Black)

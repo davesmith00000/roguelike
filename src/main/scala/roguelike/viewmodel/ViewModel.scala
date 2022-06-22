@@ -56,7 +56,7 @@ final case class GameViewModel(
       Outcome(this)
         .addGlobalEvents(
           FloatingMessage.spawnEvent(
-            playerPosition.display,
+            playerPosition.display(squareSize),
             FloatingMessage.Message("+1 " + item.name, RGB.Green)
           )
         )
@@ -65,7 +65,7 @@ final case class GameViewModel(
       Outcome(this)
         .addGlobalEvents(
           FloatingMessage.spawnEvent(
-            playerPosition.display,
+            playerPosition.display(squareSize),
             FloatingMessage.Message("-1 " + item.name, RGB.Red)
           )
         )
@@ -114,10 +114,7 @@ final case class GameViewModel(
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
         this.copy(
-          playerPosition = ActorPosition(
-            model.player.position,
-            GameViewModel.SquareSize
-          )
+          playerPosition = ActorPosition(model.player.position)
         )
       )
 
@@ -167,7 +164,7 @@ object GameViewModel:
       viewportSize = initialViewportSize,
       squareSize = SquareSize,
       visibleGridSize = initialViewportSize / SquareSize.toSize,
-      playerPosition = ActorPosition(player.position, SquareSize),
+      playerPosition = ActorPosition(player.position),
       lookAtPosition = Point.zero,
       hoverSquare = Point.zero,
       tiles = Batch.empty,
