@@ -5,6 +5,7 @@ import indigo.scenes.SceneEvent
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.MainMenuScene
+import roguelike.components.entities.HostilesManager
 import roguelike.components.windows.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.GamePhase
@@ -22,6 +23,7 @@ object GameSceneUpdate:
     model.gamePhase match
       case GamePhase.WaitForInput => onWaitingForInput(context, model)
       case GamePhase.MovingPlayer => otherPhase(context, model)
+      case GamePhase.UpdateNPC    => updateNpcPhase(context, model)
       case GamePhase.MovingNPC    => otherPhase(context, model)
 
   def onWaitingForInput(
@@ -153,6 +155,24 @@ object GameSceneUpdate:
         if model.gameState.lookingAround =>
       Outcome(model.toggleLookAround(0))
         .addGlobalEvents(GameEvent.Targeted(model.lookAtTarget))
+
+    // Other
+    case e: GameEvent =>
+      model.update(context)(e)
+
+    case _ =>
+      Outcome(model)
+
+  def updateNpcPhase(
+      context: FrameContext[Size],
+      model: Model
+  ): GlobalEvent => Outcome[Model] =
+    case FrameTick if model.gamePhase.isUpdateNPC =>
+      HostilesManager.updateModel(
+        context,
+        model,
+        HostilesManager.Cmds.Update(model.gameMap)
+      )
 
     // Other
     case e: GameEvent =>

@@ -394,23 +394,13 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       Outcome(this)
 
     case GameEvent.ModelHandOff(ViewModelEvent.PlayerMoveComplete) =>
-      // This is a fudge. The player move is done and we should now check for
-      // other things the player is doing, like attacking, then hand off to the
-      // view model again for the next round of presentation.
-      // What we actually do is the entire NPC moves, and immediately complete.
-      val res = for {
-        gm <- gameMap.update(player.position)
-        um <- HostilesManager.updateModel(
-          context,
-          this,
-          HostilesManager.Cmds.Update(gm)
+      gameMap.update(player.position).map { gm =>
+        this.copy(
+          gameMap = gm,
+          gamePhase = GamePhase.UpdateNPC,
+          hostiles = hostiles.queueAll
         )
-      } yield um.copy(
-        gameMap = gm,
-        gamePhase = GamePhase.MovingNPC
-      )
-
-      res.addGlobalEvents(GameEvent.NPCTurnComplete)
+      }
 
   // TODO: Move all the player movement stuff to the PlayerComponent.
   def performPlayerTurn(dice: Dice, by: Point): Outcome[Model] =

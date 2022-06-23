@@ -45,63 +45,50 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
               case h                            => Outcome(h)
             }
           )
-          .map(es => model.copy(pool = model.pool.copy(hostiles = es)))
+          .map(es => model.copy(pool = model.pool.copy(done = es)))
+
+  private def updateNextHostile(
+      context: FrameContext[Size],
+      model: HostilesM,
+      gameMap: GameMap
+  ): (Hostile, Batch[Hostile]) => Outcome[Hostile] = (h, hs) =>
+    val randomDirection: () => Point =
+      () =>
+        HostilesPool.getRandomDirection(
+          context.dice,
+          h.position,
+          gameMap
+        )
+
+    val f: Hostile => Batch[Point] =
+      h => if h.blocksMovement then Batch(h.position) else Batch.empty
+
+    val entityPositions =
+      hs.flatMap(f)
+
+    val getPathTo: (Dice, Point, Point) => Batch[Point] =
+      (dice, from, to) =>
+        GameMap.getPathTo(dice, from, to, entityPositions, gameMap)
+
+    HostileComponent.updateModel(
+      context,
+      h,
+      HostileComponent.Cmds
+        .Update(model.playerPosition, randomDirection, getPathTo)
+    )
 
   def nextModel(
       context: FrameContext[Size],
       model: HostilesM
   ): Cmds => Outcome[HostilesM] =
     case Cmds.Update(gameMap) =>
-      @tailrec
-      def rec(
-          remaining: List[Hostile],
-          events: Batch[GameEvent],
-          acc: Batch[Outcome[Hostile]]
-      ): Outcome[Batch[Hostile]] =
-        remaining match
-          case Nil =>
-            Outcome.sequence(acc).addGlobalEvents(events)
-
-          case x :: xs
-              if !x.isAlive || !model.visibleTiles.contains(x.position) =>
-            // Filter out the dead and the unseen
-            rec(xs, events, Outcome(x) :: acc)
-
-          case x :: xs =>
-            val randomDirection: () => Point =
-              () =>
-                HostilesPool.getRandomDirection(
-                  context.dice,
-                  x.position,
-                  gameMap
-                )
-
-            val f: Hostile => Batch[Point] =
-              h => if h.blocksMovement then Batch(h.position) else Batch.empty
-
-            val entityPositions =
-              xs.toBatch.flatMap(f) ++
-                Outcome
-                  .sequence(acc)
-                  .map(_.flatMap(f))
-                  .getOrElse(Batch.empty)
-
-            val getPathTo: (Dice, Point, Point) => Batch[Point] =
-              (dice, from, to) =>
-                GameMap.getPathTo(dice, from, to, entityPositions, gameMap)
-
-            val updated =
-              HostileComponent.updateModel(
-                context,
-                x,
-                HostileComponent.Cmds
-                  .Update(model.playerPosition, randomDirection, getPathTo)
-              )
-
-            rec(xs, events, updated :: acc)
-
-      val res = rec(model.pool.hostiles.toList, Batch.empty, Batch.empty)
-      res.map(hs => model.copy(pool = model.pool.copy(hostiles = hs)))
+      model.pool
+        .updateNextQueued(model.visibleTiles)(
+          updateNextHostile(context, model, gameMap)
+        )
+        .map { nextPool =>
+          model.copy(pool = nextPool)
+        }
 
     case Cmds.ConfuseHostile(playerName, id, numberOfTurns) =>
       updateHostile(id, model) { hostile =>

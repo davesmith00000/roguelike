@@ -1,4 +1,10 @@
 package roguelike.model
 
 enum GamePhase:
-  case WaitForInput, MovingPlayer, MovingNPC
+  case WaitForInput
+  case MovingPlayer
+  case UpdateNPC
+  case MovingNPC
+
+  def isUpdateNPC: Boolean =
+    this == UpdateNPC

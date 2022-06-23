@@ -10,10 +10,51 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-final case class HostilesPool(hostiles: Batch[Hostile]):
+final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
+
+  lazy val hostiles: Batch[Hostile] =
+    queued ++ done
 
   lazy val toJSArray: scalajs.js.Array[Hostile] =
     hostiles.toJSArray
+
+  def queueAll: HostilesPool =
+    this.copy(done = Batch.empty, queued = hostiles)
+
+  /** Runs through the queued hostiles until it finds one that is alive,
+    * processes that one, and drops out. If it reaches the end of the list, it
+    * ends the NPC turn.
+    */
+  def updateNextQueued(visibleTiles: Batch[Point])(
+      f: (Hostile, Batch[Hostile]) => Outcome[Hostile]
+  ): Outcome[HostilesPool] =
+    @tailrec
+    def rec(
+        remaining: Batch[Hostile],
+        processed: Batch[Hostile]
+    ): Outcome[HostilesPool] =
+      if remaining.isEmpty then
+        Outcome(
+          this.copy(
+            queued = remaining,
+            done = processed ++ done
+          ),
+          Batch(GameEvent.NPCTurnComplete)
+        )
+      else
+        val h = remaining.head
+        val t = remaining.tail
+
+        if h.isAlive && visibleTiles.contains(h.position) then
+          f(h, t ++ done).map { d =>
+            this.copy(
+              queued = t,
+              done = (d :: processed) ++ done
+            )
+          }
+        else rec(t, h :: processed)
+
+    rec(queued, Batch.empty)
 
   def findAllInRange(target: Point, range: Int) =
     hostiles
@@ -66,6 +107,9 @@ final case class HostilesPool(hostiles: Batch[Hostile]):
     }
 
 object HostilesPool:
+
+  def apply(hostiles: Batch[Hostile]): HostilesPool =
+    HostilesPool(Batch.empty, hostiles)
 
   def getRandomDirection(
       dice: Dice,
