@@ -21,6 +21,7 @@ object GameSceneUpdate:
       model: Model
   ): GlobalEvent => Outcome[Model] =
     model.gamePhase match
+      case _ if WindowManager.showingWindow(model) => onWaitingForInput(context, model)
       case GamePhase.WaitForInput => onWaitingForInput(context, model)
       case GamePhase.MovingPlayer => otherPhase(context, model)
       case GamePhase.UpdateNPC    => updateNpcPhase(context, model)
