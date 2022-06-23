@@ -319,10 +319,15 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         if p.nonEmpty then
           val next      = p.head
           val remaining = p.tail
-          performPlayerTurn(context.dice, next - player.position).map {
-            _.copy(
-              autoMovePath = remaining
-            )
+          performPlayerTurn(context.dice, next - player.position).map { m =>
+            if m.player.position == player.position then
+              m.copy(
+                autoMovePath = Batch.empty
+              )
+            else
+              m.copy(
+                autoMovePath = remaining
+              )
           }
         else
           Outcome(
