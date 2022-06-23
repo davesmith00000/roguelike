@@ -118,7 +118,6 @@ object GameSceneUpdate:
           !WindowManager.showingWindow(model) =>
       WindowManager
         .updateModel(context, model, WindowManagerCommand.ShowHistory)
-        .addGlobalEvents(GameEvent.RedrawHistoryLog)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isRunning ||

@@ -39,7 +39,6 @@ enum GameEvent extends GlobalEvent:
 
   // System events
   case Log(message: Message)
-  case Redraw
   case RedrawHistoryLog
   case Targeted(position: Point)
   case WindowEvent(command: WindowManagerCommand)

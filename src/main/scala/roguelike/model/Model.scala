@@ -165,7 +165,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       Outcome(
         this.copy(
           messageLog = messageLog.addMessage(message)
-        )
+        ),
+        Batch(GameEvent.RedrawHistoryLog)
       )
 
     case GameEvent.Inventory(e) =>
@@ -362,8 +363,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
 
       if noHostilesVisible then
         val events =
-          if autoMovePath.isEmpty then Batch(GameEvent.Redraw)
-          else Batch(GameEvent.Redraw, GameEvent.PlayerContinueMove)
+          if autoMovePath.isEmpty then Batch.empty
+          else Batch(GameEvent.PlayerContinueMove)
 
         Outcome(this.copy(gamePhase = GamePhase.WaitForInput))
           .addGlobalEvents(events)
@@ -373,12 +374,9 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             gamePhase = GamePhase.WaitForInput,
             autoMovePath = Batch.empty
           )
-        ).addGlobalEvents(GameEvent.Redraw)
+        )
 
     case GameEvent.RedrawHistoryLog =>
-      Outcome(this)
-
-    case GameEvent.Redraw =>
       Outcome(this)
 
     case GameEvent.CameraSnapToPlayer =>

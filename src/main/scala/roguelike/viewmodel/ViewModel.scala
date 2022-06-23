@@ -93,9 +93,6 @@ final case class GameViewModel(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
 
-    case GameEvent.Redraw =>
-      Outcome(this)
-
     case GameEvent.RedrawHistoryLog =>
       val history =
         model.messageLog
@@ -105,9 +102,17 @@ final case class GameViewModel(
               Graphic(10, 10, TerminalText(Assets.Basic.tileMap, fg, bg))
           }
 
+      val shortLog =
+        model.messageLog
+          .toTerminal(Size(50, 5), false, 0, false)
+          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
+            (fg, bg) =>
+              Graphic(10, 10, TerminalText(Assets.Basic.tileMap, fg, bg))
+          }
+
       Outcome(
         this.copy(
-          terminals = terminals.copy(history = history)
+          terminals = terminals.copy(history = history, shortLog = shortLog)
         )
       )
 
@@ -243,8 +248,8 @@ object GameViewModel:
       )
     }
 
-final case class CachedTerminals(history: TerminalClones)
+final case class CachedTerminals(history: TerminalClones, shortLog: TerminalClones)
 
 object CachedTerminals:
   def initial: CachedTerminals =
-    CachedTerminals(TerminalClones.empty)
+    CachedTerminals(TerminalClones.empty, TerminalClones.empty)

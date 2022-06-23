@@ -79,7 +79,8 @@ object GameView:
 
     val collectables: Batch[SceneNode] =
       viewModel.collectables.toBatch.map { collectable =>
-        val pos = (collectable.position * viewModel.squareSize) - (viewModel.squareSize / 2)
+        val pos =
+          (collectable.position * viewModel.squareSize) - (viewModel.squareSize / 2)
         collectable.item match
           case Ranged.LightningScroll =>
             GameGraphics.lightningScroll
@@ -153,7 +154,9 @@ object GameView:
         case _ =>
           val offset =
             (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-          Camera.Fixed(viewModel.playerPosition.display(viewModel.squareSize) - offset)
+          Camera.Fixed(
+            viewModel.playerPosition.display(viewModel.squareSize) - offset
+          )
 
     SceneUpdateFragment(
       Layer(
@@ -203,9 +206,13 @@ object GameView:
             model.entitiesList,
             model.stairsPosition,
             viewModel.hoverSquare
+          ),
+          UIElements.renderShortLog(
+            vpSize,
+            viewModel.terminals.shortLog.clones
           )
         ) ++ WindowManager.present(context, model, viewModel)
       )
     ).addCloneBlanks(
-      GameGraphics.tileClone :: viewModel.terminals.history.blanks
+      GameGraphics.tileClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
     )
