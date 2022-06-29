@@ -27,6 +27,7 @@ enum GameEvent extends GlobalEvent:
   case PlayerMoveTowards(target: Point) // Move towards tile on click.
   case PlayerContinueMove               // Continue moving towards the target.
   case PlayerTryPickUp
+  case PlayerMoveComplete
 
   // Inventory events
   case Inventory(event: InventoryEvent)
@@ -45,9 +46,6 @@ enum GameEvent extends GlobalEvent:
 
   // ViewModel events
   case CameraSnapToPlayer
-  case ViewModelHandOff(event: ViewModelEvent)
-  case ModelHandOff(event: ViewModelEvent)
-  case ViewModelPhaseComplete(event: ViewModelEvent)
 
 enum HostileEvent:
   case HostileMeleeAttack(attackerName: String, power: Int)
@@ -60,7 +58,3 @@ enum InventoryEvent:
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)
   case RemoveFromInventory(inventoryPosition: Int)
-
-enum ViewModelEvent:
-  case MovePlayer
-  case PlayerMoveComplete

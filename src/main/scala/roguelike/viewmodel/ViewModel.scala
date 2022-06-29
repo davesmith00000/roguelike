@@ -6,7 +6,6 @@ import roguelike.Assets
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
-import roguelike.ViewModelEvent
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.game.MiniMap
@@ -29,11 +28,7 @@ object ViewModel:
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(GameViewModel.initial(player, initialViewportSize))
 
-enum GameViewModelPhase:
-  case Idle, MovingPlayer
-
 final case class GameViewModel(
-    phase: GameViewModelPhase,
     magnification: Int,
     viewportSize: Size,
     squareSize: Point,
@@ -143,13 +138,6 @@ final case class GameViewModel(
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
-    case GameEvent.ViewModelHandOff(ViewModelEvent.MovePlayer) =>
-      Outcome(this.copy(phase = GameViewModelPhase.MovingPlayer))
-
-    case GameEvent.ViewModelPhaseComplete(e) =>
-      Outcome(this.copy(phase = GameViewModelPhase.Idle))
-        .addGlobalEvents(GameEvent.ModelHandOff(e))
-
     case _ =>
       Outcome(this)
 
@@ -170,7 +158,6 @@ object GameViewModel:
       .mkString("\n")
 
     GameViewModel(
-      GameViewModelPhase.Idle,
       magnification = 2,
       viewportSize = initialViewportSize,
       squareSize = SquareSize,
@@ -248,7 +235,10 @@ object GameViewModel:
       )
     }
 
-final case class CachedTerminals(history: TerminalClones, shortLog: TerminalClones)
+final case class CachedTerminals(
+    history: TerminalClones,
+    shortLog: TerminalClones
+)
 
 object CachedTerminals:
   def initial: CachedTerminals =

@@ -13,8 +13,6 @@ import roguelike.model.Model
 import roguelike.model.entity.Hostile
 import roguelike.viewmodel.GameViewModel
 
-import scala.annotation.tailrec
-
 object HostilesManager extends Component[Size, Model, GameViewModel]:
   type Command            = Cmds
   type ComponentModel     = HostilesM

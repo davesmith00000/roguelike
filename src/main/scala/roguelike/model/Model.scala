@@ -6,7 +6,6 @@ import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
-import roguelike.ViewModelEvent
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
@@ -33,7 +32,6 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     ], // TODO - is this really an 'active' inventory slot?
     loadInfo: GameLoadInfo,
     currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
-    gamePhase: GamePhase, // TODO: Should this be part of GameState?
     autoMovePath: Batch[Point],
     windowManager: ActiveWindow,
     collectables: Batch[Collectable],
@@ -49,7 +47,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def closeAllWindows: Model =
     this.copy(
       gameState =
-        if gameState == GameState.ShowingWindow then GameState.Game
+        if gameState == GameState.ShowingWindow then GameState.WaitForInput
         else gameState
     )
 
@@ -61,7 +59,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def toggleLookAround(radius: Int): Model =
     val show = !gameState.lookingAround
     this.copy(
-      gameState = if show then GameState.LookAround(radius) else GameState.Game,
+      gameState =
+        if show then GameState.LookAround(radius) else GameState.WaitForInput,
       lookAtTarget = player.position
     )
 
@@ -307,8 +306,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.PlayerTurnEnd =>
-      Outcome(this.copy(gamePhase = GamePhase.MovingPlayer))
-        .addGlobalEvents(GameEvent.ViewModelHandOff(ViewModelEvent.MovePlayer))
+      Outcome(this.copy(gameState = GameState.UpdatingPlayer))
 
     case GameEvent.PlayerMoveTowards(target) =>
       if autoMovePath.isEmpty then
@@ -371,12 +369,12 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           if autoMovePath.isEmpty then Batch.empty
           else Batch(GameEvent.PlayerContinueMove)
 
-        Outcome(this.copy(gamePhase = GamePhase.WaitForInput))
+        Outcome(this.copy(gameState = GameState.WaitForInput))
           .addGlobalEvents(events)
       else
         Outcome(
           this.copy(
-            gamePhase = GamePhase.WaitForInput,
+            gameState = GameState.WaitForInput,
             autoMovePath = Batch.empty
           )
         )
@@ -387,20 +385,11 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     case GameEvent.CameraSnapToPlayer =>
       Outcome(this)
 
-    case GameEvent.ViewModelPhaseComplete(_) =>
-      Outcome(this)
-
-    case GameEvent.ViewModelHandOff(_) =>
-      Outcome(this)
-
-    case GameEvent.ModelHandOff(ViewModelEvent.MovePlayer) =>
-      Outcome(this)
-
-    case GameEvent.ModelHandOff(ViewModelEvent.PlayerMoveComplete) =>
+    case GameEvent.PlayerMoveComplete =>
       gameMap.update(player.position).map { gm =>
         this.copy(
           gameMap = gm,
-          gamePhase = GamePhase.UpdateNPC,
+          gameState = GameState.UpdateNPCs,
           hostiles = hostiles.queueAll
         )
       }
@@ -457,11 +446,10 @@ object Model:
       Point.zero,
       GameMap.initial(RogueLikeGame.screenSize),
       MessageLog.DefaultLimited,
-      GameState.Game,
+      GameState.WaitForInput,
       None,
       GameLoadInfo.initial,
       0,
-      GamePhase.WaitForInput,
       Batch.empty,
       WindowManager.initialModel,
       Batch.empty,
@@ -504,11 +492,10 @@ object Model:
           Point.zero,
           gm,
           MessageLog.DefaultLimited,
-          GameState.Game,
+          GameState.WaitForInput,
           None,
           GameLoadInfo.initial,
           0,
-          GamePhase.WaitForInput,
           Batch.empty,
           WindowManager.initialModel,
           Batch.fromList(dungeon.collectables),
