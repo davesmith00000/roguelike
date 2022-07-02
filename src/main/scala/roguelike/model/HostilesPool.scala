@@ -10,10 +10,14 @@ import scala.annotation.tailrec
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
+final case class HostilesPool(
+    queued: Batch[Hostile],
+    inProgress: Option[Hostile],
+    done: Batch[Hostile]
+):
 
   lazy val hostiles: Batch[Hostile] =
-    queued ++ done
+    queued ++ Batch.fromOption(inProgress) ++ done
 
   lazy val toJSArray: scalajs.js.Array[Hostile] =
     hostiles.toJSArray
@@ -21,11 +25,36 @@ final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
   def queueAll: HostilesPool =
     this.copy(done = Batch.empty, queued = hostiles)
 
+  def update(
+      visibleTiles: Batch[Point],
+      f: (Hostile, Batch[Hostile]) => Outcome[Hostile]
+  ): Outcome[HostilesPool] =
+    inProgress match
+      case None =>
+        updateNextQueued(visibleTiles, f)
+
+      case Some(hostile) =>
+        Outcome(this)
+
+  def completeInProgress: Outcome[HostilesPool] =
+    inProgress match
+      case None =>
+        Outcome(this)
+
+      case Some(hostile) =>
+        Outcome(
+          this.copy(
+            inProgress = None,
+            done = hostile :: done
+          )
+        )
+
   /** Runs through the queued hostiles until it finds one that is alive,
     * processes that one, and drops out. If it reaches the end of the list, it
     * ends the NPC turn.
     */
-  def updateNextQueued(visibleTiles: Batch[Point])(
+  def updateNextQueued(
+      visibleTiles: Batch[Point],
       f: (Hostile, Batch[Hostile]) => Outcome[Hostile]
   ): Outcome[HostilesPool] =
     @tailrec
@@ -36,7 +65,8 @@ final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
       if remaining.isEmpty then
         Outcome(
           this.copy(
-            queued = remaining,
+            queued = Batch.empty,
+            inProgress = None,
             done = processed ++ done
           ),
           Batch(GameEvent.NPCTurnComplete)
@@ -49,7 +79,8 @@ final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
           f(h, t ++ done).map { d =>
             this.copy(
               queued = t,
-              done = (d :: processed) ++ done
+              inProgress = Some(d),
+              done = processed ++ done
             )
           }
         else rec(t, h :: processed)
@@ -109,7 +140,7 @@ final case class HostilesPool(queued: Batch[Hostile], done: Batch[Hostile]):
 object HostilesPool:
 
   def apply(hostiles: Batch[Hostile]): HostilesPool =
-    HostilesPool(Batch.empty, hostiles)
+    HostilesPool(Batch.empty, None, hostiles)
 
   def getRandomDirection(
       dice: Dice,

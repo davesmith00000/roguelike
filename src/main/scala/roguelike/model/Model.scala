@@ -379,6 +379,16 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           )
         )
 
+    case GameEvent.NPCMoveComplete =>
+      HostilesManager.updateModel(
+        context,
+        this,
+        HostilesManager.Cmds.CompleteInProgressHostile
+      )
+
+    case GameEvent.PlayerDescended =>
+      Model.genNextFloor(context.dice, this)
+
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)
 

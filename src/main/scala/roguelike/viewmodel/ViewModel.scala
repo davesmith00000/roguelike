@@ -6,6 +6,7 @@ import roguelike.Assets
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.game.MiniMap
@@ -34,6 +35,7 @@ final case class GameViewModel(
     squareSize: Point,
     visibleGridSize: Size,
     playerPosition: ActorPosition,
+    hostilePositions: Map[Int, ActorPosition],
     lookAtPosition: Point,
     hoverSquare: Point,
     tiles: Batch[(GameTile, Point)],
@@ -43,28 +45,11 @@ final case class GameViewModel(
     helpControlsText: String,
     miniMap: MiniMap
 ):
+
   def update(
       context: FrameContext[Size],
       model: Model
   ): GlobalEvent => Outcome[GameViewModel] =
-    case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
-      Outcome(this)
-        .addGlobalEvents(
-          FloatingMessage.spawnEvent(
-            playerPosition.display(squareSize),
-            FloatingMessage.Message("+1 " + item.name, RGB.Green)
-          )
-        )
-
-    case GameEvent.Inventory(InventoryEvent.DropItem(item, _)) =>
-      Outcome(this)
-        .addGlobalEvents(
-          FloatingMessage.spawnEvent(
-            playerPosition.display(squareSize),
-            FloatingMessage.Message("-1 " + item.name, RGB.Red)
-          )
-        )
-
     case KeyboardEvent.KeyDown(KeyMapping.ZoomIn1) |
         KeyboardEvent.KeyDown(KeyMapping.ZoomIn2) =>
       Outcome(
@@ -87,6 +72,57 @@ final case class GameViewModel(
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
+
+    case ViewportResize(vp) =>
+      Outcome(
+        this.copy(
+          viewportSize = vp.size
+        )
+      )
+
+    case FrameTick =>
+      GameViewModel.nextViewModel(context, model, this)
+
+    case MouseEvent.Click(_)
+        if !WindowManager.showingWindow(model) &&
+          model.player.position == hoverSquare &&
+          model.gameState.isWaitForInput =>
+      Outcome(this)
+        .addGlobalEvents(GameEvent.PlayerTryPickUp)
+
+    case MouseEvent.Click(_)
+        if !WindowManager.showingWindow(model) &&
+          model.gameState.isWaitForInput =>
+      Outcome(this)
+        .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
+
+    case e: GameEvent =>
+      updateGameEvent(context, model)(e)
+
+    case _ =>
+      Outcome(this)
+
+  def updateGameEvent(
+      context: FrameContext[Size],
+      model: Model
+  ): GameEvent => Outcome[GameViewModel] =
+    case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
+      Outcome(this)
+        .addGlobalEvents(
+          FloatingMessage.spawnEvent(
+            playerPosition.display(squareSize),
+            FloatingMessage.Message("+1 " + item.name, RGB.Green)
+          )
+        )
+
+    case GameEvent.Inventory(InventoryEvent.DropItem(item, _)) =>
+      Outcome(this)
+        .addGlobalEvents(
+          FloatingMessage.spawnEvent(
+            playerPosition.display(squareSize),
+            FloatingMessage.Message("-1 " + item.name, RGB.Red)
+          )
+        )
 
     case GameEvent.RedrawHistoryLog =>
       val history =
@@ -118,28 +154,71 @@ final case class GameViewModel(
         )
       )
 
-    case ViewportResize(vp) =>
-      Outcome(
-        this.copy(
-          viewportSize = vp.size
-        )
+    case GameEvent.NPCMoveComplete =>
+      HostilesManager.updateViewModel(
+        context,
+        model,
+        this,
+        HostilesManager.Cmds.CompleteInProgressHostile
       )
 
-    case FrameTick =>
-      GameViewModel.nextViewModel(context, model, this)
-
-    case MouseEvent.Click(_)
-        if !WindowManager.showingWindow(model) &&
-          model.player.position == hoverSquare =>
+    case GameEvent.PlayerTurnEnd =>
       Outcome(this)
-        .addGlobalEvents(GameEvent.PlayerTryPickUp)
 
-    case MouseEvent.Click(_) if !WindowManager.showingWindow(model) =>
+    case GameEvent.PlayerAttack(_, _, _) =>
       Outcome(this)
-        .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
-    case _ =>
+    case GameEvent.PlayerCastsConfusion(_, _, _) =>
       Outcome(this)
+
+    case GameEvent.PlayerCastsFireball(_, _, _) =>
+      Outcome(this)
+
+    case GameEvent.PlayerMoveTowards(_) =>
+      Outcome(this)
+
+    case GameEvent.PlayerContinueMove =>
+      Outcome(this)
+
+    case GameEvent.PlayerTryPickUp =>
+      Outcome(this)
+
+    case GameEvent.PlayerMoveComplete =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.UseConsumables(_)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.RemoveFromInventory(_)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.UseRanged(_, _)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.TargetUsingRanged(_, _)) =>
+      Outcome(this)
+    case GameEvent.NPCTurnComplete =>
+      Outcome(this)
+
+    case GameEvent.Hostile(_) =>
+      Outcome(this)
+
+    case GameEvent.Log(_) =>
+      Outcome(this)
+
+    case GameEvent.Targeted(_) =>
+      Outcome(this)
+
+    case GameEvent.WindowEvent(_) =>
+      Outcome(this)
+
+    case GameEvent.PlayerDescended =>
+      Outcome(reset)
+
+  def reset: GameViewModel =
+    this.copy(
+      hostilePositions = Map()
+    )
 
 object GameViewModel:
 
@@ -163,6 +242,7 @@ object GameViewModel:
       squareSize = SquareSize,
       visibleGridSize = initialViewportSize / SquareSize.toSize,
       playerPosition = ActorPosition(player.position),
+      hostilePositions = Map(),
       lookAtPosition = Point.zero,
       hoverSquare = Point.zero,
       tiles = Batch.empty,
@@ -214,6 +294,14 @@ object GameViewModel:
         PlayerComponent.Cmds.Update
       )
 
+    val hostilesPositions =
+      HostilesManager.updateViewModel(
+        context,
+        model,
+        viewModel,
+        HostilesManager.Cmds.Update(model.gameMap)
+      )
+
     val nextMiniMap =
       val gm = model.gameMap
       viewModel.miniMap.update(
@@ -221,10 +309,11 @@ object GameViewModel:
         gm.exploredWalls
       )
 
-    nextPlayerPosition.map { pp =>
+    (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
+        hostilePositions = hps.hostilePositions,
         lookAtPosition =
           (model.lookAtTarget * viewModel.squareSize) - (viewModel.squareSize.x / 2),
         hoverSquare = hoverSquare,

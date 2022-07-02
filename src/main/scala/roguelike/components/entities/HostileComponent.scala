@@ -13,17 +13,22 @@ import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
-import roguelike.viewmodel.GameViewModel
+import roguelike.viewmodel.ActorPosition
 
-object HostileComponent extends Component[Size, Hostile, GameViewModel]:
+object HostileComponent
+    extends Component[Size, Hostile, HostilesManager.HostilesVM]:
   type Command            = Cmds
   type ComponentModel     = Hostile
   type ComponentViewModel = HostileVM
 
   def modelLens: Lens[Hostile, Hostile] = Lens.keepLatest
 
-  def viewModelLens: Lens[GameViewModel, HostileVM] =
-    Lens.readOnly(viewModel => HostileVM(viewModel.squareSize))
+  def viewModelLens: Lens[HostilesManager.HostilesVM, HostileVM] =
+    Lens(
+      viewModel => HostileVM(viewModel.squareSize, viewModel.hostilePositions),
+      (viewModel, hvm) =>
+        viewModel.copy(hostilePositions = hvm.hostilePositions)
+    )
 
   def nextModel(
       context: FrameContext[Size],
@@ -87,12 +92,37 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
       res.clearGlobalEvents
         .addGlobalEvents(events)
 
+    case Cmds.UpdateViewModel =>
+      Outcome(hostile)
+
   def nextViewModel(
       context: FrameContext[Size],
       hostile: Hostile,
       viewModel: HostileVM
   ): Cmds => Outcome[HostileVM] =
-    _ => Outcome(viewModel)
+    case Cmds.UpdateViewModel =>
+      viewModel.hostilePositions.get(hostile.id) match
+        case None =>
+          Outcome(
+            viewModel.copy(
+              hostilePositions = viewModel.hostilePositions +
+                (hostile.id -> ActorPosition(hostile.position))
+            )
+          )
+
+        case Some(hp) =>
+          hp.next(
+            context.delta,
+            hostile.position,
+            GameEvent.NPCMoveComplete
+          ).map { pp =>
+            viewModel.copy(
+              hostilePositions = viewModel.hostilePositions + (hostile.id -> pp)
+            )
+          }
+
+    case _ =>
+      Outcome(viewModel)
 
   def view(
       context: FrameContext[Size],
@@ -113,7 +143,13 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
         case h: Troll if h.isAlive => (viewModel.squareSize.x * 0.4).toInt
         case _: Troll              => (viewModel.squareSize.x * 0.5).toInt
 
-    val position = hostile.position * viewModel.squareSize
+    val position =
+      viewModel.hostilePositions.get(hostile.id) match
+        case None =>
+          hostile.position * viewModel.squareSize
+
+        case Some(hp) =>
+          hp.display(viewModel.squareSize)
 
     val halfSquareWidth = viewModel.squareSize.x / 2
 
@@ -160,5 +196,9 @@ object HostileComponent extends Component[Size, Hostile, GameViewModel]:
         randomDirection: () => Point,
         getPathTo: (Dice, Point, Point) => Batch[Point]
     )
+    case UpdateViewModel
 
-  final case class HostileVM(squareSize: Point)
+  final case class HostileVM(
+      squareSize: Point,
+      hostilePositions: Map[Int, ActorPosition]
+  )

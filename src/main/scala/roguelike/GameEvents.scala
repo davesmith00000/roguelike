@@ -28,12 +28,14 @@ enum GameEvent extends GlobalEvent:
   case PlayerContinueMove               // Continue moving towards the target.
   case PlayerTryPickUp
   case PlayerMoveComplete
+  case PlayerDescended
 
   // Inventory events
   case Inventory(event: InventoryEvent)
 
   // Phase management
   case NPCTurnComplete
+  case NPCMoveComplete
 
   // Hostile events
   case Hostile(event: HostileEvent)

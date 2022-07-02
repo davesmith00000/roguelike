@@ -100,11 +100,11 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(KeyMapping.Descend)
         if model.gameState.isWaitForInput && model.player.isAlive =>
       if model.player.position == model.stairsPosition then
-        Model
-          .genNextFloor(context.dice, model)
+        Outcome(model)
           .addGlobalEvents(
             GameEvent
               .Log(Message("You descend the staircase.", ColorScheme.descend)),
+            GameEvent.PlayerDescended,
             GameEvent.CameraSnapToPlayer,
             GameEvent.PlayerTurnEnd
           )

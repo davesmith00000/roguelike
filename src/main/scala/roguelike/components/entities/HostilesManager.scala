@@ -7,10 +7,12 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.components.Component
 import roguelike.model.GameMap
+import roguelike.model.GameState
 import roguelike.model.HostilesPool
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.entity.Hostile
+import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
 
 object HostilesManager extends Component[Size, Model, GameViewModel]:
@@ -21,13 +23,25 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
   def modelLens: Lens[Model, HostilesM] =
     Lens(
       model =>
-        HostilesM(model.hostiles, model.player.position, model.gameMap.visible),
+        HostilesM(
+          model.gameState,
+          model.hostiles,
+          model.player.position,
+          model.gameMap.visible
+        ),
       (m, hp) => m.copy(hostiles = hp.pool)
     )
 
   def viewModelLens: Lens[GameViewModel, HostilesVM] =
-    Lens.readOnly(viewModel =>
-      HostilesVM(viewModel.tilePositions, viewModel.squareSize)
+    Lens(
+      viewModel =>
+        HostilesVM(
+          viewModel.tilePositions,
+          viewModel.squareSize,
+          viewModel.hostilePositions
+        ),
+      (viewModel, hvm) =>
+        viewModel.copy(hostilePositions = hvm.hostilePositions)
     )
 
   def updateHostile(id: Int, model: HostilesM)(
@@ -81,7 +95,8 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
   ): Cmds => Outcome[HostilesM] =
     case Cmds.Update(gameMap) =>
       model.pool
-        .updateNextQueued(model.visibleTiles)(
+        .update(
+          model.visibleTiles,
           updateNextHostile(context, model, gameMap)
         )
         .map { nextPool =>
@@ -154,12 +169,41 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
           )
       }
 
+    case Cmds.CompleteInProgressHostile =>
+      model.pool.completeInProgress
+        .map { nextPool =>
+          model.copy(pool = nextPool)
+        }
+
   def nextViewModel(
       context: FrameContext[Size],
       model: HostilesM,
       viewModel: HostilesVM
   ): Cmds => Outcome[HostilesVM] =
-    _ => Outcome(viewModel)
+    case Cmds.Update(_) =>
+      model.gameState match
+        case GameState.UpdateNPCs =>
+          model.pool.inProgress match
+            case None =>
+              Outcome(viewModel)
+
+            case Some(hostile) =>
+              HostileComponent
+                .updateViewModel(
+                  context,
+                  hostile,
+                  viewModel,
+                  HostileComponent.Cmds.UpdateViewModel
+                )
+
+        case _ =>
+          Outcome(viewModel)
+
+    case Cmds.CompleteInProgressHostile =>
+      Outcome(viewModel)
+
+    case _ =>
+      Outcome(viewModel)
 
   def view(
       context: FrameContext[Size],
@@ -176,7 +220,8 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
         HostileComponent.view(
           context,
           hostile,
-          HostileComponent.HostileVM(viewModel.squareSize)
+          HostileComponent
+            .HostileVM(viewModel.squareSize, viewModel.hostilePositions)
         )
       }
 
@@ -185,10 +230,16 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
     case AttackHostileMelee(playerName: String, id: Int, attackPower: Int)
     case AttackHostileRanged(playerName: String, id: Int, damage: Int)
     case Update(gameMap: GameMap)
+    case CompleteInProgressHostile
 
   final case class HostilesM(
+      gameState: GameState,
       pool: HostilesPool,
       playerPosition: Point,
       visibleTiles: Batch[Point]
   )
-  final case class HostilesVM(tilePositions: Batch[Point], squareSize: Point)
+  final case class HostilesVM(
+      tilePositions: Batch[Point],
+      squareSize: Point,
+      hostilePositions: Map[Int, ActorPosition]
+  )
