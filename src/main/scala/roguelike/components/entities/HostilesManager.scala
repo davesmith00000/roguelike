@@ -78,9 +78,8 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
     val entityPositions =
       hs.flatMap(f)
 
-    val getPathTo: (Dice, Point, Point) => Batch[Point] =
-      (dice, from, to) =>
-        GameMap.getPathTo(dice, from, to, entityPositions, gameMap)
+    val getPathTo: (Point, Point) => Batch[Point] =
+      (from, to) => gameMap.getPathTo(from, to, entityPositions)
 
     HostileComponent.updateModel(
       context,

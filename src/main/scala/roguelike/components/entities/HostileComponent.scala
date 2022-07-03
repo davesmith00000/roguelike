@@ -49,7 +49,7 @@ object HostileComponent
 
         case x =>
           // Otherwise, move a little closer...
-          val path = getPathTo(context.dice, x.position, playerPosition)
+          val path = getPathTo(x.position, playerPosition)
 
           // First path result is current location, we want the next one if it exists.
           path.drop(1).headOption match
@@ -194,7 +194,7 @@ object HostileComponent
     case Update(
         playerPosition: Point,
         randomDirection: () => Point,
-        getPathTo: (Dice, Point, Point) => Batch[Point]
+        getPathTo: (Point, Point) => Batch[Point]
     )
     case UpdateViewModel
 

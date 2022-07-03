@@ -4,10 +4,11 @@ import indigo._
 import indigo.syntax._
 import io.circe._
 import io.circe.syntax._
-import io.indigoengine.roguelike.starterkit.*
+import io.indigoengine.roguelike.starterkit.utils.FOV
 import roguelike.GameEvent
 import roguelike.model.entity._
 import roguelike.util.Indices
+import roguelike.util.PathFinder
 
 import scala.annotation.tailrec
 import scala.scalajs.js
@@ -41,26 +42,11 @@ final case class GameMap(
     )
 
   def getPathTo(
-      dice: Dice,
       from: Point,
       to: Point,
       additionalBlocked: Batch[Point]
   ): Batch[Point] =
-    val area = Rectangle.fromPoints(from, to).expand(2)
-    val filter: (GameTile, Point) => Boolean = (tile, _) =>
-      tile match
-        case GameTile.Ground     => true
-        case GameTile.DownStairs => true
-        case _                   => false
-
-    val walkable =
-      GameMap
-        .searchByBoundsWithPosition(this, area)
-        .filterNot(_._2.isBlocked)
-        .map(_._1)
-        .filterNot(additionalBlocked.contains)
-
-    GameMap.getWalkablePathTo(dice, from, to, walkable, area)
+    GameMap.getPathTo(from, to, additionalBlocked, this)
 
   def insert(coords: Point, tile: GameTile): GameMap =
     if bounds.contains(coords) then
@@ -184,18 +170,13 @@ object GameMap:
     visibleTiles(tiles.map(_._2), Batch.empty)
 
   def getPathTo(
-      dice: Dice,
       from: Point,
       to: Point,
       additionalBlocked: Batch[Point],
       gameMap: GameMap
   ): Batch[Point] =
-    val area = Rectangle.fromPoints(from, to).expand(2)
-    val filter: (GameTile, Point) => Boolean = (tile, _) =>
-      tile match
-        case GameTile.Ground     => true
-        case GameTile.DownStairs => true
-        case _                   => false
+    // Bit of a premature optimisation, tries to find a very direct path by limiting the search scope drastically...
+    val area = Rectangle.fromPoints(from, to).expand(4)
 
     val walkable =
       searchByBoundsWithPosition(gameMap, area)
@@ -203,26 +184,17 @@ object GameMap:
         .map(_._1)
         .filterNot(additionalBlocked.contains)
 
-    GameMap.getWalkablePathTo(dice, from, to, walkable, area)
-
-  def getWalkablePathTo(
-      dice: Dice,
-      from: Point,
-      to: Point,
-      walkable: Batch[Point],
-      area: Rectangle
-  ): Batch[Point] =
-    PathFinder
-      .fromWalkable(area.size, walkable.map(_ - area.position))
-      .locatePath(dice, from - area.position, to - area.position, _ => 1)
-      .map(_ + area.position)
+    PathFinder.locatePath(from, to, walkable)
 
   def searchByBoundsWithPosition(
       gameMap: GameMap,
       bounds: Rectangle
   ): Batch[(Point, GameTile)] =
-    gameMap.tileMap.zipWithIndex.collect {
-      case (Some(tile), index)
-          if bounds.contains(Indices.indexToPoint(index, gameMap.size.width)) =>
-        (Indices.indexToPoint(index, gameMap.size.width), tile)
-    }
+    gameMap.tileMap.zipWithIndex
+      .map { case (maybeGameTile, index) =>
+        (maybeGameTile, Indices.indexToPoint(index, gameMap.size.width))
+      }
+      .collect {
+        case (Some(tile), position) if bounds.contains(position) =>
+          (position, tile)
+      }

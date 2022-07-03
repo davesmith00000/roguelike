@@ -312,7 +312,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       if autoMovePath.isEmpty then
         val p =
           gameMap
-            .getPathTo(context.dice, player.position, target, Batch.empty)
+            .getPathTo(player.position, target, Batch.empty)
             .tail
         if p.nonEmpty then
           val next      = p.head
