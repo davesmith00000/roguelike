@@ -1,7 +1,6 @@
 package roguelike.components.entities
 
 import indigo.*
-import indigo.scenes.Lens
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent

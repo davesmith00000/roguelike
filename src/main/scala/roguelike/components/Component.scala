@@ -1,7 +1,6 @@
 package roguelike.components
 
 import indigo.*
-import indigo.scenes.Lens
 
 trait Component[StartupData, ParentModel, ParentViewModel]:
   type ComponentModel
