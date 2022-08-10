@@ -28,13 +28,7 @@ lazy val roguelike =
       windowStartWidth      := 1280,
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
-      electronInstall := (sys.props("os.name").toLowerCase match {
-        case x if x.contains("windows") || x.contains("linux") =>
-          indigoplugin.ElectronInstall.Version("^18.0.0")
-
-        case _ =>
-          indigoplugin.ElectronInstall.Global
-      }),
+      electronInstall := indigoplugin.ElectronInstall.Version("^18.0.0"),
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "indigo-json-circe"    % "0.13.1-SNAPSHOT",
         "io.indigoengine" %%% "indigo"               % "0.13.1-SNAPSHOT",
