@@ -135,12 +135,20 @@ object HostileComponent
         case h: Troll if h.isAlive => RGBA(0.3, 0.6, 0.0, 1.0)
         case _: Troll              => RGBA(0.1, 0.2, 1.0, 0.75)
 
-    val size: Int =
+    val radius: Double =
       hostile match
-        case h: Orc if h.isAlive   => (viewModel.squareSize.x * 0.25).toInt
-        case _: Orc                => (viewModel.squareSize.x * 0.35).toInt
-        case h: Troll if h.isAlive => (viewModel.squareSize.x * 0.4).toInt
-        case _: Troll              => (viewModel.squareSize.x * 0.5).toInt
+        case h: Orc if h.isAlive   => (viewModel.squareSize.x * 0.25)
+        case _: Orc                => (viewModel.squareSize.x * 0.35)
+        case h: Troll if h.isAlive => (viewModel.squareSize.x * 0.4)
+        case _: Troll              => (viewModel.squareSize.x * 0.5)
+
+    val size =
+      viewModel.hostilePositions.get(hostile.id) match
+        case None =>
+          radius.toInt
+          
+        case Some(hp) =>
+          (radius * (hp.attacking + 1.0)).toInt
 
     val position =
       viewModel.hostilePositions.get(hostile.id) match
@@ -148,7 +156,7 @@ object HostileComponent
           hostile.position * viewModel.squareSize
 
         case Some(hp) =>
-          hp.display(viewModel.squareSize)
+          hp.moving(viewModel.squareSize)
 
     val halfSquareWidth = viewModel.squareSize.x / 2
 

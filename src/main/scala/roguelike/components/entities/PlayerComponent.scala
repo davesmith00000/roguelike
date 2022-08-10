@@ -113,10 +113,11 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       model: PlayerM,
       viewModel: PlayerVM
   ): Batch[SceneNode] =
+    val radius = ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
     Batch(
       Shape.Circle(
-        viewModel.playerPosition.display(viewModel.squareSize),
-        (viewModel.squareSize.x / 2.5).toInt,
+        viewModel.playerPosition.moving(viewModel.squareSize),
+        radius,
         Fill.Color(RGBA.White),
         Stroke(2, RGBA.Black)
       )
