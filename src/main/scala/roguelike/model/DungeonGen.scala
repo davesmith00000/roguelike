@@ -9,6 +9,7 @@ import roguelike.model.gamedata.Ranged
 import roguelike.model.items.Item
 
 import scala.annotation.tailrec
+import scala.scalajs.js
 
 object DungeonGen:
 
@@ -339,25 +340,29 @@ object DungeonGen:
       if numOfRooms == maxRooms then
         lastRoomCenter match
           case None =>
-            Dungeon(
-              playerStart,
-              stairsPosition,
-              finaliseTiles(roomTiles ++ tunnelTiles, Nil),
-              hostiles,
-              collectables
-            )
+            new Dungeon {
+              val playerStart: Point    = playerStart
+              val stairsPosition: Point = stairsPosition
+              val positionedTiles: List[(Point, GameTile)] =
+                finaliseTiles(roomTiles ++ tunnelTiles, Nil)
+              val hostiles: List[Hostile]         = hostiles
+              val collectables: List[Collectable] = collectables
+            }
 
           case Some(center) =>
-            Dungeon(
-              playerStart,
-              center,
-              finaliseTiles(
-                roomTiles ++ tunnelTiles ++ List((center, GameTile.DownStairs)),
-                Nil
-              ),
-              hostiles,
-              collectables
-            )
+            new Dungeon {
+              val playerStart: Point    = playerStart
+              val stairsPosition: Point = stairsPosition
+              val positionedTiles: List[(Point, GameTile)] =
+                finaliseTiles(
+                  roomTiles ++ tunnelTiles ++ List(
+                    (center, GameTile.DownStairs)
+                  ),
+                  Nil
+                )
+              val hostiles: List[Hostile]         = hostiles
+              val collectables: List[Collectable] = collectables
+            }
       else
         val w = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
         val h = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
@@ -431,10 +436,9 @@ object DungeonGen:
 
     rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
 
-final case class Dungeon(
-    playerStart: Point,
-    stairsPosition: Point,
-    positionedTiles: List[(Point, GameTile)],
-    hostiles: List[Hostile],
-    collectables: List[Collectable]
-)
+trait Dungeon extends js.Object:
+  val playerStart: Point
+  val stairsPosition: Point
+  val positionedTiles: List[(Point, GameTile)]
+  val hostiles: List[Hostile]
+  val collectables: List[Collectable]

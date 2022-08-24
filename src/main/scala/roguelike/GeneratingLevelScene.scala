@@ -3,10 +3,15 @@ package roguelike
 import indigo._
 import indigo.scenes._
 import io.indigoengine.roguelike.starterkit.*
+import org.scalajs.dom.Worker
 import roguelike.GameEvent
 import roguelike.game.GameScene
+import roguelike.model.Dungeon
+import roguelike.model.DungeonGenConfig
 import roguelike.model.Message
 import roguelike.model.Model
+import roguelike.subsystems.WorkerSubSystem
+import roguelike.subsystems.WorkerName
 import roguelike.viewmodel.ViewModel
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
@@ -27,7 +32,11 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
     EventFilters.Permissive
 
   val subSystems: Set[SubSystem] =
-    Set()
+    Set(
+      WorkerSubSystem[DungeonGenConfig, Dungeon](
+        WorkerName("dungeon-gen-worker")
+      )
+    )
 
   def updateModel(
       context: FrameContext[Size],
