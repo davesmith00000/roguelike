@@ -17,11 +17,11 @@ import scala.collection.mutable
 import scala.scalajs.js
 
 final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
-    worker: Worker
+    workerName: WorkerName
 ) extends SubSystem:
-
+  val worker: Worker = new Worker(workerName.toString + ".js")
   val id: SubSystemId =
-    SubSystemId(worker.hashCode.toString)
+    SubSystemId("[WorkerSubSystem] " + workerName.toString)
 
   type EventType      = GlobalEvent
   type SubSystemModel = Unit
@@ -73,3 +73,10 @@ final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
     case Receive(value: B) extends WorkerEvent
 
   case object WorkerSubSystemEnqueue extends GlobalEvent
+
+opaque type WorkerName = String
+object WorkerName:
+  inline def apply(WorkerName: String): WorkerName       = WorkerName
+  extension (sn: WorkerName) inline def toString: String = sn
+  given CanEqual[WorkerName, WorkerName]                 = CanEqual.derived
+  given CanEqual[Option[WorkerName], Option[WorkerName]] = CanEqual.derived
