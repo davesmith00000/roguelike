@@ -387,7 +387,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.PlayerDescended =>
-      Model.genNextFloor(context.dice, this)
+      Outcome(this)
+    // Model.genNextFloor(context.dice, this)
 
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)
@@ -477,66 +478,45 @@ object Model:
       currentFloor = saveData.currentFloor
     )
 
-  def gen(dice: Dice): Outcome[Model] =
-    val dungeon =
-      DungeonGen.makeMap(
-        dice,
-        DungeonGen.MaxRooms,
-        DungeonGen.RoomMinSize,
-        DungeonGen.RoomMaxSize,
-        RogueLikeGame.screenSize - Size(0, 5),
-        DungeonGen.maxMonstersPerRoom(0),
-        DungeonGen.maxCollectablesPerRoom(0),
-        0
-      )
+  def assignDungeon(
+      dice: Dice,
+      dungeon: Dungeon
+  ): Outcome[Model] = assignDungeon(dice, dungeon, None)
 
-    val p = Player.initial(dice, dungeon.playerStart)
-
+  def assignDungeon(
+      dice: Dice,
+      dungeon: Dungeon,
+      model: Option[Model]
+  ): Outcome[Model] =
     GameMap
       .gen(RogueLikeGame.screenSize, dungeon)
       .update(dungeon.playerStart)
       .map { gm =>
-        Model(
-          p,
-          dungeon.stairsPosition,
-          Point.zero,
-          gm,
-          MessageLog.DefaultLimited,
-          GameState.WaitForInput,
-          None,
-          GameLoadInfo.initial,
-          0,
-          Batch.empty,
-          WindowManager.initialModel,
-          Batch.fromList(dungeon.collectables),
-          HostilesPool(Batch.fromList(dungeon.hostiles))
-        )
-      }
-
-  def genNextFloor(dice: Dice, currentModel: Model): Outcome[Model] =
-    val nextFloor = currentModel.currentFloor + 1
-
-    val dungeon =
-      DungeonGen.makeMap(
-        dice,
-        DungeonGen.MaxRooms,
-        DungeonGen.RoomMinSize,
-        DungeonGen.RoomMaxSize,
-        RogueLikeGame.screenSize - Size(0, 5),
-        DungeonGen.maxMonstersPerRoom(nextFloor),
-        DungeonGen.maxCollectablesPerRoom(nextFloor),
-        nextFloor
-      )
-
-    GameMap
-      .gen(RogueLikeGame.screenSize, dungeon)
-      .update(dungeon.playerStart)
-      .map { gm =>
-        currentModel.copy(
-          player = currentModel.player.copy(position = dungeon.playerStart),
-          stairsPosition = dungeon.stairsPosition,
-          gameMap = gm,
-          currentFloor = nextFloor,
-          hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
-        )
+        model match {
+          case Some(currentModel) =>
+            currentModel.copy(
+              player = currentModel.player.copy(position = dungeon.playerStart),
+              stairsPosition = dungeon.stairsPosition,
+              gameMap = gm,
+              currentFloor = dungeon.currentFloor,
+              hostiles = HostilesPool(Batch.fromArray(dungeon.hostiles))
+            )
+          case None =>
+            val p = Player.initial(dice, dungeon.playerStart)
+            Model(
+              p,
+              dungeon.stairsPosition,
+              Point.zero,
+              gm,
+              MessageLog.DefaultLimited,
+              GameState.WaitForInput,
+              None,
+              GameLoadInfo.initial,
+              dungeon.currentFloor,
+              Batch.empty,
+              WindowManager.initialModel,
+              Batch.fromArray(dungeon.collectables),
+              HostilesPool(Batch.fromArray(dungeon.hostiles))
+            )
+        }
       }

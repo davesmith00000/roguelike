@@ -16,14 +16,12 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 @JSExportTopLevel("DungeonGenWorker")
 object DungeonGenWorker {
   @JSExport
-  def main(): Unit = {
+  def main(): Unit =
     WorkerGlobal.addEventListener("message", onMessage _)
-    WorkerGlobal.postMessage(s"Started")
-  }
 
   def onMessage(msg: dom.MessageEvent) = {
     val config = msg.data.asInstanceOf[DungeonGenConfig]
-    val dice   = Dice.fromSeed(config.seed)
+    val dice   = Dice.fromSeed(config.seed.toLong)
     val dungeon = DungeonGen.makeMap(
       dice,
       DungeonGen.MaxRooms,
