@@ -347,6 +347,7 @@ object DungeonGen:
                 finaliseTiles(roomTiles ++ tunnelTiles, Nil)
               val hostiles: List[Hostile]         = hostiles
               val collectables: List[Collectable] = collectables
+              val currentFloor: Int               = currentFloor
             }
 
           case Some(center) =>
@@ -362,6 +363,7 @@ object DungeonGen:
                 )
               val hostiles: List[Hostile]         = hostiles
               val collectables: List[Collectable] = collectables
+              val currentFloor: Int               = currentFloor
             }
       else
         val w = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
@@ -436,9 +438,10 @@ object DungeonGen:
 
     rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
 
-trait Dungeon extends js.Object:
+trait Dungeon:
   val playerStart: Point
   val stairsPosition: Point
   val positionedTiles: List[(Point, GameTile)]
   val hostiles: List[Hostile]
   val collectables: List[Collectable]
+  val currentFloor: Int

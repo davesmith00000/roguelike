@@ -10,8 +10,8 @@ import roguelike.model.Dungeon
 import roguelike.model.DungeonGenConfig
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.subsystems.WorkerSubSystem
 import roguelike.subsystems.WorkerName
+import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
@@ -31,20 +31,26 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
+  val workerSubSystem = WorkerSubSystem[DungeonGenConfig, Dungeon](
+    WorkerName("assets/dungeon-gen-worker")
+  )
   val subSystems: Set[SubSystem] =
-    Set(
-      WorkerSubSystem[DungeonGenConfig, Dungeon](
-        WorkerName("dungeon-gen-worker")
-      )
-    )
+    Set(workerSubSystem)
 
   def updateModel(
       context: FrameContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case GenerateLevel =>
+      Outcome(model).addGlobalEvents(
+        workerSubSystem.WorkerEvent.Send(new DungeonGenConfig {
+          val seed: Double      = context.dice.seed.toDouble
+          val currentLevel: Int = 0
+        })
+      )
+    case workerSubSystem.WorkerEvent.Receive(dungeon) =>
       Model
-        .gen(context.dice)
+        .assignDungeon(context.dice, dungeon)
         .map(_.copy(loadInfo = model.loadInfo))
         .addGlobalEvents(
           SceneEvent.JumpTo(GameScene.name),
@@ -70,7 +76,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
     Outcome(
       SceneUpdateFragment(
         Text(
-          "Generating level...",
+          "Generating level" + ("." * (context.gameTime.running.toInt % 4)),
           RoguelikeTiles.Size10x10.Fonts.fontKey,
           TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
         )

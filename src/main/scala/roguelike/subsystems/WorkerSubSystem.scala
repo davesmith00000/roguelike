@@ -1,5 +1,6 @@
 package roguelike.subsystems
 
+import indigo.shared.IndigoLogger
 import indigo.shared.Outcome
 import indigo.shared.collections.Batch
 import indigo.shared.events.FrameTick
