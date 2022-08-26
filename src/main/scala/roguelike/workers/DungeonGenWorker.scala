@@ -5,6 +5,7 @@ import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
 import org.scalajs.dom
 import roguelike.RogueLikeGame
+import roguelike.model.Dungeon
 import roguelike.model.DungeonGen
 import roguelike.model.DungeonGenConfig
 import roguelike.model.GameMap
@@ -33,6 +34,8 @@ object DungeonGenWorker {
       config.currentLevel
     )
 
-    WorkerGlobal.postMessage(dungeon)
+    IndigoLogger.consoleLog(dungeon.playerStart.toString)
+
+    WorkerGlobal.postMessage(Dungeon.toJsObj(dungeon))
   }
 }

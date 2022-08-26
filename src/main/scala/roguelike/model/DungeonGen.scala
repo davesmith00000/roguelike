@@ -9,7 +9,6 @@ import roguelike.model.gamedata.Ranged
 import roguelike.model.items.Item
 
 import scala.annotation.tailrec
-import scala.scalajs.js
 
 object DungeonGen:
 
@@ -437,11 +436,3 @@ object DungeonGen:
           )
 
     rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
-
-trait Dungeon:
-  val playerStart: Point
-  val stairsPosition: Point
-  val positionedTiles: List[(Point, GameTile)]
-  val hostiles: List[Hostile]
-  val collectables: List[Collectable]
-  val currentFloor: Int

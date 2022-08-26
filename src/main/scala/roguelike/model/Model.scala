@@ -499,7 +499,7 @@ object Model:
               stairsPosition = dungeon.stairsPosition,
               gameMap = gm,
               currentFloor = dungeon.currentFloor,
-              hostiles = HostilesPool(Batch.fromArray(dungeon.hostiles))
+              hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
             )
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)
@@ -515,8 +515,8 @@ object Model:
               dungeon.currentFloor,
               Batch.empty,
               WindowManager.initialModel,
-              Batch.fromArray(dungeon.collectables),
-              HostilesPool(Batch.fromArray(dungeon.hostiles))
+              Batch.fromList(dungeon.collectables),
+              HostilesPool(Batch.fromList(dungeon.hostiles))
             )
         }
       }
