@@ -30,15 +30,13 @@ final case class GameMap(
         pointFromIndex(index)
     }.toJSArray
 
-  def update(playerPosition: Point): Outcome[GameMap] =
+  def update(playerPosition: Point): GameMap =
     val newVisible =
       GameMap.calculateFOV(GameMap.FOVRadius, playerPosition, this)
 
-    Outcome(
-      this.copy(
-        visible = newVisible,
-        explored = explored ++ newVisible.toSet
-      )
+    this.copy(
+      visible = newVisible,
+      explored = explored ++ newVisible.toSet
     )
 
   def getPathTo(
