@@ -162,10 +162,10 @@ object GameMap:
             )
           then
             visibleTiles(
-              l.tail,
+              l.drop(1),
               l.head :: acc
             )
-          else visibleTiles(l.tail, acc)
+          else visibleTiles(l.drop(1), acc)
 
     visibleTiles(tiles.map(_._2), Batch.empty)
 
