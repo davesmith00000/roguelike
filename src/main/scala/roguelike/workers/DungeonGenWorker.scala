@@ -9,10 +9,13 @@ import roguelike.model.Dungeon
 import roguelike.model.DungeonGen
 import roguelike.model.DungeonGenConfig
 import roguelike.model.GameMap
+import roguelike.model.JsGameMap
+import roguelike.model.JsDungeon
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.annotation.JSExportTopLevel
+import roguelike.model.JsDungeonGameMapTuple
 
 @JSExportTopLevel("DungeonGenWorker")
 object DungeonGenWorker {
@@ -23,7 +26,7 @@ object DungeonGenWorker {
   def onMessage(msg: dom.MessageEvent) = {
     val config = msg.data.asInstanceOf[DungeonGenConfig]
     val dice   = Dice.fromSeed(config.seed.toLong)
-    val dungeon =
+    val dungeon = JsDungeon.fromDungeon(
       DungeonGen.makeMap(
         dice,
         DungeonGen.MaxRooms,
@@ -34,7 +37,15 @@ object DungeonGenWorker {
         DungeonGen.maxCollectablesPerRoom(0),
         config.currentLevel
       )
+    )
+    val gameMap = JsGameMap.fromGameMap(
+      GameMap
+        .gen(RogueLikeGame.screenSize, dungeon)
+    )
 
-    WorkerGlobal.postMessage(dungeon)
+    WorkerGlobal.postMessage(new JsDungeonGameMapTuple {
+      val dungeon: JsDungeon = dungeon
+      val gameMap: JsGameMap = gameMap
+    })
   }
 }
