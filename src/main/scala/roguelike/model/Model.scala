@@ -313,10 +313,10 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         val p =
           gameMap
             .getPathTo(player.position, target, Batch.empty)
-            .tail
+            .drop(1)
         if p.nonEmpty then
           val next      = p.head
-          val remaining = p.tail
+          val remaining = p.drop(1)
           performPlayerTurn(context.dice, next - player.position).map { m =>
             if m.player.position == player.position then
               m.copy(
@@ -354,7 +354,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         performPlayerTurn(context.dice, autoMovePath.head - player.position)
           .map {
             _.copy(
-              autoMovePath = autoMovePath.tail
+              autoMovePath = autoMovePath.drop(1)
             )
           }
 

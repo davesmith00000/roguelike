@@ -46,7 +46,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
       Outcome(model).addGlobalEvents(
         workerSubSystem.WorkerEvent.Send(new DungeonGenConfig {
           val seed: Double      = context.dice.seed.toDouble
-          val currentLevel: Int = 0
+          val currentLevel: Int = model.currentFloor
         })
       )
     case workerSubSystem.WorkerEvent.Receive(dungeon) =>

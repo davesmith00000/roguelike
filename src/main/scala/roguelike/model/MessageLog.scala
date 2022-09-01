@@ -22,8 +22,8 @@ final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
         messages = messages.headOption
           .map { m =>
             val msgs =
-              if m.text == message.text then m.increaseCount :: messages.tail
-              else message :: m :: messages.tail
+              if m.text == message.text then m.increaseCount :: messages.drop(1)
+              else message :: m :: messages.drop(1)
 
             maxLength match
               case None      => msgs

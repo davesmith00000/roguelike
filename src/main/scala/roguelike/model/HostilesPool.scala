@@ -73,7 +73,7 @@ final case class HostilesPool(
         )
       else
         val h = remaining.head
-        val t = remaining.tail
+        val t = remaining.drop(1)
 
         if h.isAlive && visibleTiles.contains(h.position) then
           f(h, t ++ done).map { d =>
