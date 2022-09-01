@@ -323,7 +323,7 @@ object DungeonGen:
       maxMonstersPerRoom: Int,
       maxCollectablesPerRoom: Int,
       currentFloor: Int
-  ): Dungeon =
+  ): JsDungeon =
     @tailrec
     def rec(
         numOfRooms: Int,
@@ -339,31 +339,29 @@ object DungeonGen:
       if numOfRooms == maxRooms then
         lastRoomCenter match
           case None =>
-            new Dungeon {
-              val playerStart: Point    = playerStart
-              val stairsPosition: Point = stairsPosition
-              val positionedTiles: List[(Point, GameTile)] =
-                finaliseTiles(roomTiles ++ tunnelTiles, Nil)
-              val hostiles: List[Hostile]         = hostiles
-              val collectables: List[Collectable] = collectables
-              val currentFloor: Int               = currentFloor
-            }
+            Dungeon(
+              playerStart,
+              stairsPosition,
+              finaliseTiles(roomTiles ++ tunnelTiles, Nil),
+              hostiles,
+              collectables,
+              currentFloor
+            )
 
           case Some(center) =>
-            new Dungeon {
-              val playerStart: Point    = playerStart
-              val stairsPosition: Point = stairsPosition
-              val positionedTiles: List[(Point, GameTile)] =
-                finaliseTiles(
-                  roomTiles ++ tunnelTiles ++ List(
-                    (center, GameTile.DownStairs)
-                  ),
-                  Nil
-                )
-              val hostiles: List[Hostile]         = hostiles
-              val collectables: List[Collectable] = collectables
-              val currentFloor: Int               = currentFloor
-            }
+            Dungeon(
+              playerStart,
+              stairsPosition,
+              finaliseTiles(
+                roomTiles ++ tunnelTiles ++ List(
+                  (center, GameTile.DownStairs)
+                ),
+                Nil
+              ),
+              hostiles,
+              collectables,
+              currentFloor
+            )
       else
         val w = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
         val h = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
@@ -435,4 +433,6 @@ object DungeonGen:
             stairsPosition
           )
 
-    rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
+    Dungeon.toJsObj(
+      rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
+    )

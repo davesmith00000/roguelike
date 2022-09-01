@@ -23,19 +23,18 @@ object DungeonGenWorker {
   def onMessage(msg: dom.MessageEvent) = {
     val config = msg.data.asInstanceOf[DungeonGenConfig]
     val dice   = Dice.fromSeed(config.seed.toLong)
-    val dungeon = DungeonGen.makeMap(
-      dice,
-      DungeonGen.MaxRooms,
-      DungeonGen.RoomMinSize,
-      DungeonGen.RoomMaxSize,
-      RogueLikeGame.screenSize - Size(0, 5),
-      DungeonGen.maxMonstersPerRoom(0),
-      DungeonGen.maxCollectablesPerRoom(0),
-      config.currentLevel
-    )
+    val dungeon =
+      DungeonGen.makeMap(
+        dice,
+        DungeonGen.MaxRooms,
+        DungeonGen.RoomMinSize,
+        DungeonGen.RoomMaxSize,
+        RogueLikeGame.screenSize - Size(0, 5),
+        DungeonGen.maxMonstersPerRoom(0),
+        DungeonGen.maxCollectablesPerRoom(0),
+        config.currentLevel
+      )
 
-    IndigoLogger.consoleLog(dungeon.playerStart.toString)
-
-    WorkerGlobal.postMessage(Dungeon.toJsObj(dungeon))
+    WorkerGlobal.postMessage(dungeon)
   }
 }

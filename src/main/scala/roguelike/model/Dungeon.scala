@@ -17,24 +17,23 @@ import scala.scalajs.js
 
 import js.JSConverters._
 
-trait Dungeon:
-  val playerStart: Point
-  val stairsPosition: Point
-  val positionedTiles: List[(Point, GameTile)]
-  val hostiles: List[Hostile]
-  val collectables: List[Collectable]
-  val currentFloor: Int
+final case class Dungeon(
+    playerStart: Point,
+    stairsPosition: Point,
+    positionedTiles: List[(Point, GameTile)],
+    hostiles: List[Hostile],
+    collectables: List[Collectable],
+    currentFloor: Int
+)
 
 object Dungeon:
   def toJsObj(d: Dungeon) =
     new JsDungeon {
       val playerStart: JsPoint    = JsPoint.fromPoint(d.playerStart)
       val stairsPosition: JsPoint = JsPoint.fromPoint(d.stairsPosition)
-      val positionedTiles: js.Array[(JsPoint, JsGameTile)] =
+      val positionedTiles: js.Array[JsPointGameTileTuple] =
         d.positionedTiles.map {
-          _ match {
-            case (p, t) => (JsPoint.fromPoint(p), JsGameTile.fromGameTime(t))
-          }
+          JsPointGameTileTuple.fromTuple(_)
         }.toJSArray
       val hostiles: js.Array[JsHostile] =
         d.hostiles.map(JsHostile.fromHostile(_)).toJSArray
@@ -45,31 +44,25 @@ object Dungeon:
     }
 
   def fromJsObj(d: JsDungeon) =
-    new Dungeon {
-      val playerStart: Point    = JsPoint.toPoint(d.playerStart)
-      val stairsPosition: Point = JsPoint.toPoint(d.stairsPosition)
-      val positionedTiles: List[(Point, GameTile)] = d.positionedTiles.map {
-        _ match {
-          case (p, t) =>
-            (
-              JsPoint.toPoint(p),
-              JsGameTile.toGameTile(t)
-            )
-        }
-      }.toList
-      val hostiles: List[Hostile] = d.hostiles.map {
+    Dungeon(
+      JsPoint.toPoint(d.playerStart),
+      JsPoint.toPoint(d.stairsPosition),
+      d.positionedTiles.map {
+        JsPointGameTileTuple.toTuple(_)
+      }.toList,
+      d.hostiles.map {
         JsHostile.toHostile(_)
-      }.toList
-      val collectables: List[Collectable] = d.collectables.map {
+      }.toList,
+      d.collectables.map {
         JsCollectable.toCollectable(_)
-      }.toList
-      val currentFloor: Int = d.currentFloor
-    }
+      }.toList,
+      d.currentFloor
+    )
 
 trait JsDungeon extends js.Object:
   val playerStart: JsPoint
   val stairsPosition: JsPoint
-  val positionedTiles: js.Array[(JsPoint, JsGameTile)]
+  val positionedTiles: js.Array[JsPointGameTileTuple]
   val hostiles: js.Array[JsHostile]
   val collectables: js.Array[JsCollectable]
   val currentFloor: Int
@@ -79,10 +72,11 @@ trait JsPoint extends js.Object:
   val y: Int
 
 object JsPoint:
-  def fromPoint(p: Point) = new JsPoint {
-    val x: Int = p.x
-    val y: Int = p.y
-  }
+  def fromPoint(p: Point) =
+    new JsPoint {
+      val x: Int = p.x
+      val y: Int = p.y
+    }
 
   def toPoint(p: JsPoint) = Point(p.x, p.y)
 
@@ -104,6 +98,21 @@ object JsGameTile:
     case "d" => GameTile.DownStairs
     case _   => GameTile.Wall
   }
+
+trait JsPointGameTileTuple extends js.Object:
+  val point: JsPoint
+  val gameTile: JsGameTile
+
+object JsPointGameTileTuple:
+  def fromTuple(t: (Point, GameTile)) = new JsPointGameTileTuple {
+    val point: JsPoint       = JsPoint.fromPoint(t._1)
+    val gameTile: JsGameTile = JsGameTile.fromGameTime(t._2)
+  }
+
+  def toTuple(t: JsPointGameTileTuple) = (
+    JsPoint.toPoint(t.point),
+    JsGameTile.toGameTile(t.gameTile)
+  )
 
 trait JsHostile extends js.Object:
   val id: Int
