@@ -323,7 +323,7 @@ object DungeonGen:
       maxMonstersPerRoom: Int,
       maxCollectablesPerRoom: Int,
       currentFloor: Int
-  ): JsDungeon =
+  ): Dungeon =
     @tailrec
     def rec(
         numOfRooms: Int,
@@ -351,11 +351,9 @@ object DungeonGen:
           case Some(center) =>
             Dungeon(
               playerStart,
-              stairsPosition,
+              center,
               finaliseTiles(
-                roomTiles ++ tunnelTiles ++ List(
-                  (center, GameTile.DownStairs)
-                ),
+                roomTiles ++ tunnelTiles ++ List((center, GameTile.DownStairs)),
                 Nil
               ),
               hostiles,
@@ -433,6 +431,13 @@ object DungeonGen:
             stairsPosition
           )
 
-    Dungeon.toJsObj(
-      rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
-    )
+    rec(0, None, Nil, Nil, Nil, Nil, Nil, Point.zero, Point.zero)
+
+final case class Dungeon(
+    playerStart: Point,
+    stairsPosition: Point,
+    positionedTiles: List[(Point, GameTile)],
+    hostiles: List[Hostile],
+    collectables: List[Collectable],
+    currentFloor: Int
+)
