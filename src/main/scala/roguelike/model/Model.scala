@@ -397,7 +397,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       Outcome(this)
 
     case GameEvent.PlayerMoveComplete =>
-      gameMap.update(player.position).map { gm =>
+      Outcome(gameMap.update(player.position)).map { gm =>
         this.copy(
           gameMap = gm,
           gameState = GameState.UpdateNPCs,
@@ -480,17 +480,17 @@ object Model:
 
   def assignDungeon(
       dice: Dice,
-      dungeon: Dungeon
-  ): Outcome[Model] = assignDungeon(dice, dungeon, None)
+      dungeon: Dungeon,
+      gameMap: GameMap
+  ): Outcome[Model] = assignDungeon(dice, dungeon, gameMap, None)
 
   def assignDungeon(
       dice: Dice,
       dungeon: Dungeon,
+      gameMap: GameMap,
       model: Option[Model]
   ): Outcome[Model] =
-    GameMap
-      .gen(RogueLikeGame.screenSize, dungeon)
-      .update(dungeon.playerStart)
+    Outcome(gameMap)
       .map { gm =>
         model match {
           case Some(currentModel) =>

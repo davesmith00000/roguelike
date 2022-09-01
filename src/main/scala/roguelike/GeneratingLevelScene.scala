@@ -8,9 +8,11 @@ import roguelike.GameEvent
 import roguelike.game.GameScene
 import roguelike.model.Dungeon
 import roguelike.model.DungeonGenConfig
-import roguelike.model.JsDungeon
 import roguelike.model.Message
 import roguelike.model.Model
+import roguelike.model.js.JsDungeon
+import roguelike.model.js.JsDungeonGameMapTuple
+import roguelike.model.js.JsGameMap
 import roguelike.subsystems.WorkerName
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
@@ -32,9 +34,10 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val workerSubSystem = WorkerSubSystem[DungeonGenConfig, JsDungeon](
-    WorkerName("assets/dungeon-gen-worker")
-  )
+  val workerSubSystem =
+    WorkerSubSystem[DungeonGenConfig, JsDungeonGameMapTuple](
+      WorkerName("assets/dungeon-gen-worker")
+    )
   val subSystems: Set[SubSystem] =
     Set(workerSubSystem)
 
@@ -49,9 +52,13 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
           val currentLevel: Int = model.currentFloor
         })
       )
-    case workerSubSystem.WorkerEvent.Receive(dungeon) =>
+    case workerSubSystem.WorkerEvent.Receive(msg) =>
       Model
-        .assignDungeon(context.dice, Dungeon.fromJsObj(dungeon))
+        .assignDungeon(
+          context.dice,
+          JsDungeon.toDungeon(msg.dungeon),
+          JsGameMap.toGameMap(msg.gameMap)
+        )
         .map(_.copy(loadInfo = model.loadInfo))
         .addGlobalEvents(
           SceneEvent.JumpTo(GameScene.name),

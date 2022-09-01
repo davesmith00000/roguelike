@@ -3,6 +3,7 @@ package roguelike.model.js
 import roguelike.model.Dungeon
 
 import scala.scalajs.js
+
 import js.JSConverters._
 
 trait JsDungeon extends js.Object:

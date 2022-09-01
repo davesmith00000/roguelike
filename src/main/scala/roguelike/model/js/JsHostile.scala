@@ -5,6 +5,7 @@ import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 
 import scala.scalajs.js
+
 import js.JSConverters._
 
 trait JsHostile extends js.Object:
