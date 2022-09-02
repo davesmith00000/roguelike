@@ -1,8 +1,10 @@
 package roguelike.workers
 
+import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
 import org.scalajs.dom
+import org.scalajs.dom.Worker
 import roguelike.RogueLikeGame
 import roguelike.model.DungeonGen
 import roguelike.model.DungeonGenConfig
@@ -15,15 +17,42 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.annotation.JSExportTopLevel
 
-@JSExportTopLevel("DungeonGenWorker")
-object DungeonGenWorker {
+trait IndigoWorker[A <: js.Any, B <: js.Any]:
+  val name: WorkerName
+  lazy val worker: Worker = new Worker(name.toString + ".js")
+
   @JSExport
-  def main(): Unit =
+  def doWork(): Unit =
     WorkerGlobal.addEventListener("message", onMessage _)
 
-  def onMessage(msg: dom.MessageEvent) = {
-    val config = msg.data.asInstanceOf[DungeonGenConfig]
-    val dice   = Dice.fromSeed(config.seed.toLong)
+  def onMessage(msg: dom.MessageEvent): Unit =
+    process(msg.data.asInstanceOf[A])
+      .map(WorkerGlobal.postMessage(_))
+
+  def process(data: A): Batch[B]
+
+  def send(data: A) =
+    worker.postMessage(data)
+
+  def receive(callback: (data: B) => Unit) =
+    worker.addEventListener(
+      "message",
+      (e: js.Any) =>
+        e match {
+          case e: dom.MessageEvent =>
+            callback(e.data.asInstanceOf[B])
+
+          case _ => ()
+        }
+    )
+
+@JSExportTopLevel("DungeonGenWorker")
+object DungeonGenWorker
+    extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapTuple] {
+  val name: WorkerName = WorkerName("assets/dungeon-gen-worker")
+
+  def process(config: DungeonGenConfig) = {
+    val dice = Dice.fromSeed(config.seed.toLong)
     val dungeonModel =
       DungeonGen.makeMap(
         dice,
@@ -41,9 +70,16 @@ object DungeonGenWorker {
         .gen(RogueLikeGame.screenSize, dungeonModel)
         .update(dungeonModel.playerStart)
 
-    WorkerGlobal.postMessage(new JsDungeonGameMapTuple {
+    Batch(new JsDungeonGameMapTuple {
       val dungeon: JsDungeon = JsDungeon.fromDungeon(dungeonModel)
       val gameMap: JsGameMap = JsGameMap.fromGameMap(gameMapModel)
     })
   }
 }
+
+opaque type WorkerName = String
+object WorkerName:
+  inline def apply(WorkerName: String): WorkerName       = WorkerName
+  extension (sn: WorkerName) inline def toString: String = sn
+  given CanEqual[WorkerName, WorkerName]                 = CanEqual.derived
+  given CanEqual[Option[WorkerName], Option[WorkerName]] = CanEqual.derived

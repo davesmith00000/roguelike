@@ -13,9 +13,9 @@ import roguelike.model.Model
 import roguelike.model.js.JsDungeon
 import roguelike.model.js.JsDungeonGameMapTuple
 import roguelike.model.js.JsGameMap
-import roguelike.subsystems.WorkerName
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
+import roguelike.workers.DungeonGenWorker
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 
@@ -35,9 +35,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
     EventFilters.Permissive
 
   val workerSubSystem =
-    WorkerSubSystem[DungeonGenConfig, JsDungeonGameMapTuple](
-      WorkerName("assets/dungeon-gen-worker")
-    )
+    WorkerSubSystem(DungeonGenWorker)
   val subSystems: Set[SubSystem] =
     Set(workerSubSystem)
 
