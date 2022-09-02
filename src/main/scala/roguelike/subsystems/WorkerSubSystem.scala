@@ -11,18 +11,17 @@ import indigo.shared.subsystems.SubSystemFrameContext
 import indigo.shared.subsystems.SubSystemId
 import org.scalajs.dom
 import org.scalajs.dom.Event
-import org.scalajs.dom.Worker
+import roguelike.workers.IndigoWorker
 
 import scala.annotation.nowarn.apply
 import scala.collection.mutable
 import scala.scalajs.js
 
-final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
-    workerName: WorkerName
+final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
+    worker: IndigoWorker[A, B]
 ) extends SubSystem:
-  val worker: Worker = new Worker(workerName.toString + ".js")
   val id: SubSystemId =
-    SubSystemId("[WorkerSubSystem] " + workerName.toString)
+    SubSystemId("[WorkerSubSystem] " + worker.name.toString)
 
   type EventType      = GlobalEvent
   type SubSystemModel = Unit
@@ -33,13 +32,11 @@ final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
   private val eventQueue: mutable.Queue[WorkerEvent.Receive] =
     new mutable.Queue[WorkerEvent.Receive]()
 
-  worker.onmessage = (e: js.Any) =>
-    e match {
-      case e: dom.MessageEvent =>
-        eventQueue.enqueue(WorkerEvent.Receive(e.data.asInstanceOf[B]))
-
-      case _ => eventQueue
-    }
+  worker.receive((data: B) =>
+    eventQueue.enqueue(
+      WorkerEvent.Receive(data)
+    )
+  )
 
   def eventFilter: GlobalEvent => Option[EventType] =
     case FrameTick      => Some(WorkerSubSystemEnqueue)
@@ -54,7 +51,7 @@ final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
       model: Unit
   ): GlobalEvent => Outcome[Unit] =
     case WorkerEvent.Send(value) =>
-      worker.postMessage(value)
+      worker.send(value)
       Outcome(model)
 
     case WorkerSubSystemEnqueue =>
@@ -74,10 +71,3 @@ final case class WorkerSubSystem[A <: js.Object, B <: js.Object](
     case Receive(value: B) extends WorkerEvent
 
   case object WorkerSubSystemEnqueue extends GlobalEvent
-
-opaque type WorkerName = String
-object WorkerName:
-  inline def apply(WorkerName: String): WorkerName       = WorkerName
-  extension (sn: WorkerName) inline def toString: String = sn
-  given CanEqual[WorkerName, WorkerName]                 = CanEqual.derived
-  given CanEqual[Option[WorkerName], Option[WorkerName]] = CanEqual.derived
