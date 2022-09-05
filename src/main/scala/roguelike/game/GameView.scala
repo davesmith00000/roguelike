@@ -185,7 +185,6 @@ object GameView:
       Layer(
         RogueLikeGame.layerKeyUi,
         Batch(
-          UIElements.renderMiniMap(vpSize, viewModel.miniMap),
           UIElements.renderBar(
             model.player,
             20,

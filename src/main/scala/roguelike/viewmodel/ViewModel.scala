@@ -9,7 +9,6 @@ import roguelike.RogueLikeGame
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
-import roguelike.game.MiniMap
 import roguelike.model.GameMap
 import roguelike.model.GameTile
 import roguelike.model.Model
@@ -42,8 +41,7 @@ final case class GameViewModel(
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
     terminals: CachedTerminals,
-    helpControlsText: String,
-    miniMap: MiniMap
+    helpControlsText: String
 ):
 
   def update(
@@ -249,8 +247,7 @@ object GameViewModel:
       tilePositions = Batch.empty,
       collectables = js.Array(),
       terminals = CachedTerminals.initial,
-      helpControlsText,
-      miniMap = MiniMap.initial(Point.zero, RogueLikeGame.screenSize)
+      helpControlsText
     )
 
   def nextViewModel(
@@ -302,13 +299,6 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    val nextMiniMap =
-      val gm = model.gameMap
-      viewModel.miniMap.update(
-        model.player.position,
-        gm.exploredWalls
-      )
-
     (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
@@ -319,8 +309,7 @@ object GameViewModel:
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),
-        collectables = collectables,
-        miniMap = nextMiniMap
+        collectables = collectables
       )
     }
 
