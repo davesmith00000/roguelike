@@ -17,21 +17,16 @@ object Assets:
   end Basic
 
   object Game:
-    val icons: AssetName  = AssetName("simple-sprites-24x24")
-    val miniMapFragShader = AssetName("minimap frag")
+    val icons: AssetName = AssetName("simple-sprites-24x24")
 
     val assets: Set[AssetType] =
       Set(
-        AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png")),
-        AssetType.Text(
-          miniMapFragShader,
-          AssetPath("assets/shaders/minimap.frag")
-        )
+        AssetType.Image(icons, AssetPath("assets/" + icons.toString + ".png"))
       )
 
     def loaded(assetCollection: AssetCollection): Boolean =
-      assetCollection.findImageDataByName(icons).isDefined &&
-        assetCollection.findTextDataByName(miniMapFragShader).isDefined
+      assetCollection.findImageDataByName(icons).isDefined
+
   end Game
 
 end Assets

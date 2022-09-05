@@ -5,7 +5,6 @@ import indigo.scenes._
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.game.GameScene
-import roguelike.game.MiniMap
 import roguelike.model.Model
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ViewModel
@@ -77,7 +76,6 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       Outcome(
         Startup
           .Success(bootData)
-          .addShaders(MiniMap.shader)
       )
     else Outcome(Startup.Success(bootData))
 
