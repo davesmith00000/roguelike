@@ -3,6 +3,7 @@ package roguelike.model
 import indigo._
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.GenerateLevel
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
@@ -387,8 +388,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.PlayerDescended =>
-      Outcome(this)
-    // Model.genNextFloor(context.dice, this)
+      Outcome(this).addGlobalEvents(GenerateLevel)
 
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)
