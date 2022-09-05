@@ -25,6 +25,7 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
   def doWork(): Unit =
     WorkerGlobal.addEventListener("message", onMessage _)
 
+  @SuppressWarnings(Array("scalafix:DisableSyntax.asInstanceOf"))
   def onMessage(msg: dom.MessageEvent): Unit =
     process(msg.data.asInstanceOf[A])
       .map(WorkerGlobal.postMessage(_))
@@ -34,6 +35,7 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
   def send(data: A) =
     worker.postMessage(data)
 
+  @SuppressWarnings(Array("scalafix:DisableSyntax.asInstanceOf"))
   def receive(callback: (data: B) => Unit) =
     worker.addEventListener(
       "message",
