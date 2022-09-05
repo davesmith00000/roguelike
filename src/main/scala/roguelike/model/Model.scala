@@ -316,7 +316,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
             .drop(1)
         if p.nonEmpty then
           val next      = p.head
-          val remaining = p.drop(1)
+          val remaining = p.tail
           performPlayerTurn(context.dice, next - player.position).map { m =>
             if m.player.position == player.position then
               m.copy(
