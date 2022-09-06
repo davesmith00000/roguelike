@@ -7,8 +7,8 @@ trait DungeonGenConfig extends js.Object:
   val currentLevel: Int
 
 object DungeonGenConfig:
-  def apply(seed: Double, currentLevel: Int): DungeonGenConfig =
+  def apply(s: Double, c: Int): DungeonGenConfig =
     new DungeonGenConfig {
-      val seed: Double      = seed
-      val currentLevel: Int = currentLevel
+      val seed: Double      = s
+      val currentLevel: Int = c
     }
