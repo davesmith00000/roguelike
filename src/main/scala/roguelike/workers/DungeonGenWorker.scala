@@ -1,5 +1,6 @@
 package roguelike.workers
 
+import indigo.shared.IndigoLogger
 import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
