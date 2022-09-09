@@ -27,7 +27,13 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     None
 
   def scenes(bootData: Size): NonEmptyList[Scene[Size, Model, ViewModel]] =
-    NonEmptyList(LoadingScene, MainMenuScene, GeneratingLevelScene, GameScene)
+    NonEmptyList(
+      LogoScene,
+      LoadingScene,
+      MainMenuScene,
+      GeneratingLevelScene,
+      GameScene
+    )
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
@@ -63,7 +69,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     )
 
   def initialModel(startupData: Size): Outcome[Model] =
-    Outcome(Model.blank(Dice.fromSeed(0)))
+    Outcome(Model.blank(Dice.fromSeed(0))).addGlobalEvents()
 
   def initialViewModel(startupData: Size, model: Model): Outcome[ViewModel] =
     Outcome(ViewModel.initial(model.player, startupData))
