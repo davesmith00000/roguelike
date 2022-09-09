@@ -5,6 +5,8 @@ import indigo._
 object Assets:
 
   object Basic:
+    val indigoLogo         = AssetName("indigoLogo")
+    val purpleKingdomLogo  = AssetName("pkLogo")
     val textFragShader     = AssetName("text frag")
     val tileMap: AssetName = AssetName("Anikki_square_10x10")
 
@@ -12,7 +14,17 @@ object Assets:
       Set(
         AssetType.Text(textFragShader, AssetPath("assets/shaders/text.frag")),
         AssetType
-          .Image(tileMap, AssetPath("assets/" + tileMap.toString + ".png"))
+          .Image(tileMap, AssetPath("assets/" + tileMap.toString + ".png")),
+        AssetType
+          .Image(
+            purpleKingdomLogo,
+            AssetPath("assets/" + purpleKingdomLogo.toString + ".png")
+          ),
+        AssetType
+          .Image(
+            indigoLogo,
+            AssetPath("assets/" + indigoLogo.toString + ".png")
+          )
       )
   end Basic
 
