@@ -217,6 +217,122 @@ object KeyMappingsGen extends GameDataGenerator {
 
 }
 
+object AssetsGen extends GameDataGenerator {
+
+  val fileName: String = "assets.md"
+
+  def makeName(name: String, typ: String): String = {
+    val n = GameDataGenerator.sanitizeName(name)
+    n + "_" + typ
+  }
+
+  def assetNames: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil =>
+      val n = makeName(name, typ)
+      s"""  val $n: AssetName = AssetName("$n")"""
+  }
+
+  def imageAssets: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil if typ == "image" =>
+      "      " + makeName(name, typ) + ","
+
+    case _ =>
+      ""
+  }
+
+  def textAssets: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil if typ == "text" =>
+      "      " + makeName(name, typ) + ","
+
+    case _ =>
+      ""
+  }
+
+  def assetSetLine(name: String, typ: String, path: String): String = {
+    val n = makeName(name, typ)
+    typ match {
+      case "image" =>
+        s"""      AssetType.Image($n, AssetPath("$path")),"""
+
+      case "text" =>
+        s"""      AssetType.Text($n, AssetPath("$path")),"""
+
+      case _ =>
+        ""
+    }
+  }
+
+  def initialAssetSet: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil if phase == "init" =>
+      assetSetLine(name, typ, path)
+
+    case _ =>
+      ""
+  }
+
+  def lazyAssetSet: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil if phase == "lazy" =>
+      assetSetLine(name, typ, path)
+
+    case _ =>
+      ""
+  }
+
+  def mappers(moduleName: String): List[PartialFunction[List[String], String]] =
+    List(
+      assetNames,
+      imageAssets,
+      textAssets,
+      initialAssetSet,
+      lazyAssetSet
+    )
+
+  def template(
+      moduleName: String,
+      fullyQualifiedPath: String,
+      contents: List[String]
+  ): String =
+    s"""package $fullyQualifiedPath
+    |
+    |import indigo.*
+    |
+    |object $moduleName:
+    |
+    |${contents.head}
+    |
+    |  private val imagesAssets: Set[AssetName] =
+    |    Set(
+    |${contents(1)}
+    |    )
+    |
+    |  private val textAssets: Set[AssetName] =
+    |    Set(
+    |${contents(2)}
+    |    )
+    |
+    |  val initialAssets: Set[AssetType] =
+    |    Set(
+    |${contents(3)}
+    |    )
+    |
+    |  val lazyAssets: Set[AssetType] =
+    |    Set(
+    |${contents(4)}
+    |    )
+    |  
+    |  def loaded(assetCollection: AssetCollection): Boolean =
+    |    imagesLoaded(assetCollection) && textsLoaded(assetCollection)
+    |  
+    |  private def imagesLoaded(assetCollection: AssetCollection): Boolean =
+    |    imagesAssets.forall(i => assetCollection.findImageDataByName(i).isDefined)
+    |  
+    |  private def textsLoaded(assetCollection: AssetCollection): Boolean =
+    |    textAssets.forall(t => assetCollection.findTextDataByName(t).isDefined)
+    |
+    |""".stripMargin
+
+}
+
 trait GameDataGenerator {
 
   val tripleQuotes: String = "\"\"\""
@@ -251,14 +367,16 @@ trait GameDataGenerator {
 
 object GameDataGenerator {
 
-  val fallback: String => PartialFunction[List[String], String] =
-    moduleName => { case fields =>
-      val msg =
-        moduleName + " gen: Unexpected number of data fields, got: " + fields
-          .mkString("[", ", ", "]")
-      println(msg)
-      throw new Exception(msg)
-    }
+  val fallback: Int => String => PartialFunction[List[String], String] =
+    mappingNum =>
+      moduleName => { case fields =>
+        val msg1 = s"Non-exhaustive match on mapper in position $mappingNum"
+        val msg2 =
+          moduleName + s" gen: Unexpected number of data fields, got: " + fields
+            .mkString("[", ", ", "]")
+        println(msg1 + "\n" + msg2)
+        throw new Exception(msg1 + " - " + msg2)
+      }
 
   def generate(
       moduleName: String,
@@ -294,9 +412,13 @@ object GameDataGenerator {
     val rows: List[List[String]] = contents
       .map(_.split('|').map(_.trim).toList)
 
-    val newContents = mappers(moduleName)
-      .map { mpr =>
-        rows.map(fields => mpr.orElse(fallback(moduleName))(fields))
+    val newContents = mappers(moduleName).zipWithIndex
+      .map { case (mpr, i) =>
+        rows
+          .map { fields =>
+            mpr.orElse(fallback(i)(moduleName))(fields)
+          }
+          .filterNot(_.trim.isEmpty)
       }
       .map(_.mkString("\n"))
 

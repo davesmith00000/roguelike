@@ -28,7 +28,7 @@ lazy val roguelike =
       windowStartWidth      := 1280,
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
-      electronInstall := indigoplugin.ElectronInstall.Version("^18.0.0"),
+      electronInstall       := indigoplugin.ElectronInstall.Version("^18.0.0"),
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "indigo-json-circe"    % "0.13.1-SNAPSHOT",
         "io.indigoengine" %%% "indigo"               % "0.13.1-SNAPSHOT",
@@ -66,6 +66,13 @@ lazy val roguelike =
               .gen(
                 "KeyMapping",
                 "roguelike.model.gamedata",
+                gameData,
+                outDir
+              ) ++
+            AssetsGen
+              .gen(
+                "GameAssets",
+                "roguelike.assets",
                 gameData,
                 outDir
               )
