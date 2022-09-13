@@ -50,7 +50,15 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   ): GlobalEvent => Outcome[Unit] =
     case FrameTick =>
       if (context.running > maxSceneTime)
-        Outcome(model).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+        Outcome(model)
+          .addGlobalEvents(
+            AssetBundleLoaderEvent.Load(
+              BindingKey("Loading"),
+              Assets.Game.assets
+            ),
+            StorageEvent.Load(ModelSaveData.saveKey),
+            SceneEvent.JumpTo(MainMenuScene.name)
+          )
       else
         Outcome(model)
     case _ => Outcome(model)
