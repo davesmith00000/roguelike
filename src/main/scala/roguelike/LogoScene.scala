@@ -5,22 +5,26 @@ import indigo.scenes._
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
+import roguelike.extensions._
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
+import roguelike.model.SceneTime
 import roguelike.viewmodel.ViewModel
+
+import scala.math.max
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 
-  type SceneModel     = Unit
+  type SceneModel     = SceneTime
   type SceneViewModel = Unit
 
   val name: SceneName =
     SceneName("logo scene")
 
-  val modelLens: Lens[Model, Unit] =
-    Lens.unit
+  val modelLens: Lens[Model, SceneTime] =
+    Lens(_.sceneTime, (m, t) => m.copy(sceneTime = t))
 
   val viewModelLens: Lens[ViewModel, Unit] =
     Lens.unit
@@ -31,25 +35,22 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set()
 
-  val fadeInTime   = Seconds(5)
+  val fadeTime     = Seconds(6)
   val stoppingTime = Seconds(2)
-  val fadeOutTime  = Seconds(2)
-  val maxSceneTime = (fadeInTime + stoppingTime + fadeOutTime) * 2
-  val fadeSignal = Signal(t =>
-    if (t <= fadeInTime)
-      (t / fadeInTime).toDouble
-    else if (t > fadeInTime + stoppingTime)
-      Math.max(0, 1 - (t / (fadeInTime + stoppingTime + fadeOutTime)).toDouble)
-    else
-      1
-  )
+  val maxSceneTime = (fadeTime + stoppingTime) * 2
 
   def updateModel(
       context: FrameContext[Size],
-      model: Unit
-  ): GlobalEvent => Outcome[Unit] =
+      model: SceneTime
+  ): GlobalEvent => Outcome[SceneTime] =
+    case e: SceneEvent =>
+      e match {
+        case SceneEvent.SceneChange(_, _, _) =>
+          Outcome(model.copy(time = Seconds(0), skip = false))
+        case _ => Outcome(model)
+      }
     case FrameTick =>
-      if (context.running > maxSceneTime)
+      if (model.time > maxSceneTime)
         Outcome(model)
           .addGlobalEvents(
             AssetBundleLoaderEvent.Load(
@@ -60,28 +61,28 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
             SceneEvent.JumpTo(MainMenuScene.name)
           )
       else
-        Outcome(model)
+        Outcome(model.copy(time = model.time + context.delta))
     case _ => Outcome(model)
 
   def updateViewModel(
       context: FrameContext[Size],
-      model: Unit,
+      model: SceneTime,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
       context: FrameContext[Size],
-      model: Unit,
+      model: SceneTime,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
     val halfWidth  = context.startUpData.width * 0.5
     val halfHeight = context.startUpData.height * 0.5
     val logo =
-      if (context.running < (fadeInTime + stoppingTime + fadeOutTime))
-        getIndigoGraphic(context.running)
+      if (model.time < (fadeTime + stoppingTime))
+        getIndigoGraphic(model.time)
       else
-        getPurpleKingdomGraphic(context.running)
+        getPurpleKingdomGraphic(model.time)
 
     val logoHalfSize = logo.bounds.halfSize
     Outcome(
@@ -107,7 +108,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
         .Bitmap(Assets.Basic.indigoLogo)
         .stretch
         .toImageEffects
-        .withAlpha(fadeSignal.at(time))
+        .fadeInOut(fadeTime, stoppingTime, time)
     ).withScale(Vector2(2, 2))
 
   def getPurpleKingdomGraphic(time: Seconds) =
@@ -121,7 +122,5 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
         .Bitmap(Assets.Basic.purpleKingdomLogo)
         .stretch
         .toImageEffects
-        .withAlpha(
-          fadeSignal.at(time - (fadeInTime + stoppingTime + fadeOutTime))
-        )
+        .fadeInOut((fadeTime + stoppingTime), fadeTime, stoppingTime, time)
     ).withScale(Vector2(2, 2))

@@ -7,9 +7,8 @@ import scala.math.sqrt
 object Math:
   def lerp(start: Double, end: Double, percentage: Double): Double =
     if (percentage <= 1)
-      (start + (end - start)) * percentage
-    else
-      end
+      (1 - percentage) * start + percentage * end;
+    else end
 
   def lerp(
       start: Double,
@@ -19,8 +18,7 @@ object Math:
   ): Double =
     if (time <= duration)
       lerp(start, end, time.toDouble / duration.toDouble)
-    else
-      end
+    else end
 
   def easeIn(t: Double): Double =
     t * t

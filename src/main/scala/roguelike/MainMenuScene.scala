@@ -94,7 +94,6 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         RGB.White.mix(RGB.Black, 0.5)
       else RGB.White
 
-    IndigoLogger.consoleLog(model.sceneTime.toString)
     Outcome(
       SceneUpdateFragment(
         Text(
