@@ -115,17 +115,25 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
     Outcome(
       SceneUpdateFragment(
-        Group(
-          titleText
-        )
-          .withScale(new Vector2(textMagnification, textMagnification))
-          .withPosition(titleStart)
-          .easeOut(titleStart, titleEnd, Seconds(5), model.sceneTime.time),
-        getMenuFragment(
-          context,
-          halfWidth,
-          model.sceneTime.skip,
-          !model.loadInfo.loadedData.isEmpty
+        Layer(
+          Group(
+            titleText
+          )
+            .withScale(new Vector2(textMagnification, textMagnification))
+            .withPosition(titleStart)
+            .easeOut(titleStart, titleEnd, slideInTime, model.sceneTime.time)
+        ).fadeIn(fadInTime, model.sceneTime.time),
+        Layer(
+          getMenuFragment(
+            context,
+            halfWidth,
+            model.sceneTime.skip,
+            !model.loadInfo.loadedData.isEmpty
+          )
+        ).fadeIn(
+          slideInTime + titlePauseTime,
+          menuFadeInTime,
+          model.sceneTime.time
         )
       )
     )
