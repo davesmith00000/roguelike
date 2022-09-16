@@ -5,7 +5,7 @@ import indigo.scenes._
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
@@ -43,7 +43,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
             .addGlobalEvents(
               AssetBundleLoaderEvent.Load(
                 BindingKey("Loading"),
-                Assets.Game.assets
+                GameAssets.lazyAssets
               ),
               StorageEvent.Load(ModelSaveData.saveKey)
             )
@@ -125,7 +125,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
         Text(
           text,
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
         ).moveTo(10, 10)
       )
     )

@@ -5,7 +5,7 @@ import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.model.Equipment
 import roguelike.model.GameState
 import roguelike.model.Inventory
@@ -31,7 +31,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -39,7 +39,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -47,19 +47,19 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA(0.3, 0.3, 0.3, 1.0))
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA(0.3, 0.3, 0.3, 1.0))
     )
   val toolTipAlive: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Blue)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Blue)
     )
   val toolTipDead: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Red)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Red)
     )
 
   val letters: Batch[String]            = ('a' to 'z').toBatch.map(_.toString)
@@ -178,7 +178,7 @@ object UIElements:
     Text(
       text,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
     )
       .moveTo(5, 5)
 
@@ -189,7 +189,7 @@ object UIElements:
     Text(
       helpControlsText,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
 

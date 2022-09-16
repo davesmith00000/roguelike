@@ -5,7 +5,7 @@ import indigo.scenes._
 import io.indigoengine.roguelike.starterkit.*
 import org.scalajs.dom.Worker
 import roguelike.GameEvent
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.Dungeon
 import roguelike.model.DungeonGenConfig
@@ -87,7 +87,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
         Text(
           "Generating level" + ("." * (context.gameTime.running.toInt % 4)),
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
         )
       )
     )

@@ -4,7 +4,7 @@ import indigo._
 import indigo.scenes._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
@@ -77,19 +77,19 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         Text(
           "My Generic Roguelite",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.Basic.tileMap, RGB.Yellow, RGBA.Zero)
+          TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
         )
           .moveTo(10, 10),
         Text(
           "[n] Play a new game",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
         )
           .moveTo(10, 25),
         Text(
           "[c] Continue last game",
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(Assets.Basic.tileMap, loadColor, RGBA.Zero)
+          TerminalText(GameAssets.TileMap, loadColor, RGBA.Zero)
         )
           .moveTo(10, 35)
       )

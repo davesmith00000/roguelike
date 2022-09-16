@@ -5,7 +5,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
@@ -128,7 +128,7 @@ final case class GameViewModel(
           .toTerminal(Size(50, 30), false, 0, true)
           .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
             (fg, bg) =>
-              Graphic(10, 10, TerminalText(Assets.Basic.tileMap, fg, bg))
+              Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
           }
 
       val shortLog =
@@ -136,7 +136,7 @@ final case class GameViewModel(
           .toTerminal(Size(50, 5), false, 0, false)
           .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
             (fg, bg) =>
-              Graphic(10, 10, TerminalText(Assets.Basic.tileMap, fg, bg))
+              Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
           }
 
       Outcome(
