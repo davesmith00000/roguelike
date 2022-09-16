@@ -222,8 +222,7 @@ object AssetsGen extends GameDataGenerator {
   val fileName: String = "assets.md"
 
   def makeName(name: String, typ: String): String = {
-    val n = GameDataGenerator.sanitizeName(name)
-    n + "_" + typ
+    GameDataGenerator.sanitizeName(name)
   }
 
   def assetNames: PartialFunction[List[String], String] = {
