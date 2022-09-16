@@ -9,7 +9,7 @@ import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 
 final case class Message(
     text: String,

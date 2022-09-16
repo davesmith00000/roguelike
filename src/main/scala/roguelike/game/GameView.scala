@@ -4,7 +4,7 @@ import indigo.*
 import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.RogueLikeGame
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.assets.GameGraphics
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent

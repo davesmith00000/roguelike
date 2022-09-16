@@ -4,7 +4,7 @@ import indigo._
 import indigo.scenes._
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.Model
 import roguelike.subsystems.FloatingMessage
@@ -51,7 +51,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         gameViewport.size
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
-        .withAssets(Assets.Basic.assets)
+        .withAssets(GameAssets.initialAssets)
         .withShaders(TerminalText.standardShader)
         .withSubSystems(
           FPSCounter(
@@ -73,7 +73,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       assetCollection: AssetCollection,
       dice: Dice
   ): Outcome[Startup[Size]] =
-    if Assets.Game.loaded(assetCollection) then
+    if GameAssets.loaded(assetCollection) then
       Outcome(
         Startup
           .Success(bootData)

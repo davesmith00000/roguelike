@@ -4,7 +4,7 @@ import indigo.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.assets.Assets
+import roguelike.assets.GameAssets
 import roguelike.components.Component
 import roguelike.game.UIElements
 import roguelike.model.Inventory
@@ -95,7 +95,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -117,7 +117,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(Assets.Basic.tileMap, RGB.White, RGBA.Zero)
+            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
