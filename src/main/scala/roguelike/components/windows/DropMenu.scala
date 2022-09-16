@@ -2,9 +2,9 @@ package roguelike.components.windows
 
 import indigo.*
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.Assets
 import roguelike.ColorScheme
 import roguelike.GameEvent
+import roguelike.assets.Assets
 import roguelike.components.Component
 import roguelike.game.UIElements
 import roguelike.model.Inventory

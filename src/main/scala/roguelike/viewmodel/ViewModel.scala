@@ -2,10 +2,10 @@ package roguelike.viewmodel
 
 import indigo._
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.Assets
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.assets.Assets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager

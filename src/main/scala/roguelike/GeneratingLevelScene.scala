@@ -5,6 +5,7 @@ import indigo.scenes._
 import io.indigoengine.roguelike.starterkit.*
 import org.scalajs.dom.Worker
 import roguelike.GameEvent
+import roguelike.assets.Assets
 import roguelike.game.GameScene
 import roguelike.model.Dungeon
 import roguelike.model.DungeonGenConfig

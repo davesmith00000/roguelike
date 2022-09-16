@@ -3,9 +3,9 @@ package roguelike.game
 import indigo.*
 import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.Assets
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
+import roguelike.assets.Assets
 import roguelike.model.Equipment
 import roguelike.model.GameState
 import roguelike.model.Inventory

@@ -7,9 +7,9 @@ import indigo.shared.datatypes.Size
 import io.circe._
 import io.circe.syntax._
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.Assets
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
+import roguelike.assets.Assets
 
 final case class Message(
     text: String,

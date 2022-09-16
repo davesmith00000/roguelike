@@ -4,6 +4,7 @@ import indigo._
 import indigo.scenes._
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
+import roguelike.assets.Assets
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model

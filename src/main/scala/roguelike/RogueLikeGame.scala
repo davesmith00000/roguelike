@@ -4,6 +4,7 @@ import indigo._
 import indigo.scenes._
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
+import roguelike.assets.Assets
 import roguelike.game.GameScene
 import roguelike.model.Model
 import roguelike.subsystems.FloatingMessage
