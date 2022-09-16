@@ -3,8 +3,8 @@ package roguelike.components.windows
 import indigo.*
 import indigo.scenes.SceneEvent
 import io.indigoengine.roguelike.starterkit.*
-import roguelike.Assets
 import roguelike.MainMenuScene
+import roguelike.assets.Assets
 import roguelike.components.Component
 import roguelike.model.GameLoadInfo
 import roguelike.model.GameState

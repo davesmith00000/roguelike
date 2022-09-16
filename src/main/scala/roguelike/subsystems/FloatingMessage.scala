@@ -4,8 +4,8 @@ import indigo._
 import indigoextras.subsystems._
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
-import roguelike.Assets
 import roguelike.RogueLikeGame
+import roguelike.assets.Assets
 
 object FloatingMessage:
 
