@@ -13,7 +13,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(0.5), Point(10), CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
 
     val expected =
       Point(10) * squareSize
@@ -30,7 +30,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(1.0), target, CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
 
     val expected =
       Point(1) * squareSize
@@ -48,7 +48,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(0.5), target, CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
         .unsafeGet
 
     val expected =
@@ -66,7 +66,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(0.5), target, CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
         .unsafeGet
 
     val expected =
@@ -84,7 +84,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(0.5), target, CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
         .unsafeGet
 
     val expected =
@@ -102,7 +102,7 @@ class ActorPositionTests extends munit.FunSuite {
     val actual =
       actorPosition
         .next(Seconds(1.1), target, CompleteEvent)
-        .map(_.display(squareSize))
+        .map(_.moving(squareSize))
         .unsafeGet
 
     val expected =
