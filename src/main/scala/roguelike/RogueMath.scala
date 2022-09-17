@@ -1,10 +1,8 @@
 package roguelike
 
-import indigo._
+import indigo.*
 
-import scala.math.sqrt
-
-object Math:
+object RogueMath:
   def lerp(start: Double, end: Double, percentage: Double): Double =
     if (percentage <= 1)
       (1 - percentage) * start + percentage * end;
@@ -44,7 +42,7 @@ object Math:
   def flip(x: Double): Double = 1 - x
 
   def easeOut(t: Double): Double =
-    flip(sqrt(flip(t)))
+    flip(Math.sqrt(flip(t)))
 
   def easeOut(
       start: Double,

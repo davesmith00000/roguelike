@@ -6,15 +6,13 @@ import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
-import roguelike.extensions._
+import roguelike.extensions.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.model.SceneTime
 import roguelike.viewmodel.ViewModel
-
-import scala.math.max
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 
@@ -54,12 +52,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
       if (model.time > maxSceneTime)
         Outcome(model)
           .addGlobalEvents(
-            AssetBundleLoaderEvent.Load(
-              BindingKey("Loading"),
-              GameAssets.lazyAssets
-            ),
-            StorageEvent.Load(ModelSaveData.saveKey),
-            SceneEvent.JumpTo(MainMenuScene.name)
+            SceneEvent.JumpTo(LoadingScene.name)
           )
       else
         Outcome(model.copy(time = model.time + context.delta))
