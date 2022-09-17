@@ -34,7 +34,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set()
 
-  val fadeTime     = Seconds(6)
+  val fadeTime     = Seconds(1)
   val stoppingTime = Seconds(2)
   val maxSceneTime = (fadeTime + stoppingTime) * 2
 
@@ -43,11 +43,13 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
       model: SceneTime
   ): GlobalEvent => Outcome[SceneTime] =
     case e: SceneEvent =>
-      e match {
-        case SceneEvent.SceneChange(_, _, _) =>
-          Outcome(model.copy(time = Seconds(0), skip = false))
-        case _ => Outcome(model)
-      }
+      e match
+        case SceneEvent.SceneChange(_, LogoScene.name, at) =>
+          Outcome(model.copy(time = context.running - at, skip = false))
+
+        case _ =>
+          Outcome(model)
+
     case FrameTick =>
       if (model.time > maxSceneTime)
         Outcome(model)
@@ -56,7 +58,16 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
           )
       else
         Outcome(model.copy(time = model.time + context.delta))
-    case _ => Outcome(model)
+
+    case KeyboardEvent.KeyUp(Key.SPACE) =>
+      // Skip!
+      Outcome(model)
+        .addGlobalEvents(
+          SceneEvent.JumpTo(LoadingScene.name)
+        )
+
+    case _ =>
+      Outcome(model)
 
   def updateViewModel(
       context: FrameContext[Size],
@@ -73,10 +84,9 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
     val halfWidth  = context.startUpData.width * 0.5
     val halfHeight = context.startUpData.height * 0.5
     val logo =
-      if (model.time < (fadeTime + stoppingTime))
+      if model.time < (fadeTime + stoppingTime) then
         getIndigoGraphic(model.time)
-      else
-        getPurpleKingdomGraphic(model.time)
+      else getPurpleKingdomGraphic(model.time)
 
     val logoHalfSize = logo.bounds.halfSize
     Outcome(
@@ -91,7 +101,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
       )
     )
 
-  def getIndigoGraphic(time: Seconds) =
+  def getIndigoGraphic(time: Seconds): Graphic[Material.ImageEffects] =
     val indigoLogoWidth  = 100
     val indigoLogoHeight = 105
 
@@ -105,7 +115,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
         .fadeInOut(fadeTime, stoppingTime, time)
     )
 
-  def getPurpleKingdomGraphic(time: Seconds) =
+  def getPurpleKingdomGraphic(time: Seconds): Graphic[Material.ImageEffects] =
     val purpleKingdomLogoWidth  = 100
     val purpleKingdomLogoHeight = 136
 
