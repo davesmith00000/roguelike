@@ -103,7 +103,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
         .stretch
         .toImageEffects
         .fadeInOut(fadeTime, stoppingTime, time)
-    ).withScale(Vector2(2, 2))
+    )
 
   def getPurpleKingdomGraphic(time: Seconds) =
     val purpleKingdomLogoWidth  = 100
@@ -117,4 +117,4 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
         .stretch
         .toImageEffects
         .fadeInOut((fadeTime + stoppingTime), fadeTime, stoppingTime, time)
-    ).withScale(Vector2(2, 2))
+    )
