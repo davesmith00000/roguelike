@@ -7,6 +7,7 @@ import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
+import roguelike.model.Loader
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
@@ -31,18 +32,6 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
   val subSystems: Set[SubSystem] =
     Set(AssetBundleLoader)
-
-  val animationsKey: AnimationKey = AnimationKey("load")
-
-  val animations: Set[Animation] = Set(
-    Animation(
-      animationsKey,
-      Frame(Rectangle(0, 0, 32, 32), Millis(200)),
-      Frame(Rectangle(32, 0, 32, 32), Millis(200)),
-      Frame(Rectangle(64, 0, 32, 32), Millis(200)),
-      Frame(Rectangle(96, 0, 32, 32), Millis(200))
-    )
-  )
 
   def updateModel(
       context: FrameContext[Size],
@@ -85,7 +74,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
     case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
       Outcome(
         loadInfo.copy(
-          state = LoadingState.InProgress(percent)
+          state = LoadingState.InProgress(Some(percent))
         )
       )
 
@@ -118,47 +107,18 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
-    val midX = context.startUpData.width * 0.5
-    val midY = context.startUpData.height * 0.5
-
-    val graphic =
-      Sprite(
-        BindingKey("loading animation"),
-        0,
-        0,
-        1,
-        animationsKey,
-        Material.Bitmap(GameAssets.Loader)
-      ).play()
-    val text =
-      Text(
-        loadInfo.state match
-          case LoadingState.NotStarted =>
-            "Started loading..."
-
-          case LoadingState.InProgress(percent) =>
-            s"Loaded...${percent.toString}%"
-
-          case LoadingState.Complete =>
-            "Loaded successfully!"
-
-          case LoadingState.Error =>
-            "Error, some assets could not be loaded."
-        ,
-        RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-      )
-    val textBounds = context.boundaryLocator.textBounds(text)
+    val loader       = Loader(context, loadInfo.state)
+    val loaderBounds = loader.getBounds()
+    val midX         = context.startUpData.width * 0.5
+    val midY         = context.startUpData.height * 0.5
 
     Outcome(
       SceneUpdateFragment(
-        graphic.moveTo(
-          (midX - 16).toInt,
-          (midY - (textBounds.height * 0.5) - 32).toInt
-        ),
-        text.moveTo(
-          (midX - (textBounds.width * 0.5)).toInt,
-          (midY - (textBounds.height * 0.5)).toInt
-        )
+        loader
+          .view()
+          .moveTo(
+            (midX - (loaderBounds.width * 0.5)).toInt,
+            (midY - (loaderBounds.height * 0.5)).toInt
+          )
       )
     )

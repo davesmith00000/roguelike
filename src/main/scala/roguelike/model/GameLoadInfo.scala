@@ -16,7 +16,7 @@ final case class GameLoadInfo(
     state.isComplete && (loadedData.isDefined || noTimeLeft)
 
   def start: GameLoadInfo =
-    this.copy(state = LoadingState.InProgress(0))
+    this.copy(state = LoadingState.InProgress(Some(0)))
 
   def updateTimeout(delta: Seconds): GameLoadInfo =
     this.copy(
@@ -37,7 +37,7 @@ object GameLoadInfo:
 
 enum LoadingState:
   case NotStarted
-  case InProgress(percent: Int)
+  case InProgress(percent: Option[Int])
   case Complete
   case Error
 
