@@ -117,6 +117,20 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
     Outcome(
       SceneUpdateFragment(
         Layer(
+          Graphic(
+            Rectangle(
+              0,
+              0,
+              context.startUpData.width,
+              context.startUpData.height
+            ),
+            1,
+            Material
+              .Bitmap(GameAssets.MenuBg)
+              .tile
+          )
+        ).fadeIn(fadInTime * 0.5, model.sceneTime.time),
+        Layer(
           Group(
             titleText
           )
