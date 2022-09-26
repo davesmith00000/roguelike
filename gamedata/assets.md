@@ -5,6 +5,7 @@ TileMap|image|init|assets/Anikki_square_10x10.png
 indigoLogo|image|init|assets/indigoLogo.png
 purpleKingdomLogo|image|init|assets/pkLogo.png
 Loader|image|init|assets/loading.png
+MenuBg|image|init|assets/menuBg.png
 Icons|image|lazy|assets/simple-sprites-24x24.png
 UI|image|lazy|assets/ui/ui.png
 DoorStone|image|lazy|assets/bg/door_stone.png
