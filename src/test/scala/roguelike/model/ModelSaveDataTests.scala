@@ -5,9 +5,9 @@
 // import indigo.shared.datatypes.Size
 // import indigo.shared.dice.Dice
 // import indigoextras.trees.QuadTree
-// import io.circe._
+// import io.circe.*
 // import io.circe.parser.decode
-// import io.circe.syntax._
+// import io.circe.syntax.*
 // import roguelike.model.entity.Collectable
 // import roguelike.model.entity.Fighter
 // import roguelike.model.entity.HostileState

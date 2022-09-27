@@ -1,11 +1,11 @@
 package roguelike
 
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.extensions._
+import roguelike.extensions.*
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
@@ -39,7 +39,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case e: SceneEvent =>
@@ -86,14 +86,14 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       Outcome(model)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
@@ -140,7 +140,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
     )
 
   def getMenuFragment(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       halfWidth: Double,
       showMenu: Boolean,
       hasLoadData: Boolean

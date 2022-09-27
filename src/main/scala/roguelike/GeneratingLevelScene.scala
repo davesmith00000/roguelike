@@ -1,7 +1,7 @@
 package roguelike
 
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import io.indigoengine.roguelike.starterkit.*
 import org.scalajs.dom.Worker
 import roguelike.GameEvent
@@ -43,7 +43,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
     Set(workerSubSystem)
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case GenerateLevel =>
@@ -73,14 +73,14 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
       Outcome(model)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =

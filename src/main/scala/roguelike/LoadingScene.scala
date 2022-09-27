@@ -1,7 +1,7 @@
 package roguelike
 
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
@@ -34,7 +34,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
     Set(AssetBundleLoader)
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       loadInfo: GameLoadInfo
   ): GlobalEvent => Outcome[GameLoadInfo] =
     case FrameTick =>
@@ -96,14 +96,14 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       Outcome(loadInfo)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       loadInfo: GameLoadInfo,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       loadInfo: GameLoadInfo,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =

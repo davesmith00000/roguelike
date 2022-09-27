@@ -1,6 +1,7 @@
 package roguelike.game
 
-import indigo._
+import indigo.*
+import indigo.scenes.SceneContext
 import indigo.scenes.SceneEvent
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -17,7 +18,7 @@ import roguelike.model.gamedata.KeyMapping
 object GameSceneUpdate:
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     model.gameState match
@@ -30,7 +31,7 @@ object GameSceneUpdate:
       case GameState.ShowingWindow  => otherPhase(context, model)
 
   def onWaitingForInput(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     // Window close keys
@@ -167,7 +168,7 @@ object GameSceneUpdate:
       Outcome(model)
 
   def updateNpcPhase(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case FrameTick if model.gameState.isUpdatingNPCs =>
@@ -185,7 +186,7 @@ object GameSceneUpdate:
       Outcome(model)
 
   def otherPhase(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     // Other

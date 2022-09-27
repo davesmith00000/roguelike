@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import indigo.shared.scenegraph.CloneTiles
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.components.Component
@@ -22,20 +23,20 @@ object History extends Component[Size, Model, GameViewModel]:
     }
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): Unit => Outcome[Model] =
     _ => Outcome(model)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: HistoryViewModel
   ): Unit => Outcome[HistoryViewModel] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: HistoryViewModel
   ): Batch[SceneNode] =

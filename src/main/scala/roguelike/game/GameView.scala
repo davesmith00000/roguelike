@@ -1,6 +1,7 @@
 package roguelike.game
 
 import indigo.*
+import indigo.scenes.SceneContext
 import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.RogueLikeGame
@@ -24,7 +25,7 @@ import roguelike.viewmodel.ViewModel
 object GameView:
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
@@ -37,7 +38,7 @@ object GameView:
     )
 
   def drawGameLayer(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): SceneUpdateFragment =
@@ -175,7 +176,7 @@ object GameView:
     )
 
   def drawUiLayer(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): SceneUpdateFragment =

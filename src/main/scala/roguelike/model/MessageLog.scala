@@ -4,8 +4,8 @@ import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGB
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame

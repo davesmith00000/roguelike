@@ -1,7 +1,7 @@
 package roguelike.subsystems
 
-import indigo._
-import indigoextras.subsystems._
+import indigo.*
+import indigoextras.subsystems.*
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
 import roguelike.RogueLikeGame

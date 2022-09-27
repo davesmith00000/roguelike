@@ -1,6 +1,7 @@
 package roguelike.components.entities
 
 import indigo.*
+import indigo.scenes.SceneContext
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -59,7 +60,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
           .map(es => model.copy(pool = model.pool.copy(done = es)))
 
   private def updateNextHostile(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: HostilesM,
       gameMap: GameMap
   ): (Hostile, Batch[Hostile]) => Outcome[Hostile] = (h, hs) =>
@@ -88,7 +89,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
     )
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: HostilesM
   ): Cmds => Outcome[HostilesM] =
     case Cmds.Update(gameMap) =>
@@ -174,7 +175,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
         }
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: HostilesM,
       viewModel: HostilesVM
   ): Cmds => Outcome[HostilesVM] =
@@ -204,7 +205,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
       Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: HostilesM,
       viewModel: HostilesVM
   ): Batch[SceneNode] =

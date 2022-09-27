@@ -1,6 +1,6 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 
 final case class GameLoadInfo(
     state: LoadingState,

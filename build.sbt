@@ -28,12 +28,12 @@ lazy val roguelike =
       windowStartWidth      := 1280,
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
-      electronInstall       := indigoplugin.ElectronInstall.Version("^18.0.0"),
+      electronInstall       := indigoplugin.ElectronInstall.Latest,
       libraryDependencies ++= Seq(
-        "io.indigoengine" %%% "indigo-json-circe"    % "0.13.1-SNAPSHOT",
-        "io.indigoengine" %%% "indigo"               % "0.13.1-SNAPSHOT",
-        "io.indigoengine" %%% "indigo-extras"        % "0.13.1-SNAPSHOT",
-        "io.indigoengine" %%% "roguelike-starterkit" % "0.1.1-SNAPSHOT"
+        "io.indigoengine" %%% "indigo-json-circe"    % "0.14.0",
+        "io.indigoengine" %%% "indigo"               % "0.14.0",
+        "io.indigoengine" %%% "indigo-extras"        % "0.14.0",
+        "io.indigoengine" %%% "roguelike-starterkit" % "0.2.0"
       ),
       scalafixOnCompile := true,
       semanticdbEnabled := true,

@@ -4,9 +4,9 @@ import indigo.shared.IndigoLogger
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGB
 import indigo.shared.datatypes.Size
-import io.circe._
+import io.circe.*
 import io.circe.parser.decode
-import io.circe.syntax._
+import io.circe.syntax.*
 
 object SharedCodecs:
 

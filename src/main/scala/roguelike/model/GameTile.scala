@@ -1,8 +1,8 @@
 package roguelike.model
 
-import indigo._
-import io.circe._
-import io.circe.syntax._
+import indigo.*
+import io.circe.*
+import io.circe.syntax.*
 
 sealed trait GameTile:
   def blocked: Boolean

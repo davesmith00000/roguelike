@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
@@ -24,7 +25,7 @@ object InventoryMenu extends Component[Size, Model, GameViewModel]:
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       inventory: Inventory
   ): HandleInput => Outcome[Inventory] =
     case HandleInput(key) =>
@@ -37,14 +38,14 @@ object InventoryMenu extends Component[Size, Model, GameViewModel]:
             .use(keyIndex)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       inventory: Inventory,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       inventory: Inventory,
       viewportSize: Size
   ): Batch[SceneNode] =

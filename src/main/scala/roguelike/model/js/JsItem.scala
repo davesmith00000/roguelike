@@ -4,7 +4,7 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
-import roguelike.model.items._
+import roguelike.model.items.*
 
 import scala.scalajs.js
 

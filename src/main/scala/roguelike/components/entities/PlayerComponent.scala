@@ -1,6 +1,7 @@
 package roguelike.components.entities
 
 import indigo.*
+import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
@@ -40,7 +41,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     )
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: PlayerM
   ): Cmds => Outcome[PlayerM] =
     case Cmds.RemoveFromInvetory(at) =>
@@ -83,7 +84,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       Outcome(model)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: PlayerM,
       viewModel: PlayerVM
   ): Cmds => Outcome[PlayerVM] =
@@ -109,7 +110,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: PlayerM,
       viewModel: PlayerVM
   ): Batch[SceneNode] =
@@ -124,7 +125,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     )
 
   def handleHostileEvent(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       player: Player
   ): HostileEvent => Outcome[Player] = {
     case HostileEvent.HostileMeleeAttack(name, power) =>
