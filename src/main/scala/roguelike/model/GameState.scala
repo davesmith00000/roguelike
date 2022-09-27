@@ -1,6 +1,6 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 
 enum GameState:
   case WaitForInput

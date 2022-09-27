@@ -1,6 +1,7 @@
 package roguelike.components
 
 import indigo.*
+import indigo.scenes.SceneContext
 
 trait Component[StartupData, ParentModel, ParentViewModel]:
   type ComponentModel
@@ -11,7 +12,7 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
   def viewModelLens: Lens[ParentViewModel, ComponentViewModel]
 
   def updateModel(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ParentModel,
       cmd: Command
   ): Outcome[ParentModel] =
@@ -19,12 +20,12 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
     n.map(nn => modelLens.set(model, nn))
 
   def nextModel(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ComponentModel
   ): Command => Outcome[ComponentModel]
 
   def updateViewModel(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ParentModel,
       viewModel: ParentViewModel,
       cmd: Command
@@ -37,20 +38,20 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
     n.map(nn => viewModelLens.set(viewModel, nn))
 
   def nextViewModel(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ComponentModel,
       viewModel: ComponentViewModel
   ): Command => Outcome[ComponentViewModel]
 
   def present(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ParentModel,
       viewModel: ParentViewModel
   ): Batch[SceneNode] =
     view(context, modelLens.get(model), viewModelLens.get(viewModel))
 
   def view(
-      context: FrameContext[StartupData],
+      context: SceneContext[StartupData],
       model: ComponentModel,
       viewModel: ComponentViewModel
   ): Batch[SceneNode]

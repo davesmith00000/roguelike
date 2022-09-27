@@ -1,6 +1,7 @@
 package roguelike.components.entities
 
 import indigo.*
+import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
@@ -30,7 +31,7 @@ object HostileComponent
     )
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       hostile: Hostile
   ): Cmds => Outcome[Hostile] =
     case Cmds.Update(playerPosition, randomDirection, getPathTo) =>
@@ -95,7 +96,7 @@ object HostileComponent
       Outcome(hostile)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       hostile: Hostile,
       viewModel: HostileVM
   ): Cmds => Outcome[HostileVM] =
@@ -124,7 +125,7 @@ object HostileComponent
       Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       hostile: Hostile,
       viewModel: HostileVM
   ): Batch[SceneNode] =
@@ -146,7 +147,7 @@ object HostileComponent
       viewModel.hostilePositions.get(hostile.id) match
         case None =>
           radius.toInt
-          
+
         case Some(hp) =>
           (radius * (hp.attacking + 1.0)).toInt
 

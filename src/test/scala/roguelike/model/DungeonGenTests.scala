@@ -1,6 +1,6 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee

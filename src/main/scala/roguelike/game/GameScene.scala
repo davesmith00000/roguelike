@@ -1,7 +1,7 @@
 package roguelike.game
 
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import roguelike.GameEvent
 import roguelike.GenerateLevel
 import roguelike.model.Dungeon
@@ -38,7 +38,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
     Set(workerSubSystem)
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case GenerateLevel =>
@@ -68,14 +68,14 @@ object GameScene extends Scene[Size, Model, ViewModel]:
       GameSceneUpdate.updateModel(context, model)(e)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
     viewModel.update(context, model)
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =

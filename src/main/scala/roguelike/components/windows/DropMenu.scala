@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -33,7 +34,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: DropMenuModel
   ): HandleInput => Outcome[DropMenuModel] =
     case HandleInput(key) =>
@@ -59,14 +60,14 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
               )
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: DropMenuModel,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: DropMenuModel,
       viewportSize: Size
   ): Batch[SceneNode] =

@@ -1,7 +1,7 @@
 package roguelike
 
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
@@ -39,7 +39,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val maxSceneTime = (fadeTime + stoppingTime) * 2
 
   def updateModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: SceneTime
   ): GlobalEvent => Outcome[SceneTime] =
     case e: SceneEvent =>
@@ -70,14 +70,14 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
       Outcome(model)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: SceneTime,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: SceneTime,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =

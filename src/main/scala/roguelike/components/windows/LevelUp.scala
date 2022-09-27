@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -25,7 +26,7 @@ object LevelUp extends Component[Size, Model, GameViewModel]:
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       player: Player
   ): HandleInput => Outcome[Player] =
     // Constitution
@@ -60,14 +61,14 @@ object LevelUp extends Component[Size, Model, GameViewModel]:
       )
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Player,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       player: Player,
       viewportSize: Size
   ): Batch[SceneNode] =

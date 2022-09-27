@@ -4,7 +4,7 @@ import roguelike.model.Dungeon
 
 import scala.scalajs.js
 
-import js.JSConverters._
+import js.JSConverters.*
 
 trait JsDungeon extends js.Object:
   val playerStart: JsPoint

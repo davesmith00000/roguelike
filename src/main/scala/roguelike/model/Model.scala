@@ -1,6 +1,7 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
+import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.GenerateLevel
@@ -12,14 +13,14 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
 import roguelike.components.windows.WindowManagerCommand
-import roguelike.model.entity._
+import roguelike.model.entity.*
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 final case class Model( // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
     player: Player,
@@ -67,7 +68,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     )
 
   def handleInventoryEvent(
-      context: FrameContext[Size]
+      context: SceneContext[Size]
   ): InventoryEvent => Outcome[Model] = {
     case InventoryEvent.RemoveFromInventory(at) =>
       PlayerComponent.updateModel(
@@ -155,7 +156,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
   }
 
-  def update(context: FrameContext[Size]): GameEvent => Outcome[Model] =
+  def update(context: SceneContext[Size]): GameEvent => Outcome[Model] =
     case GameEvent.PlayerTryPickUp =>
       pickUp
 

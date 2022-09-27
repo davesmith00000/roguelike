@@ -1,6 +1,7 @@
 package roguelike.viewmodel
 
-import indigo._
+import indigo.*
+import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.InventoryEvent
@@ -19,7 +20,7 @@ import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 final case class ViewModel(game: GameViewModel)
 
@@ -45,7 +46,7 @@ final case class GameViewModel(
 ):
 
   def update(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[GameViewModel] =
     case KeyboardEvent.KeyDown(KeyMapping.ZoomIn1) |
@@ -101,7 +102,7 @@ final case class GameViewModel(
       Outcome(this)
 
   def updateGameEvent(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): GameEvent => Outcome[GameViewModel] =
     case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
@@ -251,7 +252,7 @@ object GameViewModel:
     )
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): Outcome[GameViewModel] =

@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import indigo.scenes.SceneEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.MainMenuScene
@@ -21,7 +22,7 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): HandleInput => Outcome[Model] =
     // Save
@@ -56,14 +57,14 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
       Outcome(model)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: Size
   ): HandleInput => Outcome[Size] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewportSize: Size
   ): Batch[SceneNode] =

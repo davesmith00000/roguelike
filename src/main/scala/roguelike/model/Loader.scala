@@ -1,10 +1,11 @@
 package roguelike.model
 
 import indigo.*
+import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 
-final case class Loader(context: FrameContext[Size], state: LoadingState):
+final case class Loader(context: SceneContext[Size], state: LoadingState):
   val paddingToText = 72
   val text =
     Text(

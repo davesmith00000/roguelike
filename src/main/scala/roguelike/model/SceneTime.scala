@@ -1,5 +1,5 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 
 final case class SceneTime(time: Seconds, skip: Boolean)

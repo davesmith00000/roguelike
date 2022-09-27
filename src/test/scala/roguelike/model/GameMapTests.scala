@@ -7,7 +7,7 @@ import indigo.Size
 import indigo.shared.collections.Batch
 
 import scalajs.js
-import scalajs.js.JSConverters._
+import scalajs.js.JSConverters.*
 
 class GameMapTests extends munit.FunSuite {
 

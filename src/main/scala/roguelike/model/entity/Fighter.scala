@@ -16,7 +16,7 @@ import io.circe.syntax._
 final case class Fighter(hp: Int, maxHp: Int, defense: Int, power: Int):
   def hpAsMultiplier: Double = hp.toDouble / maxHp.toDouble
 
-  def healthFull: Boolean = hp == maxHp
+  def healthFull: Boolean  = hp == maxHp
   def healthEmpty: Boolean = hp == 0
 
   def withHp(value: Int): Fighter =

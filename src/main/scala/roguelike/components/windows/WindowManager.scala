@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import indigo.scenes.SceneContext
 import roguelike.components.Component
 import roguelike.model.GameState
 import roguelike.model.Model
@@ -24,7 +25,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
     )
 
   def nextModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model
   ): WindowManagerCommand => Outcome[Model] =
     case WindowManagerCommand.ShowQuit =>
@@ -89,14 +90,14 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
           Outcome(model)
 
   def nextViewModel(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): WindowManagerCommand => Outcome[GameViewModel] =
     _ => Outcome(viewModel)
 
   def view(
-      context: FrameContext[Size],
+      context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
   ): Batch[SceneNode] =
