@@ -2,28 +2,28 @@ package roguelike
 
 import indigo.*
 import indigo.scenes.*
+import indigo.syntax.*
+import indigo.syntax.animations.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
-import roguelike.extensions.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
-import roguelike.model.SceneTime
 import roguelike.viewmodel.ViewModel
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 
-  type SceneModel     = SceneTime
+  type SceneModel     = Unit
   type SceneViewModel = Unit
 
   val name: SceneName =
     SceneName("logo scene")
 
-  val modelLens: Lens[Model, SceneTime] =
-    Lens(_.sceneTime, (m, t) => m.copy(sceneTime = t))
+  val modelLens: Lens[Model, Unit] =
+    Lens.unit
 
   val viewModelLens: Lens[ViewModel, Unit] =
     Lens.unit
@@ -34,33 +34,12 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set()
 
-  val fadeTime     = Seconds(1)
-  val stoppingTime = Seconds(2)
-  val maxSceneTime = (fadeTime + stoppingTime) * 2
-
   def updateModel(
       context: SceneContext[Size],
-      model: SceneTime
-  ): GlobalEvent => Outcome[SceneTime] =
-    case e: SceneEvent =>
-      e match
-        case SceneEvent.SceneChange(_, LogoScene.name, at) =>
-          Outcome(model.copy(time = context.running - at, skip = false))
-
-        case _ =>
-          Outcome(model)
-
-    case FrameTick =>
-      if (model.time > maxSceneTime)
-        Outcome(model)
-          .addGlobalEvents(
-            SceneEvent.JumpTo(LoadingScene.name)
-          )
-      else
-        Outcome(model.copy(time = model.time + context.delta))
-
+      model: Unit
+  ): GlobalEvent => Outcome[Unit] =
     case KeyboardEvent.KeyUp(Key.SPACE) =>
-      // Skip!
+      // Hit space to skip!!!
       Outcome(model)
         .addGlobalEvents(
           SceneEvent.JumpTo(LoadingScene.name)
@@ -71,60 +50,86 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
 
   def updateViewModel(
       context: SceneContext[Size],
-      model: SceneTime,
+      model: Unit,
       viewModel: Unit
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
   def present(
       context: SceneContext[Size],
-      model: SceneTime,
+      model: Unit,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
-    val halfWidth  = context.startUpData.width * 0.5
-    val halfHeight = context.startUpData.height * 0.5
-    val logo =
-      if model.time < (fadeTime + stoppingTime) then
-        getIndigoGraphic(model.time)
-      else getPurpleKingdomGraphic(model.time)
+    val screenCenter = context.startUpData.toPoint / 2
 
-    val logoHalfSize = logo.bounds.halfSize
-    Outcome(
-      SceneUpdateFragment(
-        logo
-          .moveTo(
-            Point(
-              (halfWidth - logoHalfSize.width).toInt,
-              (halfHeight - logoHalfSize.height).toInt
+    val anims: Batch[Outcome[Graphic[Material.ImageEffects]]] =
+      logo(1.seconds, screenCenter, false)
+        .at(context.running - context.sceneTime)(Outcome(Logos.indigo))
+        .toBatch ++
+        logo(5.5.seconds, screenCenter, true)
+          .at(context.running - context.sceneTime)(Outcome(Logos.pkg))
+          .toBatch
+
+    anims.sequence.map { a =>
+      SceneUpdateFragment(a)
+    }
+
+  def logo(
+      delay: Seconds,
+      screenCenter: Point,
+      emitEventOnComplete: Boolean
+  ): Timeline[Outcome[Graphic[Material.ImageEffects]]] =
+    timeline(
+      layer(
+        startAfter(delay),
+        animate(1.seconds) { logo =>
+          lerp >>> SignalFunction { d =>
+            logo.map(_.moveTo(screenCenter).modifyMaterial(_.withAlpha(d)))
+          }
+        },
+        show(2.seconds) { logo =>
+          logo.map(_.moveTo(screenCenter))
+        },
+        animate(1.seconds) { logo =>
+          lerp >>> SignalFunction { d =>
+            logo.map(
+              _.moveTo(screenCenter).modifyMaterial(_.withAlpha(1.0 - d))
             )
-          )
+          }
+        },
+        pause(0.5.second),
+        show(0.5.seconds) { logo =>
+          logo
+            .map(_.modifyMaterial(_.withAlpha(0.0)))
+            .addGlobalEvents(
+              if emitEventOnComplete then
+                Batch(SceneEvent.JumpTo(LoadingScene.name))
+              else Batch.empty
+            )
+        }
       )
     )
 
-  def getIndigoGraphic(time: Seconds): Graphic[Material.ImageEffects] =
-    val indigoLogoWidth  = 100
-    val indigoLogoHeight = 105
+  object Logos:
 
-    Graphic(
-      Rectangle(0, 0, indigoLogoWidth, indigoLogoHeight),
-      1,
-      Material
-        .Bitmap(GameAssets.IndigoLogo)
-        .stretch
-        .toImageEffects
-        .fadeInOut(fadeTime, stoppingTime, time)
-    )
+    val pkg: Graphic[Material.ImageEffects] =
+      val size = Size(100, 136)
 
-  def getPurpleKingdomGraphic(time: Seconds): Graphic[Material.ImageEffects] =
-    val purpleKingdomLogoWidth  = 100
-    val purpleKingdomLogoHeight = 136
+      Graphic(
+        size,
+        Material
+          .Bitmap(GameAssets.PurpleKingdomLogo)
+          .stretch
+          .toImageEffects
+      ).withRef(size.toPoint / 2)
 
-    Graphic(
-      Rectangle(0, 0, purpleKingdomLogoWidth, purpleKingdomLogoHeight),
-      1,
-      Material
-        .Bitmap(GameAssets.PurpleKingdomLogo)
-        .stretch
-        .toImageEffects
-        .fadeInOut((fadeTime + stoppingTime), fadeTime, stoppingTime, time)
-    )
+    val indigo: Graphic[Material.ImageEffects] =
+      val size = Size(100, 105)
+
+      Graphic(
+        size,
+        Material
+          .Bitmap(GameAssets.IndigoLogo)
+          .stretch
+          .toImageEffects
+      ).withRef(size.toPoint / 2)
