@@ -2,10 +2,11 @@ package roguelike
 
 import indigo.*
 import indigo.scenes.*
+import indigo.syntax.*
+import indigo.syntax.animations.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.extensions.*
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
@@ -37,6 +38,22 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val titlePauseTime = Seconds(1)
   val menuFadeInTime = Seconds(2)
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
+  val moveGroup: Group => SignalFunction[Point, Group] = g =>
+    SignalFunction(pt => g.withPosition(pt))
+
+  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
+    SignalFunction( d =>
+      val material = l.blending.map(b => b.blendMaterial) match {
+        case Some(m) => m
+        case None    => BlendMaterial.BlendEffects.None
+      }
+
+      material match {
+        case m: BlendMaterial.BlendEffects =>
+          l.withBlendMaterial(m.withAlpha(d))
+        case _ => l
+      }
+    )
 
   def updateModel(
       context: SceneContext[Size],
@@ -97,6 +114,14 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       model: Model,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
+    Outcome(
+      SceneUpdateFragment(
+        getTitle(context, model.sceneTime.skip),
+        getMenu(context, model)
+      )
+    )
+
+  def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
     val halfWidth         = context.startUpData.width * 0.5
     val halfHeight        = context.startUpData.height * 0.5
     val textMagnification = 3
@@ -113,69 +138,62 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       (halfHeight - (titleTextBound.size.height * textMagnification * 0.5)).toInt
     )
     val titleEnd = titleStart.moveTo(titleStart.x, 20)
-
-    Outcome(
-      SceneUpdateFragment(
-        Layer(
-          Graphic(
-            Rectangle(
-              0,
-              0,
-              context.startUpData.width,
-              context.startUpData.height
-            ),
-            1,
-            Material
-              .Bitmap(GameAssets.MenuBg)
-              .tile
+    if (skipAnimations) Group(titleText.moveTo(titleEnd))
+    else
+      val titleAnimation: Timeline[Group] =
+        timeline(
+          layer(
+            animate(4.seconds) {
+              easeOut >>> lerp(titleStart, titleEnd) >>> moveGroup(_)
+            }
           )
-        ).fadeIn(fadInTime * 0.5, model.sceneTime.time),
-        Layer(
-          Group(
-            titleText
-          )
-            .withScale(new Vector2(textMagnification, textMagnification))
-            .withPosition(titleStart)
-            .easeOut(titleStart, titleEnd, slideInTime, model.sceneTime.time)
-        ).fadeIn(fadInTime, model.sceneTime.time),
-        Layer(
-          getMenuFragment(
-            context,
-            halfWidth,
-            model.sceneTime.skip,
-            !model.loadInfo.loadedData.isEmpty
-          )
-        ).fadeIn(
-          slideInTime + titlePauseTime,
-          menuFadeInTime,
-          model.sceneTime.time
         )
+      titleAnimation.at(context.running - context.sceneTime)(Group(titleText)) match {
+        case Some(g) => g
+        case None => Group.empty
+      }
+
+  def getMenu(context: SceneContext[Size], model: Model): Layer =
+    val menuItems =
+      getMenuFragment(
+        context,
+        context.startUpData.width * 0.5,
+        !model.loadInfo.loadedData.isEmpty
       )
-    )
+    if (model.sceneTime.skip) menuItems.withBlendMaterial(BlendMaterial.BlendEffects.None)
+    else
+      val menuAnimation: TimelineAnimation[Layer] =
+        layer(
+          startAfter[Layer](6.seconds),
+          animate(2.seconds){ lerp >>> applyAlpha(_) }
+        )
+      menuAnimation.at(context.running - context.sceneTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
+        case Some(l) => l
+        case None => Layer.empty
+      }
 
   def getMenuFragment(
       context: SceneContext[Size],
       halfWidth: Double,
-      showMenu: Boolean,
       hasLoadData: Boolean
   ) =
-    if (showMenu)
-      val menuItems = Batch(
-        Text(
-          "[n] Play a new game",
-          RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-        )
-      )
-      val loadGameItem = Text(
-        "[c] Continue last game",
+    val menuItems = Batch(
+      Text(
+        "[n] Play a new game",
         RoguelikeTiles.Size10x10.Fonts.fontKey,
         TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
       )
-        .moveTo(0, 20)
+    )
+    val loadGameItem = Text(
+      "[c] Continue last game",
+      RoguelikeTiles.Size10x10.Fonts.fontKey,
+      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+    )
+      .moveTo(0, 20)
 
-      val menuMagnification = 2
+    val menuMagnification = 2
 
+    Layer(
       Group(
         (menuItems ++
           (if (hasLoadData)
@@ -192,6 +210,5 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             200
           )
         )
-    else Group.empty
-
+    )
 case object GenerateLevel extends GlobalEvent
