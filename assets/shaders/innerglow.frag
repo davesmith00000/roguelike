@@ -32,7 +32,8 @@ void fragment(){
 
   float sdf = sdfCalc((UV * 2.0) - 1.0, vec2(1.0) - (vec2(amount, amount) * aspect));
 
-  COLOR = SRC + vec4(vec3(sdf), 1.0);
+  vec4 glow = vec4(GLOW_COLOR.rgb * sdf, sdf);
 
+  COLOR = mix(glow, SRC, SRC.a);
 }
 //</indigo-fragment>
