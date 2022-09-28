@@ -2,6 +2,7 @@ package roguelike
 
 import indigo.*
 import indigo.scenes.*
+import indigo.syntax.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
@@ -11,6 +12,7 @@ import roguelike.model.Loader
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
+import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
@@ -114,11 +116,15 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
     Outcome(
       SceneUpdateFragment(
-        loader
-          .view()
-          .moveTo(
-            (midX - (loaderBounds.width * 0.5)).toInt,
-            (midY - (loaderBounds.height * 0.5)).toInt
-          )
+        Layer(
+          loader
+            .view()
+            .moveTo(
+              (midX - (loaderBounds.width * 0.5)).toInt,
+              (midY - (loaderBounds.height * 0.5)).toInt
+            )
+        ).withBlendMaterial(InnerGlow)
       )
     )
+
+

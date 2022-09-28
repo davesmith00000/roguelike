@@ -7,6 +7,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.Model
+import roguelike.screeneffects.InnerGlow
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ViewModel
 
@@ -58,7 +59,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
         .withAssets(GameAssets.initialAssets)
-        .withShaders(TerminalText.standardShader)
+        .withShaders(TerminalText.standardShader, InnerGlow.shader)
         .withSubSystems(
           FPSCounter(
             Point(5, 100),
