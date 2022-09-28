@@ -11,6 +11,7 @@ import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.SceneTime
+import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 
 object MainMenuScene extends Scene[Size, Model, ViewModel]:

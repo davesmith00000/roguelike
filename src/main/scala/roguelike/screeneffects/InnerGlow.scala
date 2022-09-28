@@ -5,21 +5,29 @@ import indigo.scenes.*
 import indigo.syntax.*
 import roguelike.assets.GameAssets
 
-case object InnerGlow extends BlendMaterial:
+final case class InnerGlow(
+    screenSize: Size,
+    colour: RGBA,
+    intensity: Double
+) extends BlendMaterial:
+
+  def toShaderData: BlendShaderData =
+    BlendShaderData(
+      InnerGlow.shaderId,
+      UniformBlock(
+        "InnerGlowData",
+        Batch(
+          Uniform("GLOW_COLOR")  -> vec4.fromRGBA(colour),
+          Uniform("SCREEN_SIZE") -> vec2.fromSize(screenSize),
+          Uniform("INTENSITY")   -> float(intensity)
+        )
+      )
+    )
+
+object InnerGlow:
   val shaderId: ShaderId = ShaderId("inner glow blend material")
 
   val shader: BlendShader.External =
     BlendShader
       .External(shaderId)
       .withFragmentProgram(GameAssets.InnerGlow)
-
-  def toShaderData: BlendShaderData =
-    BlendShaderData(
-      shaderId,
-      UniformBlock(
-        "InnerGlowData",
-        Batch(
-          Uniform("GLOW_COLOR") -> vec4.fromRGBA(RGBA.Red)
-        )
-      )
-    )
