@@ -115,9 +115,9 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
     Outcome(
-      SceneUpdateFragment(
-        getTitle(context, model.sceneTime.skip)
-      ).addLayer(getMenu(context, model))
+      SceneUpdateFragment.empty
+        .addLayer(getMenu(context, model))
+        .addLayer(getTitle(context, model.sceneTime.skip))
     )
 
   def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
@@ -136,8 +136,14 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       (halfWidth - (titleTextBound.size.width * textMagnification * 0.5)).toInt,
       (halfHeight - (titleTextBound.size.height * textMagnification * 0.5)).toInt
     )
+
+    val group =
+      Group(titleText)
+        .withScale(new Vector2(textMagnification, textMagnification))
+        .withPosition(titleStart)
+
     val titleEnd = titleStart.moveTo(titleStart.x, 20)
-    if (skipAnimations) Group(titleText.moveTo(titleEnd))
+    if (skipAnimations) group.moveTo(titleEnd)
     else
       val titleAnimation: Timeline[Group] =
         timeline(
@@ -147,7 +153,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             }
           )
         )
-      titleAnimation.at(context.running - context.sceneTime)(Group(titleText)) match {
+      titleAnimation.at(context.running - context.sceneTime)(group) match {
         case Some(g) => g
         case None => Group.empty
       }
