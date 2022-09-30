@@ -116,9 +116,8 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        getTitle(context, model.sceneTime.skip),
-        getMenu(context, model)
-      )
+        getTitle(context, model.sceneTime.skip)
+      ).addLayer(getMenu(context, model))
     )
 
   def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
@@ -162,10 +161,12 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       )
     if (model.sceneTime.skip) menuItems.withBlendMaterial(BlendMaterial.BlendEffects.None)
     else
-      val menuAnimation: TimelineAnimation[Layer] =
-        layer(
-          startAfter[Layer](6.seconds),
-          animate(2.seconds){ lerp >>> applyAlpha(_) }
+      val menuAnimation: Timeline[Layer] =
+        timeline(
+          layer(
+            startAfter[Layer](6.seconds),
+            animate(2.seconds){ lerp >>> applyAlpha(_) }
+          )
         )
       menuAnimation.at(context.running - context.sceneTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
         case Some(l) => l
