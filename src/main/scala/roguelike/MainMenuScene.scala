@@ -2,6 +2,7 @@ package roguelike
 
 import indigo.*
 import indigo.scenes.*
+import indigo.shared.datatypes.Fill.Color.apply
 import indigo.syntax.*
 import indigo.syntax.animations.*
 import io.indigoengine.roguelike.starterkit.*
@@ -35,7 +36,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
     Set()
 
   val fadInTime      = Seconds(2)
-  val slideInTime    = Seconds(5)
+  val slideInTime    = Seconds(4)
   val titlePauseTime = Seconds(1)
   val menuFadeInTime = Seconds(2)
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
@@ -117,9 +118,42 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment.empty
+        .addLayer(
+          Layer(getBackground(context))
+            .withBlendMaterial(InnerGlow(context.startUpData, RGBA(0, 0, 0, 0.5), 0.4))
+        )
         .addLayer(getMenu(context, model))
         .addLayer(getTitle(context, model.sceneTime.skip))
     )
+
+  def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
+    val graphic = Graphic(
+      context.startUpData,
+      Material
+        .Bitmap(GameAssets.MenuBg)
+        .tile
+        .toImageEffects
+        .withAlpha(0)
+    )
+
+    val time = context.running - context.sceneTime
+    val graphicTimeline: Timeline[Graphic[Material.ImageEffects]] = timeline(
+      layer(
+        animate(1.seconds) { g =>
+          lerp >>> SignalFunction { d =>
+            g.modifyMaterial(_.withAlpha(d))
+          }
+        }
+      )
+    )
+
+    if (time >= 1.second)
+      graphic.modifyMaterial(_.withAlpha(1))
+    else
+      graphicTimeline.at(time)(graphic) match {
+        case Some(g) => g
+        case None => graphic
+      }
 
   def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
     val halfWidth         = context.startUpData.width * 0.5
@@ -143,13 +177,15 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         .withScale(new Vector2(textMagnification, textMagnification))
         .withPosition(titleStart)
 
+    val time = context.running - context.sceneTime
     val titleEnd = titleStart.moveTo(titleStart.x, 20)
-    if (skipAnimations) group.moveTo(titleEnd)
+
+    if (skipAnimations || time >= slideInTime) group.moveTo(titleEnd)
     else
       val titleAnimation: Timeline[Group] =
         timeline(
           layer(
-            animate(4.seconds) {
+            animate(slideInTime) {
               easeOut >>> lerp(titleStart, titleEnd) >>> moveGroup(_)
             }
           )
