@@ -74,7 +74,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       PlayerComponent.updateModel(
         context,
         this,
-        PlayerComponent.Cmds.RemoveFromInvetory(at)
+        PlayerComponent.Cmds.RemoveFromInventory(at)
       )
 
     case InventoryEvent.UseConsumables(c) =>
@@ -139,7 +139,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           lookAtTarget = player.position,
           targetingWithRangedAt =
             Option((Ranged.ConfusionScroll, inventoryPosition))
-        )
+        ).closeAllWindows
       )
 
     case InventoryEvent.TargetUsingRanged(
@@ -152,7 +152,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           lookAtTarget = player.position,
           targetingWithRangedAt =
             Option((Ranged.FireballScroll, inventoryPosition))
-        )
+        ).closeAllWindows
       )
   }
 
