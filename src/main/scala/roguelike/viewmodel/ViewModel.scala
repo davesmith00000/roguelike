@@ -18,16 +18,17 @@ import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
+import roguelike.viewmodel.ui.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class ViewModel(game: GameViewModel)
+final case class ViewModel(game: GameViewModel, ui: UiViewModel)
 
 object ViewModel:
 
   def initial(player: Player, initialViewportSize: Size): ViewModel =
-    ViewModel(GameViewModel.initial(player, initialViewportSize))
+    ViewModel(GameViewModel.initial(player, initialViewportSize), GameUi())
 
 final case class GameViewModel(
     magnification: Int,

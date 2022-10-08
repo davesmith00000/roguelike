@@ -5,6 +5,8 @@ import indigo.scenes.*
 import indigo.shared.datatypes.Fill.Color.apply
 import indigo.syntax.*
 import indigo.syntax.animations.*
+import indigoextras.ui.Button
+import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
@@ -14,11 +16,12 @@ import roguelike.model.Model
 import roguelike.model.SceneTime
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
+import roguelike.viewmodel.ui.MainMenuUi
 
 object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
   type SceneModel     = Model
-  type SceneViewModel = Unit
+  type SceneViewModel = MainMenuUi
 
   val name: SceneName =
     SceneName("main menu scene")
@@ -26,8 +29,11 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val modelLens: Lens[Model, Model] =
     Lens.keepLatest
 
-  val viewModelLens: Lens[ViewModel, Unit] =
-    Lens.unit
+  val viewModelLens: Lens[ViewModel, MainMenuUi] =
+    Lens({_.ui match {
+      case m: MainMenuUi => m
+      case _ => MainMenuUi(Batch(NewGame))
+    }}, (vm, mainMenu) => vm.copy(ui = mainMenu))
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
@@ -67,6 +73,23 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
         case _ => Outcome(model)
       }
+    case NewGame =>
+      Outcome(model)
+        .addGlobalEvents(
+          SceneEvent.JumpTo(GeneratingLevelScene.name),
+          GenerateLevel
+        )
+
+    case LoadGame if model.loadInfo.loadedData.isDefined =>
+      model.loadInfo.loadedData match
+        case None =>
+          Outcome(model) // should not happen...
+
+        case Some(data) =>
+          Outcome(Model.fromSaveData(data))
+            .addGlobalEvents(
+              SceneEvent.JumpTo(GameScene.name)
+            )
     case FrameTick =>
       if (model.sceneTime.time < totalTime && model.sceneTime.skip == false)
         Outcome(
@@ -83,38 +106,29 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
 
     case KeyboardEvent.KeyUp(Key.KEY_N) if model.sceneTime.skip == true =>
-      Outcome(model)
-        .addGlobalEvents(
-          SceneEvent.JumpTo(GeneratingLevelScene.name),
-          GenerateLevel
-        )
+      Outcome(model).addGlobalEvents(NewGame)
 
-    case KeyboardEvent.KeyUp(Key.KEY_C)
-        if model.sceneTime.skip == true && model.loadInfo.loadedData.isDefined =>
-      model.loadInfo.loadedData match
-        case None =>
-          Outcome(model) // should not happen...
-
-        case Some(data) =>
-          Outcome(Model.fromSaveData(data))
-            .addGlobalEvents(
-              SceneEvent.JumpTo(GameScene.name)
-            )
-
+    case KeyboardEvent.KeyUp(Key.KEY_C) if model.sceneTime.skip == true =>
+      Outcome(model).addGlobalEvents(LoadGame)
     case _ =>
       Outcome(model)
 
   def updateViewModel(
       context: SceneContext[Size],
       model: Model,
-      viewModel: Unit
-  ): GlobalEvent => Outcome[Unit] =
-    _ => Outcome(viewModel)
+      viewModel: MainMenuUi
+  ): GlobalEvent => Outcome[MainMenuUi] =
+    _ =>
+      if (!model.loadInfo.loadedData.isEmpty && viewModel.loadGame == None)
+        Outcome(MainMenuUi(Batch(NewGame), Some(Batch(LoadGame))))
+      else
+        val newGame = viewModel.newGame.update(context.mouse)
+        Outcome(viewModel).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
 
   def present(
       context: SceneContext[Size],
       model: Model,
-      viewModel: Unit
+      viewModel: MainMenuUi
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment.empty
@@ -122,7 +136,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           Layer(getBackground(context))
             .withBlendMaterial(InnerGlow(context.startUpData, RGBA(0, 0, 0, 0.5), 0.4))
         )
-        .addLayer(getMenu(context, model))
+        .addLayer(getMenu(context, model, viewModel))
         .addLayer(getTitle(context, model.sceneTime.skip))
     )
 
@@ -178,7 +192,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         .withPosition(titleStart)
 
     val time = context.running - context.sceneTime
-    val titleEnd = titleStart.moveTo(titleStart.x, 20)
+    val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     if (skipAnimations || time >= slideInTime) group.moveTo(titleEnd)
     else
@@ -195,12 +209,12 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         case None => Group.empty
       }
 
-  def getMenu(context: SceneContext[Size], model: Model): Layer =
+  def getMenu(context: SceneContext[Size], model: Model, viewModel: MainMenuUi): Layer =
     val menuItems =
       getMenuFragment(
         context,
         context.startUpData.width * 0.5,
-        !model.loadInfo.loadedData.isEmpty
+        viewModel
       )
     if (model.sceneTime.skip) menuItems.withBlendMaterial(BlendMaterial.BlendEffects.None)
     else
@@ -219,40 +233,23 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   def getMenuFragment(
       context: SceneContext[Size],
       halfWidth: Double,
-      hasLoadData: Boolean
+      viewModel: MainMenuUi
   ) =
-    val menuItems = Batch(
-      Text(
-        "[n] Play a new game",
-        RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-      )
-    )
-    val loadGameItem = Text(
-      "[c] Continue last game",
-      RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-    )
-      .moveTo(0, 20)
-
+    val buttonSize = viewModel.newGame.width
+    val menuItems = Group(viewModel.view(context))
     val menuMagnification = 2
 
     Layer(
-      Group(
-        (menuItems ++
-          (if (hasLoadData)
-             Batch(loadGameItem)
-           else
-             Batch.empty))
-      ).withScale(new Vector2(menuMagnification, menuMagnification))
+      menuItems
+        .withScale(new Vector2(menuMagnification, menuMagnification))
         .withPosition(
           new Point(
-            (halfWidth - (context.boundaryLocator
-              .textBounds(loadGameItem)
-              .size
-              .width * menuMagnification * 0.5)).toInt,
+            (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
             200
           )
         )
     )
+
 case object GenerateLevel extends GlobalEvent
+case object NewGame extends GlobalEvent
+case object LoadGame extends GlobalEvent

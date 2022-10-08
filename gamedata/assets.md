@@ -7,8 +7,8 @@ indigoLogo|image|init|assets/indigoLogo.png
 purpleKingdomLogo|image|init|assets/pkLogo.png
 Loader|image|init|assets/loading.png
 MenuBg|image|init|assets/menuBg.png
+UI|image|init|assets/ui/ui.png
 Icons|image|lazy|assets/simple-sprites-24x24.png
-UI|image|lazy|assets/ui/ui.png
 DoorStone|image|lazy|assets/bg/door_stone.png
 Objects|image|lazy|assets/bg/objects.png
 Tileset|image|lazy|assets/bg/tileset.png
