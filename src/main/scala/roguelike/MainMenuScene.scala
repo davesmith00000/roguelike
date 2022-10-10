@@ -270,10 +270,11 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       SceneAudioSource(
         BindingKey(GameAssets.MenuBackgroundAudio.toString),
         PlaybackPattern.SingleTrackLoop(
-          soundTimeline.at(context.running - context.sceneTime)(track) match {
-            case Some(t) => t
-            case None => track
-          }
+          track
+          // soundTimeline.at(context.running - context.sceneTime)(track) match {
+          //   case Some(t) => t
+          //   case None => track
+          // }
         )
       )
     )
