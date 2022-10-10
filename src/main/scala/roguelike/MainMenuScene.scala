@@ -118,12 +118,28 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       model: Model,
       viewModel: MainMenuUi
   ): GlobalEvent => Outcome[MainMenuUi] =
-    _ =>
-      if (!model.loadInfo.loadedData.isEmpty && viewModel.loadGame == None)
-        Outcome(MainMenuUi(Batch(NewGame), Some(Batch(LoadGame))))
-      else
-        val newGame = viewModel.newGame.update(context.mouse)
-        Outcome(viewModel).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
+    case FrameTick =>
+      val buttonSize = viewModel.newGame.width
+      val halfWidth = context.startUpData.width * 0.5
+      val menuMagnification = 2
+      val mainMenu =
+      (
+        if (!model.loadInfo.loadedData.isEmpty && viewModel.loadGame == None)
+          MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
+        else
+          viewModel
+      ).moveTo(
+        new Point(
+          (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
+          200
+        )
+      )
+        .withScale(menuMagnification)
+
+      val newGame = mainMenu.newGame.update(context.mouse)
+      Outcome(mainMenu).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
+    case _ =>
+      Outcome(viewModel)
 
   def present(
       context: SceneContext[Size],
@@ -234,21 +250,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       halfWidth: Double,
       viewModel: MainMenuUi
-  ) =
-    val buttonSize = viewModel.newGame.width
-    val menuItems = Group(viewModel.view(context))
-    val menuMagnification = 2
-
-    Layer(
-      menuItems
-        .withScale(new Vector2(menuMagnification, menuMagnification))
-        .withPosition(
-          new Point(
-            (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
-            200
-          )
-        )
-    )
+  ) = Layer(Group(viewModel.view(context)))
 
 case object GenerateLevel extends GlobalEvent
 case object NewGame extends GlobalEvent

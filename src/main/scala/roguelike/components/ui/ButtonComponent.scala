@@ -1,6 +1,7 @@
 package roguelike.components.ui
 
 import indigo.*
+import indigo.shared.scenegraph.*
 import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
@@ -34,26 +35,32 @@ final case class ButtonComponent(
   def update(mouse: Mouse) =
     hitArea.update(mouse).map(ha => this.copy(hitArea = ha))
 
-  def draw() =
-    Group(
-      Graphic(16, 16, Material.Bitmap(GameAssets.UI))
-        .withCrop(108, 308, 16, 16)
-        .withScale(Vector2(ButtonComponent.multiplier)),
-      Graphic(width - (tileWidth * 2), 16, Material.Bitmap(GameAssets.UI).tile)
-        .withCrop(126, 308, 16, 16)
-        .moveTo(Point(tileWidth, 0))
-        .withScale(Vector2(ButtonComponent.multiplier)),
-      Graphic(16, 16, Material.Bitmap(GameAssets.UI))
-        .withCrop(144, 308, 16, 16)
-        .moveTo(Point(width - tileWidth, 0))
-        .withScale(Vector2(ButtonComponent.multiplier)),
-      Text(
-        text,
-        RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-      ).alignCenter
-        .moveTo(Point((width * 0.5).toInt, 4))
-    ).moveTo(position)
+  def draw: Batch[Group] =
+    Batch(
+      Group(
+        Graphic(16, 16, Material.Bitmap(GameAssets.UI))
+          .withCrop(108, 308, 16, 16)
+          .withScale(Vector2(ButtonComponent.multiplier)),
+        Graphic(
+          width - (tileWidth * 2),
+          16,
+          Material.Bitmap(GameAssets.UI).tile
+        )
+          .withCrop(126, 308, 16, 16)
+          .moveTo(Point(tileWidth, 0))
+          .withScale(Vector2(ButtonComponent.multiplier)),
+        Graphic(16, 16, Material.Bitmap(GameAssets.UI))
+          .withCrop(144, 308, 16, 16)
+          .moveTo(Point(width - tileWidth, 0))
+          .withScale(Vector2(ButtonComponent.multiplier)),
+        Text(
+          text,
+          RoguelikeTiles.Size10x10.Fonts.fontKey,
+          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+        ).alignCenter
+          .moveTo(Point((width * 0.5).toInt, 4))
+      ).moveTo(position)
+    )
 
 object ButtonComponent:
   private val baseTile   = 16
@@ -69,7 +76,7 @@ object ButtonComponent:
       text,
       width,
       position,
-      HitArea(Rectangle(width, (baseTile * multiplier).toInt))
+      HitArea(Rectangle(position, Size(width, (baseTile * multiplier).toInt)))
         .withClickActions(actions)
     )
 
@@ -82,6 +89,5 @@ object ButtonComponent:
       text,
       width,
       Point.zero,
-      HitArea(Rectangle(width, (baseTile * multiplier).toInt))
-        .withClickActions(actions)
+      actions
     )

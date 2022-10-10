@@ -6,13 +6,22 @@ import roguelike.components.ui.ButtonComponent
 
 final case class MainMenuUi(
     newGame: ButtonComponent,
-    loadGame: Option[ButtonComponent]
+    loadGame: Option[ButtonComponent],
+    position: Point
 ) extends UiViewModel:
   def view(context: SceneContext[Size]): Batch[SceneNode] =
     loadGame match {
-      case Some(b) => Batch(newGame.draw(), b.draw())
-      case None    => Batch(newGame.draw())
+      case Some(b) => newGame.draw ++ b.draw
+      case None    => newGame.draw
     }
+
+  def moveTo(pos: Point): MainMenuUi =
+    copy(
+      newGame = newGame.moveTo(pos),
+      loadGame = loadGame.map(l => l.moveTo(pos.withY(pos.y + 50)))
+    )
+
+  def withScale(scale: Int): MainMenuUi = this
 
 object MainMenuUi:
   def apply(
@@ -23,8 +32,9 @@ object MainMenuUi:
     MainMenuUi(
       ButtonComponent("[n] Play a new game", buttonSize, newGame),
       loadGame.map(l =>
-        ButtonComponent("[c] Continue last game", buttonSize, l).moveTo(0, 50)
-      )
+        ButtonComponent("[c] Continue last game", buttonSize, l)
+      ),
+      Point.zero
     )
 
   def apply(
