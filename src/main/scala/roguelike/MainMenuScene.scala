@@ -63,6 +63,9 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       }
     )
 
+  val changeVolume: Track => SignalFunction[Double, Track] = t =>
+    SignalFunction( d => t.copy(volume = Volume.Max * d))
+
   def updateModel(
       context: SceneContext[Size],
       model: Model
@@ -155,6 +158,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         )
         .addLayer(getMenu(context, model, viewModel))
         .addLayer(getTitle(context, model.sceneTime.skip))
+        .withAudio(getBackgroundAudio(context))
     )
 
   def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
@@ -252,6 +256,28 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       halfWidth: Double,
       viewModel: MainMenuUi
   ) = Layer(Group(viewModel.view(context)))
+
+  def getBackgroundAudio(context: SceneContext[Size]): SceneAudio =
+    val track = Track(GameAssets.MenuBackgroundAudio)
+    val soundTimeline: Timeline[Track] =
+        timeline(
+          layer(
+            animate(1.seconds){ lerp >>> changeVolume(_) }
+          )
+        )
+
+    SceneAudio(
+      SceneAudioSource(
+        BindingKey(GameAssets.MenuBackgroundAudio.toString),
+        PlaybackPattern.SingleTrackLoop(
+          soundTimeline.at(context.running - context.sceneTime)(track) match {
+            case Some(t) => t
+            case None => track
+          }
+        )
+      )
+    )
+
 
 case object GenerateLevel extends GlobalEvent
 case object NewGame extends GlobalEvent
