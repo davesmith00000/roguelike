@@ -9,6 +9,8 @@ final case class MainMenuUi(
     loadGame: Option[ButtonComponent],
     position: Point
 ) extends UiViewModel:
+  val scale: Int = newGame.scale
+
   def view(context: SceneContext[Size]): Batch[SceneNode] =
     loadGame match {
       case Some(b) => newGame.draw ++ b.draw
@@ -18,10 +20,14 @@ final case class MainMenuUi(
   def moveTo(pos: Point): MainMenuUi =
     copy(
       newGame = newGame.moveTo(pos),
-      loadGame = loadGame.map(l => l.moveTo(pos.withY(pos.y + 50)))
+      loadGame = loadGame.map(l => l.moveTo(pos.withY(pos.y + (50 * scale))))
     )
 
-  def withScale(scale: Int): MainMenuUi = this
+  def withScale(scale: Int): MainMenuUi =
+    copy(
+      newGame = newGame.withScale(scale),
+      loadGame = loadGame.map(l => l.withScale(scale))
+    ).moveTo(position)
 
 object MainMenuUi:
   def apply(

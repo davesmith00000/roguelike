@@ -2,6 +2,7 @@ package roguelike.components.ui
 
 import indigo.*
 import indigo.shared.scenegraph.*
+import indigoextras.geometry.Vertex
 import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
@@ -11,7 +12,8 @@ final case class ButtonComponent(
     text: String,
     width: Int,
     position: Point,
-    hitArea: HitArea
+    hitArea: HitArea,
+    scale: Int
 ):
   private val tileWidth =
     (ButtonComponent.baseTile * ButtonComponent.multiplier).toInt
@@ -31,6 +33,13 @@ final case class ButtonComponent(
 
   def moveBy(x: Int, y: Int): ButtonComponent =
     moveBy(Point(x, y))
+
+  def withScale(scale: Int): ButtonComponent =
+    copy(
+      hitArea =
+        hitArea.copy(area = hitArea.area.scaleBy(Vertex(scale.toDouble))),
+      scale = scale
+    )
 
   def update(mouse: Mouse) =
     hitArea.update(mouse).map(ha => this.copy(hitArea = ha))
@@ -60,6 +69,7 @@ final case class ButtonComponent(
         ).alignCenter
           .moveTo(Point((width * 0.5).toInt, 4))
       ).moveTo(position)
+        .scaleBy(Vector2(scale))
     )
 
 object ButtonComponent:
@@ -77,7 +87,8 @@ object ButtonComponent:
       width,
       position,
       HitArea(Rectangle(position, Size(width, (baseTile * multiplier).toInt)))
-        .withClickActions(actions)
+        .withClickActions(actions),
+      1
     )
 
   def apply(

@@ -128,13 +128,14 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
         else
           viewModel
-      ).moveTo(
+      )
+      .withScale(menuMagnification)
+      .moveTo(
         new Point(
           (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
           200
         )
       )
-        .withScale(menuMagnification)
 
       val newGame = mainMenu.newGame.update(context.mouse)
       Outcome(mainMenu).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
