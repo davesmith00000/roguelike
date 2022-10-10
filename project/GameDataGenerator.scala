@@ -221,19 +221,27 @@ object AssetsGen extends GameDataGenerator {
 
   val fileName: String = "assets.md"
 
-  def makeName(name: String, typ: String): String = {
+  def makeName(name: String): String = {
     GameDataGenerator.sanitizeName(name)
   }
 
   def assetNames: PartialFunction[List[String], String] = {
     case name :: typ :: phase :: path :: Nil =>
-      val n = makeName(name, typ)
+      val n = makeName(name)
       s"""  val $n: AssetName = AssetName("$n")"""
+  }
+
+  def audioAssets: PartialFunction[List[String], String] = {
+    case name :: typ :: phase :: path :: Nil if typ == "audio" =>
+      "      " + makeName(name) + ","
+
+    case _ =>
+      ""
   }
 
   def imageAssets: PartialFunction[List[String], String] = {
     case name :: typ :: phase :: path :: Nil if typ == "image" =>
-      "      " + makeName(name, typ) + ","
+      "      " + makeName(name) + ","
 
     case _ =>
       ""
@@ -241,15 +249,18 @@ object AssetsGen extends GameDataGenerator {
 
   def textAssets: PartialFunction[List[String], String] = {
     case name :: typ :: phase :: path :: Nil if typ == "text" =>
-      "      " + makeName(name, typ) + ","
+      "      " + makeName(name) + ","
 
     case _ =>
       ""
   }
 
   def assetSetLine(name: String, typ: String, path: String): String = {
-    val n = makeName(name, typ)
+    val n = makeName(name)
     typ match {
+      case "audio" =>
+        s"""      AssetType.Audio($n, AssetPath("$path")),"""
+
       case "image" =>
         s"""      AssetType.Image($n, AssetPath("$path")),"""
 
@@ -280,6 +291,7 @@ object AssetsGen extends GameDataGenerator {
   def mappers(moduleName: String): List[PartialFunction[List[String], String]] =
     List(
       assetNames,
+      audioAssets,
       imageAssets,
       textAssets,
       initialAssetSet,
@@ -299,28 +311,36 @@ object AssetsGen extends GameDataGenerator {
     |
     |${contents.head}
     |
-    |  private val imagesAssets: Set[AssetName] =
+    |  private val audioAssets: Set[AssetName] =
     |    Set(
     |${contents(1)}
     |    )
     |
-    |  private val textAssets: Set[AssetName] =
+    |  private val imagesAssets: Set[AssetName] =
     |    Set(
     |${contents(2)}
     |    )
     |
-    |  val initialAssets: Set[AssetType] =
+    |  private val textAssets: Set[AssetName] =
     |    Set(
     |${contents(3)}
     |    )
     |
-    |  val lazyAssets: Set[AssetType] =
+    |  val initialAssets: Set[AssetType] =
     |    Set(
     |${contents(4)}
     |    )
+    |
+    |  val lazyAssets: Set[AssetType] =
+    |    Set(
+    |${contents(5)}
+    |    )
     |  
     |  def loaded(assetCollection: AssetCollection): Boolean =
-    |    imagesLoaded(assetCollection) && textsLoaded(assetCollection)
+    |    audiosLoaded(assetCollection) && imagesLoaded(assetCollection) && textsLoaded(assetCollection)
+    |  
+    |  private def audiosLoaded(assetCollection: AssetCollection): Boolean =
+    |    audioAssets.forall(a => assetCollection.findAudioDataByName(a).isDefined)
     |  
     |  private def imagesLoaded(assetCollection: AssetCollection): Boolean =
     |    imagesAssets.forall(i => assetCollection.findImageDataByName(i).isDefined)
