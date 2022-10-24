@@ -2,6 +2,7 @@ package roguelike.viewmodel.ui
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import roguelike.components.ui.ButtonComponent
 
 final case class MainMenuUi(

@@ -32,7 +32,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val viewModelLens: Lens[ViewModel, MainMenuUi] =
     Lens({_.ui match {
       case m: MainMenuUi => m
-      case _ => MainMenuUi(Batch(NewGame))
+      case ui => MainMenuUi(Batch(NewGame))
     }}, (vm, mainMenu) => vm.copy(ui = mainMenu))
 
   val eventFilters: EventFilters =

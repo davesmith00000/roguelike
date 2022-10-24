@@ -2,6 +2,7 @@ package roguelike.viewmodel
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.InventoryEvent
@@ -28,7 +29,10 @@ final case class ViewModel(game: GameViewModel, ui: UiViewModel)
 object ViewModel:
 
   def initial(player: Player, initialViewportSize: Size): ViewModel =
-    ViewModel(GameViewModel.initial(player, initialViewportSize), GameUi())
+    ViewModel(
+      GameViewModel.initial(player, initialViewportSize),
+      GameUi()
+    )
 
 final case class GameViewModel(
     magnification: Int,
@@ -43,7 +47,8 @@ final case class GameViewModel(
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
     terminals: CachedTerminals,
-    helpControlsText: String
+    helpControlsText: String,
+    sprites: Batch[(AssetName, Sprite[Bitmap])]
 ):
 
   def update(
@@ -249,7 +254,8 @@ object GameViewModel:
       tilePositions = Batch.empty,
       collectables = js.Array(),
       terminals = CachedTerminals.initial,
-      helpControlsText
+      helpControlsText,
+      Batch.empty
     )
 
   def nextViewModel(

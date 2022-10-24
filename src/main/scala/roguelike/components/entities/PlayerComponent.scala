@@ -2,9 +2,11 @@ package roguelike.components.entities
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
+import roguelike.assets.GameAssets
 import roguelike.components.Component
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameState
@@ -30,7 +32,29 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
   def viewModelLens: Lens[GameViewModel, PlayerVM] =
     Lens(
-      vm => PlayerVM(vm.playerPosition, vm.squareSize /*, vm.phase*/ ),
+      vm => {
+        val sprite: Sprite[Bitmap] = vm.sprites
+          .find(s => s(0) == GameAssets.Player)
+          .map(s => s(1))
+          .getOrElse(
+            new Sprite[Bitmap](
+              BindingKey("emptyPlayer"),
+              Bitmap(GameAssets.Player),
+              AnimationKey("empty"),
+              Batch.empty,
+              false,
+              (_, _) => None,
+              Point(0, 0),
+              Radians(0),
+              Vector2(1),
+              Depth(1),
+              Point(0),
+              Flip(false, false)
+            )
+          )
+
+        PlayerVM(vm.playerPosition, vm.squareSize, sprite /*, vm.phase*/ )
+      },
       (vm, p) => vm.copy(playerPosition = p.playerPosition)
     )
 
@@ -99,7 +123,10 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
             )
             .map { pp =>
               viewModel.copy(
-                playerPosition = pp
+                playerPosition = pp,
+                sprite = viewModel.sprite
+                  .changeCycle(CycleLabel("Idle"))
+                  .play()
               )
             }
 
@@ -114,14 +141,17 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       model: PlayerM,
       viewModel: PlayerVM
   ): Batch[SceneNode] =
-    val radius = ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
+    val radius =
+      ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
     Batch(
-      Shape.Circle(
+      viewModel.sprite
+        .moveTo(viewModel.playerPosition.moving(viewModel.squareSize))
+      /*Shape.Circle(
         viewModel.playerPosition.moving(viewModel.squareSize),
         radius,
         Fill.Color(RGBA.White),
         Stroke(2, RGBA.Black)
-      )
+      )*/
     )
 
   def handleHostileEvent(
@@ -175,7 +205,8 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
   final case class PlayerVM(
       playerPosition: ActorPosition,
-      squareSize: Point
+      squareSize: Point,
+      sprite: Sprite[Bitmap]
   )
 
   enum Cmds:

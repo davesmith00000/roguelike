@@ -48,7 +48,11 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
       model: ParentModel,
       viewModel: ParentViewModel
   ): Batch[SceneNode] =
-    view(context, modelLens.get(model), viewModelLens.get(viewModel))
+    view(
+      context,
+      modelLens.get(model),
+      viewModelLens.get(viewModel)
+    )
 
   def view(
       context: SceneContext[StartupData],

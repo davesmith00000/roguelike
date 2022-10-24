@@ -1,7 +1,7 @@
 package roguelike
 
-import indigo.Point
-import indigo.shared.events.GlobalEvent
+import indigo.*
+import indigo.shared.materials.Material.Bitmap
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message
 import roguelike.model.gamedata.Armour
@@ -60,3 +60,6 @@ enum InventoryEvent:
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)
   case RemoveFromInventory(inventoryPosition: Int)
+
+enum LoadEvent extends GlobalEvent:
+  case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])

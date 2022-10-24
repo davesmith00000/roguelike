@@ -37,6 +37,8 @@ object GameScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set(workerSubSystem)
 
+  val sprite: Set[Sprite[Material.ImageEffects]] = Set.empty
+
   def updateModel(
       context: SceneContext[Size],
       model: Model

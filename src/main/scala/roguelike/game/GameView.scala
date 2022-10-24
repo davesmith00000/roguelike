@@ -2,6 +2,7 @@ package roguelike.game
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.RogueLikeGame
@@ -166,7 +167,11 @@ object GameView:
           hover ++
           collectables ++
           hostiles ++
-          PlayerComponent.present(context, model, viewModel) ++
+          PlayerComponent.present(
+            context,
+            model,
+            viewModel
+          ) ++
           lookAround
       ).withCamera(camera)
         .withMagnification(viewModel.magnification),

@@ -12,12 +12,14 @@ import roguelike.model.Loader
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
+import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
+import roguelike.viewmodel.ui.GameUi
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 
   type SceneModel     = GameLoadInfo
-  type SceneViewModel = Unit
+  type SceneViewModel = GameViewModel
 
   val name: SceneName =
     SceneName("loading scene")
@@ -25,8 +27,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   val modelLens: Lens[Model, GameLoadInfo] =
     Lens(_.loadInfo, (m, t) => m.copy(loadInfo = t))
 
-  val viewModelLens: Lens[ViewModel, Unit] =
-    Lens.unit
+  val viewModelLens: Lens[ViewModel, GameViewModel] =
+    Lens(_.game, (vm, g) => vm.copy(game = g))
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
@@ -62,7 +64,6 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
         case LoadingState.Error =>
           Outcome(loadInfo)
-
     case StorageEvent.Loaded(ModelSaveData.saveKey, data) =>
       ModelSaveData.fromJsonString(data) match
         case None =>
@@ -99,14 +100,16 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   def updateViewModel(
       context: SceneContext[Size],
       loadInfo: GameLoadInfo,
-      viewModel: Unit
-  ): GlobalEvent => Outcome[Unit] =
-    _ => Outcome(viewModel)
+      viewModel: GameViewModel
+  ): GlobalEvent => Outcome[GameViewModel] =
+    case LoadEvent.SpritesLoaded(s) =>
+      Outcome(viewModel.copy(sprites = s))
+    case _ => Outcome(viewModel)
 
   def present(
       context: SceneContext[Size],
       loadInfo: GameLoadInfo,
-      viewModel: Unit
+      viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
     val loader       = Loader(context, loadInfo.state)
     val loaderBounds = loader.getBounds()
