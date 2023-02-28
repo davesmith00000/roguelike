@@ -64,6 +64,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
         case LoadingState.Error =>
           Outcome(loadInfo)
+
     case StorageEvent.Loaded(ModelSaveData.saveKey, data) =>
       ModelSaveData.fromJsonString(data) match
         case None =>

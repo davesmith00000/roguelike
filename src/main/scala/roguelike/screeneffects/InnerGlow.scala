@@ -15,7 +15,7 @@ final case class InnerGlow(
     BlendShaderData(
       InnerGlow.shaderId,
       UniformBlock(
-        "InnerGlowData",
+        UniformBlockName("InnerGlowData"),
         Batch(
           Uniform("GLOW_COLOR")  -> vec4.fromRGBA(colour),
           Uniform("SCREEN_SIZE") -> vec2.fromSize(screenSize),

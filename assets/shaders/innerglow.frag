@@ -22,7 +22,7 @@ float sdfCalc(vec2 p, vec2 b){
   return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
 }
 
-void fragment(){
+vec4 fragment(vec4 color){
 
   // Make sure the intensity is a sensible value and invert.
   float intensity = 1.0 - clamp(INTENSITY, 0.05, 0.95);
@@ -49,7 +49,7 @@ void fragment(){
   vec4 glow = vec4(GLOW_COLOR.rgb * alpha, alpha);
 
   // Blend the normal colours of the layer with the glow.
-  COLOR = mix(SRC, glow, glow.a);
-
+  return mix(SRC, glow, glow.a);
+  
 }
 //</indigo-fragment>
