@@ -171,7 +171,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         .withAlpha(0)
     )
 
-    val time = context.running - context.sceneTime
+    val time = context.running - context.sceneStartTime
     val graphicTimeline: Timeline[Graphic[Material.ImageEffects]] = timeline(
       layer(
         animate(1.seconds) { g =>
@@ -212,7 +212,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         .withScale(new Vector2(textMagnification, textMagnification))
         .withPosition(titleStart)
 
-    val time = context.running - context.sceneTime
+    val time = context.running - context.sceneStartTime
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     if (skipAnimations || time >= slideInTime) group.moveTo(titleEnd)
@@ -225,7 +225,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             }
           )
         )
-      titleAnimation.at(context.running - context.sceneTime)(group) match {
+      titleAnimation.at(context.running - context.sceneStartTime)(group) match {
         case Some(g) => g
         case None => Group.empty
       }
@@ -246,7 +246,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             animate(2.seconds){ lerp >>> applyAlpha(_) }
           )
         )
-      menuAnimation.at(context.running - context.sceneTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
+      menuAnimation.at(context.running - context.sceneStartTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
         case Some(l) => l
         case None => Layer.empty
       }

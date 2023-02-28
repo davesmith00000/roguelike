@@ -64,10 +64,10 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
 
     val anims: Batch[Outcome[Graphic[Material.ImageEffects]]] =
       logo(1.seconds, screenCenter, false)
-        .at(context.running - context.sceneTime)(Outcome(Logos.indigo))
+        .at(context.running - context.sceneStartTime)(Outcome(Logos.indigo))
         .toBatch ++
         logo(5.5.seconds, screenCenter, true)
-          .at(context.running - context.sceneTime)(Outcome(Logos.pkg))
+          .at(context.running - context.sceneStartTime)(Outcome(Logos.pkg))
           .toBatch
 
     anims.sequence.map { a =>

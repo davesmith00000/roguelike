@@ -13,7 +13,7 @@ lazy val roguelike =
     .settings(
       name         := "roguelike",
       version      := "0.0.1",
-      scalaVersion := "3.2.0",
+      scalaVersion := "3.2.2",
       organization := "roguelike",
       libraryDependencies ++= Seq(
         "org.scalameta" %%% "munit" % "0.7.29" % Test
@@ -30,10 +30,10 @@ lazy val roguelike =
       disableFrameRateLimit := false,
       electronInstall       := indigoplugin.ElectronInstall.Latest,
       libraryDependencies ++= Seq(
-        "io.indigoengine" %%% "indigo-json-circe"    % "0.14.0",
-        "io.indigoengine" %%% "indigo"               % "0.14.0",
-        "io.indigoengine" %%% "indigo-extras"        % "0.14.0",
-        "io.indigoengine" %%% "roguelike-starterkit" % "0.2.0"
+        "io.indigoengine" %%% "indigo-json-circe"    % "0.14.1-SNAPSHOT",
+        "io.indigoengine" %%% "indigo"               % "0.14.1-SNAPSHOT",
+        "io.indigoengine" %%% "indigo-extras"        % "0.14.1-SNAPSHOT",
+        "io.indigoengine" %%% "roguelike-starterkit" % "0.2.1-SNAPSHOT"
       ),
       scalafixOnCompile := true,
       semanticdbEnabled := true,
@@ -97,8 +97,7 @@ lazy val roguelike =
           "Build the fully optimised web version"
         ),
         UsefulTask("p", "publishGame", "Publish game to ghpages"),
-        UsefulTask("c", "code", "Launch VSCode"),
-        UsefulTask("o", "oni2", "Launch Onivim 2")
+        UsefulTask("c", "code", "Launch VSCode")
       ),
       logoColor        := scala.Console.YELLOW,
       aliasColor       := scala.Console.BLUE,

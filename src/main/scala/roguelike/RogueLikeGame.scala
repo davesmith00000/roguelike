@@ -63,7 +63,8 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       BootResult(
         GameConfig.default
           .withMagnification(1)
-          .withViewport(gameViewport),
+          .withViewport(gameViewport)
+          .withFrameRateLimit(FPS.`60`),
         gameViewport.size
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
