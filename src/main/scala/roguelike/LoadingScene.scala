@@ -66,13 +66,19 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
           Outcome(loadInfo)
 
     case StorageEvent.Loaded(ModelSaveData.saveKey, data) =>
-      ModelSaveData.fromJsonString(data) match
+      data match
         case None =>
-          IndigoLogger.error("Could not decode saved data...")
+          IndigoLogger.error("No saved data found")
           Outcome(loadInfo)
 
-        case sd @ Some(_) =>
-          Outcome(loadInfo.copy(loadedData = sd))
+        case Some(d) =>
+          ModelSaveData.fromJsonString(d) match
+            case None =>
+              IndigoLogger.error("Could not decode saved data...")
+              Outcome(loadInfo)
+
+            case sd @ Some(_) =>
+              Outcome(loadInfo.copy(loadedData = sd))
 
     case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
       Outcome(
