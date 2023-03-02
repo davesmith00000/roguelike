@@ -53,14 +53,11 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
             )
 
         case LoadingState.InProgress(percent) =>
-          Outcome(loadInfo.updateTimeout(context.delta))
-
-        case LoadingState.Complete if loadInfo.isReallyComplete =>
-          Outcome(loadInfo.updateTimeout(context.delta))
-            .addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+          Outcome(loadInfo)
 
         case LoadingState.Complete =>
-          Outcome(loadInfo.updateTimeout(context.delta))
+          Outcome(loadInfo)
+            .addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
 
         case LoadingState.Error =>
           Outcome(loadInfo)
@@ -80,7 +77,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
             case sd @ Some(_) =>
               Outcome(loadInfo.copy(loadedData = sd))
 
-    case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
+    case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _)
+        if !loadInfo.state.isComplete =>
       Outcome(
         loadInfo.copy(
           state = LoadingState.InProgress(Some(percent))
@@ -111,7 +109,9 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   ): GlobalEvent => Outcome[GameViewModel] =
     case LoadEvent.SpritesLoaded(s) =>
       Outcome(viewModel.copy(sprites = s))
-    case _ => Outcome(viewModel)
+
+    case _ =>
+      Outcome(viewModel)
 
   def present(
       context: SceneContext[Size],
