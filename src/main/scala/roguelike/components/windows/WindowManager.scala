@@ -100,7 +100,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     model.windowManager match
       case ActiveWindow.Quit =>
         QuitMenu.present(context, model, viewModel)
@@ -121,7 +121,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
         History.present(context, model, viewModel)
 
       case ActiveWindow.None =>
-        Batch.empty
+        Outcome(Batch.empty)
 
   val initialModel: ActiveWindow =
     ActiveWindow.None

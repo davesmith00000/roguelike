@@ -27,8 +27,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
           model.player.position,
           model.collectables
         ),
-      (model, drop) =>
-        model.copy(player = model.player.copy(inventory = drop.inventory))
+      (model, drop) => model.copy(player = model.player.copy(inventory = drop.inventory))
     )
 
   def viewModelLens: Lens[GameViewModel, Size] = Lens.readOnly(_.viewportSize)
@@ -70,7 +69,7 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: DropMenuModel,
       viewportSize: Size
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     val windowSize = Size(350, 200)
 
     if model.inventory.backpack.count > 0 then
@@ -86,20 +85,22 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
       val text =
         "Select an collectable to drop\n" + collectables
 
-      Batch(
-        Group(
-          Shape.Box(
-            Rectangle(Point.zero, windowSize),
-            Fill.Color(RGBA.Black),
-            Stroke(2, RGBA.Red)
-          ),
-          Text(
-            text,
-            RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-          )
-            .moveTo(5, 5)
-        ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+      Outcome(
+        Batch(
+          Group(
+            Shape.Box(
+              Rectangle(Point.zero, windowSize),
+              Fill.Color(RGBA.Black),
+              Stroke(2, RGBA.Red)
+            ),
+            Text(
+              text,
+              RoguelikeTiles.Size10x10.Fonts.fontKey,
+              TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+            )
+              .moveTo(5, 5)
+          ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+        )
       )
     else
       val text =
@@ -108,20 +109,22 @@ object DropMenu extends Component[Size, Model, GameViewModel]:
           |(Empty)
           |""".stripMargin
 
-      Batch(
-        Group(
-          Shape.Box(
-            Rectangle(Point.zero, windowSize),
-            Fill.Color(RGBA.Black),
-            Stroke(2, RGBA.Red)
-          ),
-          Text(
-            text,
-            RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-          )
-            .moveTo(5, 5)
-        ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+      Outcome(
+        Batch(
+          Group(
+            Shape.Box(
+              Rectangle(Point.zero, windowSize),
+              Fill.Color(RGBA.Black),
+              Stroke(2, RGBA.Red)
+            ),
+            Text(
+              text,
+              RoguelikeTiles.Size10x10.Fonts.fontKey,
+              TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+            )
+              .moveTo(5, 5)
+          ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+        )
       )
 
   final case class HandleInput(key: Key)

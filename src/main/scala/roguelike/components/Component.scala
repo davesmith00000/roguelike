@@ -47,7 +47,7 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
       context: SceneContext[StartupData],
       model: ParentModel,
       viewModel: ParentViewModel
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     view(
       context,
       modelLens.get(model),
@@ -58,4 +58,4 @@ trait Component[StartupData, ParentModel, ParentViewModel]:
       context: SceneContext[StartupData],
       model: ComponentModel,
       viewModel: ComponentViewModel
-  ): Batch[SceneNode]
+  ): Outcome[Batch[SceneNode]]

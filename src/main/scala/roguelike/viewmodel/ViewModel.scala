@@ -48,7 +48,7 @@ final case class GameViewModel(
     collectables: js.Array[Collectable],
     terminals: CachedTerminals,
     helpControlsText: String,
-    sprites: Batch[(AssetName, Sprite[Bitmap])]
+    sprites: Option[GameSprites]
 ):
 
   def update(
@@ -254,8 +254,8 @@ object GameViewModel:
       tilePositions = Batch.empty,
       collectables = js.Array(),
       terminals = CachedTerminals.initial,
-      helpControlsText,
-      Batch.empty
+      helpControlsText = helpControlsText,
+      sprites = None
     )
 
   def nextViewModel(
@@ -329,3 +329,6 @@ final case class CachedTerminals(
 object CachedTerminals:
   def initial: CachedTerminals =
     CachedTerminals(TerminalClones.empty, TerminalClones.empty)
+
+//sprites: Batch[(AssetName, Sprite[Bitmap])]
+final case class GameSprites(player: Sprite[Bitmap])

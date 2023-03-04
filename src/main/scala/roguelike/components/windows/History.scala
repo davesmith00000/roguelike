@@ -39,17 +39,19 @@ object History extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: Model,
       viewModel: HistoryViewModel
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     val windowSize = Size(500, 310)
 
-    Batch(
-      Group(
-        Shape.Box(
-          Rectangle(Point.zero, windowSize),
-          Fill.Color(RGBA.Black),
-          Stroke(2, RGBA.Orange)
-        ) :: viewModel.historyClones
-      ).moveTo(((viewModel.viewportSize - windowSize) / 2).toPoint)
+    Outcome(
+      Batch(
+        Group(
+          Shape.Box(
+            Rectangle(Point.zero, windowSize),
+            Fill.Color(RGBA.Black),
+            Stroke(2, RGBA.Orange)
+          ) :: viewModel.historyClones
+        ).moveTo(((viewModel.viewportSize - windowSize) / 2).toPoint)
+      )
     )
 
   final case class HistoryViewModel(

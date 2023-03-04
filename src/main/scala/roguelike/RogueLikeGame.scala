@@ -3,6 +3,7 @@ package roguelike
 import indigo.*
 import indigo.platform.assets.AssetLoader
 import indigo.scenes.*
+import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
@@ -24,14 +25,6 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val layerKeyUiOverlay = BindingKey("ui-overlay")
   val layerKeyUi        = BindingKey("ui")
   val layerKeyFPS       = BindingKey("fps")
-
-  val spriteData = Batch(
-    SpriteAssetData(GameAssets.Player, GameAssets.PlayerData),
-    SpriteAssetData(GameAssets.Death, GameAssets.DeathData),
-    SpriteAssetData(GameAssets.Enemy1, GameAssets.EnemyData1),
-    SpriteAssetData(GameAssets.Enemy2, GameAssets.EnemyData2),
-    SpriteAssetData(GameAssets.Enemy3, GameAssets.EnemyData3)
-  )
 
   def initialScene(bootData: Size): Option[SceneName] =
     None
@@ -91,45 +84,31 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       dice: Dice
   ): Outcome[Startup[Size]] =
     if GameAssets.loaded(assetCollection) then
-      val missingAssets = spriteData
-        .filterNot(s =>
-          assetCollection.exists(s.imageData) && assetCollection.exists(
-            s.jsonData
-          )
-        )
-        .nonEmpty
-      if (missingAssets)
-        Outcome(
-          Startup
-            .Success(bootData)
-        )
-      else
-        val spriteAnimationLoader =
-          roguelike.AssetLoader.loadAnimation(assetCollection, dice)
-        val spritesAndAnimations: Batch[(AssetName, SpriteAndAnimations)] =
-          spriteData
-            .map(s =>
-              (
-                s.imageData,
-                spriteAnimationLoader(s.imageData, s.jsonData, Depth(1))
-              )
-            )
-            .collect { case (s: AssetName, Right(v)) =>
-              (s, v)
-            }
+      val spriteAnimationLoader: (AssetName, AssetName, Depth) => Outcome[SpriteAndAnimations] =
+        roguelike.AssetLoader.loadAnimation(assetCollection, dice)
 
+      val spritesAndAnimations: Outcome[Batch[(AssetName, SpriteAndAnimations)]] =
+        SpriteAssetData.spriteData.map { s =>
+          spriteAnimationLoader(
+            s.imageData,
+            s.jsonData,
+            Depth(1)
+          ).map(anim => s.imageData -> anim)
+        }.sequence
+
+      spritesAndAnimations.flatMap { sprites =>
         Outcome(
           Startup
             .Success(bootData)
             .addAnimations(
-              spritesAndAnimations.map(s => s(1).animations).toList
+              sprites.map(_._2.animations).toList
             )
-        )
-          .addGlobalEvents(
-            LoadEvent.SpritesLoaded(
-              spritesAndAnimations.map(s => (s(0), s(1).sprite))
-            )
+        ).addGlobalEvents(
+          LoadEvent.SpritesLoaded(
+            sprites.map(s => (s._1, s._2.sprite))
           )
+        )
+      }
     else Outcome(Startup.Success(bootData))
 
   def updateModel(
@@ -158,8 +137,3 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         Layer(layerKeyFPS)
       )
     )
-
-private final case class SpriteAssetData(
-    imageData: AssetName,
-    jsonData: AssetName
-)

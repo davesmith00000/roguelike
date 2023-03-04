@@ -67,7 +67,7 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: Model,
       viewportSize: Size
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     val text =
       s"""Quit to main menu?
           |
@@ -78,20 +78,22 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
 
     val windowSize = Size(300, 150)
 
-    Batch(
-      Group(
-        Shape.Box(
-          Rectangle(Point.zero, windowSize),
-          Fill.Color(RGBA.Black),
-          Stroke(2, RGBA.Blue)
-        ),
-        Text(
-          text,
-          RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-        )
-          .moveTo(5, 5)
-      ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+    Outcome(
+      Batch(
+        Group(
+          Shape.Box(
+            Rectangle(Point.zero, windowSize),
+            Fill.Color(RGBA.Black),
+            Stroke(2, RGBA.Blue)
+          ),
+          Text(
+            text,
+            RoguelikeTiles.Size10x10.Fonts.fontKey,
+            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+          )
+            .moveTo(5, 5)
+        ).moveTo(((viewportSize - windowSize) / 2).toPoint)
+      )
     )
 
   final case class HandleInput(key: Key)

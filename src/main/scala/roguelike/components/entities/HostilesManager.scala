@@ -40,8 +40,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
           viewModel.squareSize,
           viewModel.hostilePositions
         ),
-      (viewModel, hvm) =>
-        viewModel.copy(hostilePositions = hvm.hostilePositions)
+      (viewModel, hvm) => viewModel.copy(hostilePositions = hvm.hostilePositions)
     )
 
   def updateHostile(id: Int, model: HostilesM)(
@@ -208,21 +207,25 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: HostilesM,
       viewModel: HostilesVM
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
+
+    val renderHostile: Hostile => Outcome[Batch[SceneNode]] = hostile =>
+      HostileComponent.view(
+        context,
+        hostile,
+        HostileComponent
+          .HostileVM(viewModel.squareSize, viewModel.hostilePositions)
+      )
+
     model.pool.hostiles
       .filter(h =>
         model.visibleTiles.contains(h.position) & viewModel.tilePositions
           .contains(h.position)
       )
       .sortBy(_.isAlive)
-      .flatMap { hostile =>
-        HostileComponent.view(
-          context,
-          hostile,
-          HostileComponent
-            .HostileVM(viewModel.squareSize, viewModel.hostilePositions)
-        )
-      }
+      .map(renderHostile)
+      .sequence
+      .map(_.flatten)
 
   enum Cmds:
     case ConfuseHostile(playerName: String, id: Int, numberOfTurns: Int)

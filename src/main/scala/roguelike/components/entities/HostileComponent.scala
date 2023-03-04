@@ -15,8 +15,7 @@ import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 import roguelike.viewmodel.ActorPosition
 
-object HostileComponent
-    extends Component[Size, Hostile, HostilesManager.HostilesVM]:
+object HostileComponent extends Component[Size, Hostile, HostilesManager.HostilesVM]:
   type Command            = Cmds
   type ComponentModel     = Hostile
   type ComponentViewModel = HostileVM
@@ -26,8 +25,7 @@ object HostileComponent
   def viewModelLens: Lens[HostilesManager.HostilesVM, HostileVM] =
     Lens(
       viewModel => HostileVM(viewModel.squareSize, viewModel.hostilePositions),
-      (viewModel, hvm) =>
-        viewModel.copy(hostilePositions = hvm.hostilePositions)
+      (viewModel, hvm) => viewModel.copy(hostilePositions = hvm.hostilePositions)
     )
 
   def nextModel(
@@ -128,7 +126,7 @@ object HostileComponent
       context: SceneContext[Size],
       hostile: Hostile,
       viewModel: HostileVM
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     val color =
       hostile match
         case h: Orc if h.isAlive   => RGBA(0.2, 0.8, 0.0, 1.0)
@@ -188,12 +186,14 @@ object HostileComponent
           )
         )
 
-    Shape.Circle(
-      position,
-      size,
-      Fill.Color(color),
-      Stroke(2, color.mix(RGBA.Black, 0.5))
-    ) :: healthbar
+    Outcome(
+      Shape.Circle(
+        position,
+        size,
+        Fill.Color(color),
+        Stroke(2, color.mix(RGBA.Black, 0.5))
+      ) :: healthbar
+    )
 
   enum Cmds:
     case ConfuseFor(numberOfTurns: Int)
