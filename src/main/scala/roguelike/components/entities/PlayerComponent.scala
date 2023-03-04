@@ -32,29 +32,13 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
   def viewModelLens: Lens[GameViewModel, PlayerVM] =
     Lens(
-      vm => {
-        val sprite: Sprite[Bitmap] = vm.sprites
-          .find(s => s(0) == GameAssets.Player)
-          .map(s => s(1))
-          .getOrElse(
-            new Sprite[Bitmap](
-              BindingKey("emptyPlayer"),
-              Bitmap(GameAssets.Player),
-              AnimationKey("empty"),
-              Batch.empty,
-              false,
-              (_, _) => None,
-              Point(0, 0),
-              Radians(0),
-              Vector2(1),
-              Depth(1),
-              Point(0),
-              Flip(false, false)
-            )
-          )
-
-        PlayerVM(vm.playerPosition, vm.squareSize, sprite /*, vm.phase*/ )
-      },
+      vm =>
+        PlayerVM(
+          vm.playerPosition,
+          vm.squareSize,
+          vm.sprites.map(_.player)
+          /*, vm.phase*/
+        ),
       (vm, p) => vm.copy(playerPosition = p.playerPosition)
     )
 
@@ -115,20 +99,20 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     case Cmds.Update =>
       model.gameState match
         case GameState.UpdatingPlayer =>
-          viewModel.playerPosition
-            .next(
-              context.delta,
-              model.player.position,
-              GameEvent.PlayerMoveComplete
-            )
-            .map { pp =>
-              viewModel.copy(
-                playerPosition = pp,
-                sprite = viewModel.sprite
-                  .changeCycle(CycleLabel("Idle"))
-                  .play()
+          for {
+            pp <- viewModel.playerPosition
+              .next(
+                context.delta,
+                model.player.position,
+                GameEvent.PlayerMoveComplete
               )
+          } yield viewModel.copy(
+            playerPosition = pp,
+            sprite = viewModel.sprite.map {
+              _.changeCycle(CycleLabel("Idle"))
+                .play()
             }
+          )
 
         case _ =>
           Outcome(viewModel)
@@ -140,19 +124,38 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: PlayerM,
       viewModel: PlayerVM
-  ): Batch[SceneNode] =
+  ): Outcome[Batch[SceneNode]] =
     val radius =
       ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
-    Batch(
-      viewModel.sprite
-        .moveTo(viewModel.playerPosition.moving(viewModel.squareSize))
-      /*Shape.Circle(
-        viewModel.playerPosition.moving(viewModel.squareSize),
-        radius,
-        Fill.Color(RGBA.White),
-        Stroke(2, RGBA.Black)
-      )*/
-    )
+
+    val graphic =
+      Clip(
+        Point(0),
+        Size(32),
+        ClipSheet(4, Seconds(0.25)),
+        Material.Bitmap(GameAssets.Loader)
+      ).withRef(16, 30)
+
+    val player: Outcome[Sprite[Bitmap]] =
+      viewModel.sprite match
+        case None => Outcome.raiseError(new Exception("Player sprite missing."))
+        case Some(plr) =>
+          Outcome(
+            plr.moveTo(viewModel.playerPosition.moving(viewModel.squareSize) - Point(50))
+          )
+
+    player.map { plr =>
+      Batch(
+        Shape.Circle(
+          viewModel.playerPosition.moving(viewModel.squareSize),
+          radius,
+          Fill.Color(RGBA.Black.withAlpha(0.5)),
+          Stroke.None
+        ),
+        graphic.moveTo(viewModel.playerPosition.moving(viewModel.squareSize)),
+        plr
+      )
+    }
 
   def handleHostileEvent(
       context: SceneContext[Size],
@@ -193,8 +196,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       player
         .addXp(amount)
         .createGlobalEvents(p =>
-          if p.level > player.level then
-            Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
+          if p.level > player.level then Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
           else Batch.empty
         )
   }
@@ -206,7 +208,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
   final case class PlayerVM(
       playerPosition: ActorPosition,
       squareSize: Point,
-      sprite: Sprite[Bitmap]
+      sprite: Option[Sprite[Bitmap]]
   )
 
   enum Cmds:

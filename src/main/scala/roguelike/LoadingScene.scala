@@ -12,6 +12,7 @@ import roguelike.model.Loader
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
+import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.GameUi
@@ -52,14 +53,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
               StorageEvent.Load(ModelSaveData.saveKey)
             )
 
-        case LoadingState.InProgress(percent) =>
-          Outcome(loadInfo)
-
-        case LoadingState.Complete =>
-          Outcome(loadInfo)
-            .addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
-
-        case LoadingState.Error =>
+        case _ =>
           Outcome(loadInfo)
 
     case StorageEvent.Loaded(ModelSaveData.saveKey, data) =>
@@ -77,8 +71,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
             case sd @ Some(_) =>
               Outcome(loadInfo.copy(loadedData = sd))
 
-    case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _)
-        if !loadInfo.state.isComplete =>
+    case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) if !loadInfo.state.isComplete =>
       Outcome(
         loadInfo.copy(
           state = LoadingState.InProgress(Some(percent))
@@ -107,8 +100,24 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
-    case LoadEvent.SpritesLoaded(s) =>
-      Outcome(viewModel.copy(sprites = s))
+    case LoadEvent.SpritesLoaded(sprites) =>
+      val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
+
+      val gameSprite: Option[GameSprites] =
+        player.map { plr =>
+          GameSprites(
+            player = plr
+          )
+        }
+
+      Outcome(
+        viewModel.copy(
+          sprites = gameSprite
+        )
+      )
+
+    case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
+      Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
 
     case _ =>
       Outcome(viewModel)

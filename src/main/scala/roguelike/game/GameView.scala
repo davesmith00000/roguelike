@@ -30,19 +30,16 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    Outcome(
-      drawGameLayer(context, model, viewModel) |+| drawUiLayer(
-        context,
-        model,
-        viewModel
-      )
-    )
+    for {
+      gl <- drawGameLayer(context, model, viewModel)
+      ul <- drawUiLayer(context, model, viewModel)
+    } yield gl |+| ul
 
   def drawGameLayer(
       context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
-  ): SceneUpdateFragment =
+  ): Outcome[SceneUpdateFragment] =
 
     val gameGridData: Batch[CloneTileData] =
       viewModel.tiles
@@ -137,13 +134,6 @@ object GameView:
         case _ =>
           Batch.empty
 
-    val hostiles =
-      HostilesManager.view(
-        context,
-        HostilesManager.modelLens.get(model),
-        HostilesManager.viewModelLens.get(viewModel)
-      )
-
     val camera =
       model.gameState match
         case GameState.LookAround(_) =>
@@ -160,18 +150,21 @@ object GameView:
             viewModel.playerPosition.moving(viewModel.squareSize) - offset
           )
 
-    SceneUpdateFragment(
+    for {
+      plr <- PlayerComponent.present(context, model, viewModel)
+      hostiles <- HostilesManager.view(
+        context,
+        HostilesManager.modelLens.get(model),
+        HostilesManager.viewModelLens.get(viewModel)
+      )
+    } yield SceneUpdateFragment(
       Layer(
         RogueLikeGame.layerKeyGame,
         gameGrid ++
           hover ++
           collectables ++
           hostiles ++
-          PlayerComponent.present(
-            context,
-            model,
-            viewModel
-          ) ++
+          plr ++
           lookAround
       ).withCamera(camera)
         .withMagnification(viewModel.magnification),
@@ -184,40 +177,42 @@ object GameView:
       context: SceneContext[Size],
       model: Model,
       viewModel: GameViewModel
-  ): SceneUpdateFragment =
+  ): Outcome[SceneUpdateFragment] =
     val vpSize = viewModel.viewportSize
 
-    SceneUpdateFragment(
-      Layer(
-        RogueLikeGame.layerKeyUi,
-        Batch(
-          UIElements.renderBar(
-            model.player,
-            20,
-            Point(0, vpSize.height - 40)
-          ),
-          UIElements.renderLevel(
-            Point(0, vpSize.height - 20),
-            model.currentFloor
-          ),
-          UIElements.renderCharacterInfo(model.player),
-          UIElements.renderControls(
-            vpSize,
-            viewModel.helpControlsText
-          ),
-          UIElements.renderNameHints(
-            viewModel.squareSize,
-            context.mouse.position,
-            model.entitiesList,
-            model.stairsPosition,
-            viewModel.hoverSquare
-          ),
-          UIElements.renderShortLog(
-            vpSize,
-            viewModel.terminals.shortLog.clones
-          )
-        ) ++ WindowManager.present(context, model, viewModel)
+    WindowManager.present(context, model, viewModel).map { windows =>
+      SceneUpdateFragment(
+        Layer(
+          RogueLikeGame.layerKeyUi,
+          Batch(
+            UIElements.renderBar(
+              model.player,
+              20,
+              Point(0, vpSize.height - 40)
+            ),
+            UIElements.renderLevel(
+              Point(0, vpSize.height - 20),
+              model.currentFloor
+            ),
+            UIElements.renderCharacterInfo(model.player),
+            UIElements.renderControls(
+              vpSize,
+              viewModel.helpControlsText
+            ),
+            UIElements.renderNameHints(
+              viewModel.squareSize,
+              context.mouse.position,
+              model.entitiesList,
+              model.stairsPosition,
+              viewModel.hoverSquare
+            ),
+            UIElements.renderShortLog(
+              vpSize,
+              viewModel.terminals.shortLog.clones
+            )
+          ) ++ windows
+        )
+      ).addCloneBlanks(
+        GameGraphics.tileClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
       )
-    ).addCloneBlanks(
-      GameGraphics.tileClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
-    )
+    }
