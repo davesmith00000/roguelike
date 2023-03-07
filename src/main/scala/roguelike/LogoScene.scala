@@ -63,10 +63,10 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
     val screenCenter = context.startUpData.toPoint / 2
 
     val anims: Batch[Outcome[Graphic[Material.ImageEffects]]] =
-      logo(1.seconds, screenCenter, false)
+      logo(1.5.seconds, screenCenter, false)
         .at(context.running - context.sceneStartTime)(Outcome(Logos.indigo))
         .toBatch ++
-        logo(5.5.seconds, screenCenter, true)
+        logo(3.seconds, screenCenter, true)
           .at(context.running - context.sceneStartTime)(Outcome(Logos.pkg))
           .toBatch
 
@@ -82,23 +82,23 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
     timeline(
       layer(
         startAfter(delay),
-        animate(1.seconds) { logo =>
+        animate(0.2.seconds) { logo =>
           lerp >>> SignalFunction { d =>
             logo.map(_.moveTo(screenCenter).modifyMaterial(_.withAlpha(d)))
           }
         },
-        show(2.seconds) { logo =>
+        show(1.seconds) { logo =>
           logo.map(_.moveTo(screenCenter))
         },
-        animate(1.seconds) { logo =>
+        animate(0.2.seconds) { logo =>
           lerp >>> SignalFunction { d =>
             logo.map(
               _.moveTo(screenCenter).modifyMaterial(_.withAlpha(1.0 - d))
             )
           }
         },
-        pause(0.5.second),
-        show(0.5.seconds) { logo =>
+        pause(0.4.second),
+        show(0.2.seconds) { logo =>
           logo
             .map(_.modifyMaterial(_.withAlpha(0.0)))
             .addGlobalEvents(
