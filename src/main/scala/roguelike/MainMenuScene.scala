@@ -41,7 +41,6 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set()
 
-  val fadInTime      = Seconds(2)
   val slideInTime    = Seconds(4)
   val titlePauseTime = Seconds(1)
   val menuFadeInTime = Seconds(2)

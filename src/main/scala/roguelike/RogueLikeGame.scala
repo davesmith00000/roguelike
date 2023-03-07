@@ -83,17 +83,14 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       assetCollection: AssetCollection,
       dice: Dice
   ): Outcome[Startup[Size]] =
-    if GameAssets.loaded(assetCollection) then
-      val spriteAnimationLoader: (AssetName, AssetName, Depth) => Outcome[SpriteAndAnimations] =
+    if GameAssets.loaded(assetCollection) && GameAssets.lazyAssetsLoaded(assetCollection) then
+      val spriteAnimationLoader: (SpriteAssetData, Depth) => Outcome[SpriteAndAnimations] =
         roguelike.AssetLoader.loadAnimation(assetCollection, dice)
 
       val spritesAndAnimations: Outcome[Batch[(AssetName, SpriteAndAnimations)]] =
         SpriteAssetData.spriteData.map { s =>
-          spriteAnimationLoader(
-            s.imageData,
-            s.jsonData,
-            Depth(1)
-          ).map(anim => s.imageData -> anim)
+          spriteAnimationLoader(s, Depth.zero)
+            .map(anim => s.imageData -> anim)
         }.sequence
 
       spritesAndAnimations.flatMap { sprites =>

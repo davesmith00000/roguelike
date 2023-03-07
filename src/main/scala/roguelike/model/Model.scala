@@ -502,7 +502,8 @@ object Model:
               stairsPosition = dungeon.stairsPosition,
               gameMap = gm,
               currentFloor = dungeon.currentFloor,
-              hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
+              hostiles = HostilesPool(Batch.fromList(dungeon.hostiles)),
+              loadInfo = currentModel.loadInfo
             )
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)
