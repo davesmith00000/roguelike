@@ -10,15 +10,14 @@ object AssetLoader:
       assetCollection: AssetCollection,
       dice: Dice
   )(
-      jsonRef: AssetName,
-      name: AssetName,
+      spriteData: SpriteAssetData,
       depth: Depth
   ): Outcome[SpriteAndAnimations] = {
 
     val res = for {
-      json                <- assetCollection.findTextDataByName(jsonRef)
+      json                <- assetCollection.findTextDataByName(spriteData.jsonData)
       aseprite            <- Json.asepriteFromJson(json)
-      spriteAndAnimations <- aseprite.toSpriteAndAnimations(dice, name)
+      spriteAndAnimations <- aseprite.toSpriteAndAnimations(dice, spriteData.imageData)
     } yield spriteAndAnimations.copy(sprite = spriteAndAnimations.sprite.withDepth(depth))
 
     res match
@@ -26,7 +25,7 @@ object AssetLoader:
         Outcome(spriteAndAnimations)
 
       case None =>
-        Outcome.raiseError(new Exception("Failed to load " + name))
+        Outcome.raiseError(new Exception("Failed to load sprite from assets: " + spriteData))
   }
 
 final case class SpriteAssetData(

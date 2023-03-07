@@ -348,6 +348,23 @@ object AssetsGen extends GameDataGenerator {
     |  private def textsLoaded(assetCollection: AssetCollection): Boolean =
     |    textAssets.forall(t => assetCollection.findTextDataByName(t).isDefined)
     |
+    |  def lazyAssetsLoaded(assetCollection: AssetCollection): Boolean =
+    |    lazyAssets.forall {
+    |      case t: AssetType.Text =>
+    |        assetCollection.findTextDataByName(t.name).isDefined
+    |  
+    |      case i: AssetType.Image =>
+    |        assetCollection.findImageDataByName(i.name).isDefined
+    |  
+    |      case a: AssetType.Audio =>
+    |        assetCollection.findAudioDataByName(a.name).isDefined
+    |  
+    |      case f: AssetType.Font =>
+    |        assetCollection.findFontDataByName(f.name).isDefined
+    |  
+    |      case t: AssetType.Tagged =>
+    |        t.images.forall(i => assetCollection.findImageDataByName(i.name).isDefined)
+    |    }
     |""".stripMargin
 
 }
