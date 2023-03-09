@@ -5,7 +5,8 @@ import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 
-final case class Loader(context: SceneContext[Size], state: LoadingState):
+object Loader://(context: SceneContext[Size], state: LoadingState):
+
   val paddingToText = 72
   val text =
     Text(
@@ -29,11 +30,13 @@ final case class Loader(context: SceneContext[Size], state: LoadingState):
       TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
     )
 
-  def getBounds() =
-    val textBounds = context.boundaryLocator.textBounds(text)
+  def textBounds: Rectangle =
+    context.boundaryLocator.textBounds(text)
+
+  def getBounds(textBounds: Rectangle): Rectangle =
     Rectangle(textBounds.width, paddingToText + textBounds.height)
 
-  def view() =
+  def view(textBounds: Rectangle) =
     val graphic =
       Clip(
         Point(0),
@@ -42,8 +45,7 @@ final case class Loader(context: SceneContext[Size], state: LoadingState):
         Material.Bitmap(GameAssets.Loader)
       )
 
-    val textBounds = context.boundaryLocator.textBounds(text)
-    val midX       = textBounds.width / 2
+    val midX = textBounds.width / 2
 
     Group(
       graphic.moveTo((midX - 16).toInt, 0),
