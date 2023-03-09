@@ -62,74 +62,84 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     val screenCenter = context.startUpData.toPoint / 2
 
-    val anims: Batch[Outcome[Graphic[Material.ImageEffects]]] =
-      logo(1.5.seconds, screenCenter, false)
-        .at(context.running - context.sceneStartTime)(Outcome(Logos.indigo))
-        .toBatch ++
-        logo(3.seconds, screenCenter, true)
-          .at(context.running - context.sceneStartTime)(Outcome(Logos.pkg))
-          .toBatch
+    val multiplier      = 0.3
+    val firstLogoDelay  = 1.5.seconds
+    val secondLogoDelay = firstLogoDelay + (LogoAnim.AnimDuration * multiplier)
 
-    anims.sequence.map { a =>
-      SceneUpdateFragment(a)
-    }
+    val logo1: Batch[Outcome[Graphic[Material.ImageEffects]]] =
+      LogoAnim
+        .logo(firstLogoDelay, screenCenter, false, multiplier)
+        .at(context.running - context.sceneStartTime)(Outcome(Logos.indigo))
+        .toBatch
+
+    val logo2: Batch[Outcome[Graphic[Material.ImageEffects]]] =
+      LogoAnim
+        .logo(secondLogoDelay, screenCenter, true, multiplier)
+        .at(context.running - context.sceneStartTime)(Outcome(Logos.pkg))
+        .toBatch
+
+    (logo1 ++ logo2).sequence.map(SceneUpdateFragment(_))
+
+object LogoAnim:
+
+  val AnimDuration: Seconds = 6.seconds
 
   def logo(
       delay: Seconds,
       screenCenter: Point,
-      emitEventOnComplete: Boolean
+      emitEventOnComplete: Boolean,
+      multiplier: Double
   ): Timeline[Outcome[Graphic[Material.ImageEffects]]] =
     timeline(
       layer(
-        startAfter(delay),
-        animate(0.2.seconds) { logo =>
+        startAfter(delay),                             // Pause
+        animate(1.seconds * multiplier) { sceneNode => // Fade in
           lerp >>> SignalFunction { d =>
-            logo.map(_.moveTo(screenCenter).modifyMaterial(_.withAlpha(d)))
+            sceneNode.map(_.moveTo(screenCenter).modifyMaterial(_.withAlpha(d)))
           }
         },
-        show(1.seconds) { logo =>
-          logo.map(_.moveTo(screenCenter))
+        show(3.seconds * multiplier) { sceneNode => // Show logo
+          sceneNode.map(_.moveTo(screenCenter).modifyMaterial(_.withAlpha(1.0)))
         },
-        animate(0.2.seconds) { logo =>
+        animate(1.seconds * multiplier) { sceneNode => // Fade out
           lerp >>> SignalFunction { d =>
-            logo.map(
+            sceneNode.map(
               _.moveTo(screenCenter).modifyMaterial(_.withAlpha(1.0 - d))
             )
           }
         },
-        pause(0.4.second),
-        show(0.2.seconds) { logo =>
-          logo
-            .map(_.modifyMaterial(_.withAlpha(0.0)))
-            .addGlobalEvents(
-              if emitEventOnComplete then
-                Batch(SceneEvent.JumpTo(LoadingScene.name))
-              else Batch.empty
-            )
+        pause(1.second * multiplier),  // wait
+        show(1.seconds * multiplier) { // wait and then optionally fire an event.
+          _.addGlobalEvents(
+            if emitEventOnComplete then Batch(SceneEvent.JumpTo(LoadingScene.name))
+            else Batch.empty
+          )
         }
       )
     )
 
-  object Logos:
+object Logos:
 
-    val pkg: Graphic[Material.ImageEffects] =
-      val size = Size(100, 136)
+  val pkg: Graphic[Material.ImageEffects] =
+    val size = Size(100, 136)
 
-      Graphic(
-        size,
-        Material
-          .Bitmap(GameAssets.PurpleKingdomLogo)
-          .stretch
-          .toImageEffects
-      ).withRef(size.toPoint / 2)
+    Graphic(
+      size,
+      Material
+        .Bitmap(GameAssets.PurpleKingdomLogo)
+        .stretch
+        .toImageEffects
+    ).withRef(size.toPoint / 2)
+      .modifyMaterial(_.withAlpha(0.0))
 
-    val indigo: Graphic[Material.ImageEffects] =
-      val size = Size(100, 105)
+  val indigo: Graphic[Material.ImageEffects] =
+    val size = Size(100, 105)
 
-      Graphic(
-        size,
-        Material
-          .Bitmap(GameAssets.IndigoLogo)
-          .stretch
-          .toImageEffects
-      ).withRef(size.toPoint / 2)
+    Graphic(
+      size,
+      Material
+        .Bitmap(GameAssets.IndigoLogo)
+        .stretch
+        .toImageEffects
+    ).withRef(size.toPoint / 2)
+      .modifyMaterial(_.withAlpha(0.0))
