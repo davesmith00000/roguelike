@@ -3,18 +3,13 @@ package roguelike
 import indigo.*
 import indigo.scenes.*
 import io.indigoengine.roguelike.starterkit.*
-import org.scalajs.dom.Worker
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
-import roguelike.model.Dungeon
 import roguelike.model.DungeonGenConfig
-import roguelike.model.Loader
-import roguelike.model.LoadingState
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.js.JsDungeon
-import roguelike.model.js.JsDungeonGameMapTuple
 import roguelike.model.js.JsGameMap
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
@@ -55,6 +50,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
           )
         )
       )
+
     case workerSubSystem.WorkerEvent.Receive(msg) =>
       Model
         .assignDungeon(
@@ -84,18 +80,12 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
       model: Model,
       viewModel: Unit
   ): Outcome[SceneUpdateFragment] =
-    val loader       = Loader(context, LoadingState.InProgress(None))
-    val loaderBounds = loader.getBounds()
-    val midX         = context.startUpData.width * 0.5
-    val midY         = context.startUpData.height * 0.5
-
     Outcome(
       SceneUpdateFragment(
-        loader
-          .view()
-          .moveTo(
-            (midX - (loaderBounds.width * 0.5)).toInt,
-            (midY - (loaderBounds.height * 0.5)).toInt
-          )
+        Text(
+          "Generating level.",
+          RoguelikeTiles.Size10x10.Fonts.fontKey,
+          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+        )
       )
     )
