@@ -100,24 +100,24 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
-    case LoadEvent.SpritesLoaded(sprites) =>
-      val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
+    // case LoadEvent.SpritesLoaded(sprites) =>
+    //   val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
 
-      val gameSprite: Option[GameSprites] =
-        player.map { plr =>
-          GameSprites(
-            player = plr
-          )
-        }
+    //   val gameSprite: Option[GameSprites] =
+    //     player.map { plr =>
+    //       GameSprites(
+    //         player = plr
+    //       )
+    //     }
 
-      Outcome(
-        viewModel.copy(
-          sprites = gameSprite
-        )
-      )
+    //   Outcome(
+    //     viewModel.copy(
+    //       sprites = gameSprite
+    //     )
+    //   )
 
-    case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
-      Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+    // case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
+    //   Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
 
     case _ =>
       Outcome(viewModel)
@@ -127,16 +127,19 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
+    // TODO Move all this inside the loader object
     val loader       = Loader(context, loadInfo.state)
-    val loaderBounds = loader.getBounds()
+    val textBounds   = loader.textBounds
+    val loaderBounds = loader.getBounds(textBounds)
     val midX         = context.startUpData.width * 0.5
     val midY         = context.startUpData.height * 0.5
 
     Outcome(
       SceneUpdateFragment(
         Layer(
+            // TODO Move all this inside the loaded
           loader
-            .view()
+            .view(textBounds)
             .moveTo(
               (midX - (loaderBounds.width * 0.5)).toInt,
               (midY - (loaderBounds.height * 0.5)).toInt
