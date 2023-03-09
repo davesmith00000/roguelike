@@ -27,7 +27,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val layerKeyFPS       = BindingKey("fps")
 
   def initialScene(bootData: Size): Option[SceneName] =
-    None
+    Option(LogoScene.name)
 
   def scenes(bootData: Size): NonEmptyList[Scene[Size, Model, ViewModel]] =
     NonEmptyList(
