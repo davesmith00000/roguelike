@@ -37,6 +37,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set(AssetBundleLoader)
 
+  val loadBindingKey: BindingKey = BindingKey("initial game load")
+
   def updateModel(
       context: SceneContext[Size],
       loadInfo: GameLoadInfo
@@ -44,10 +46,10 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
     case FrameTick =>
       loadInfo.state match
         case LoadingState.NotStarted =>
-          Outcome(GameLoadInfo.withTimeOut(Seconds(1.5)).start)
+          Outcome(GameLoadInfo.initial.start)
             .addGlobalEvents(
               AssetBundleLoaderEvent.Load(
-                BindingKey("Loading"),
+                loadBindingKey,
                 GameAssets.lazyAssets
               ),
               StorageEvent.Load(ModelSaveData.saveKey)
@@ -56,40 +58,36 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
         case _ =>
           Outcome(loadInfo)
 
-    case StorageEvent.Loaded(ModelSaveData.saveKey, data) =>
-      data match
-        case None =>
-          IndigoLogger.error("No saved data found")
+    case StorageEvent.Loaded(ModelSaveData.saveKey, Some(data)) =>
+      ModelSaveData.fromJsonString(data) match
+        case Left(msg) =>
+          IndigoLogger.error(s"Could not decode saved data, got: $msg")
           Outcome(loadInfo)
 
-        case Some(d) =>
-          ModelSaveData.fromJsonString(d) match
-            case None =>
-              IndigoLogger.error("Could not decode saved data...")
-              Outcome(loadInfo)
+        case Right(sd) =>
+          IndigoLogger.info("Save data found and loaded")
+          Outcome(loadInfo.withSaveData(sd))
 
-            case sd @ Some(_) =>
-              Outcome(loadInfo.copy(loadedData = sd))
+    case StorageEvent.Loaded(ModelSaveData.saveKey, None) =>
+      IndigoLogger.info("No saved data found")
+      Outcome(loadInfo)
 
-    case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) if !loadInfo.state.isComplete =>
+    case AssetBundleLoaderEvent.LoadProgress(key, percent, _, _) if key == loadBindingKey =>
+      IndigoLogger.info(s"Asset load progress ${percent}%")
       Outcome(
-        loadInfo.copy(
-          state = LoadingState.InProgress(Some(percent))
-        )
+        loadInfo.toInProgress(percent)
       )
 
-    case AssetBundleLoaderEvent.Success(_) =>
+    case AssetBundleLoaderEvent.Success(key) if key == loadBindingKey =>
+      IndigoLogger.info("Asset load success")
       Outcome(
-        loadInfo.copy(
-          state = LoadingState.Complete
-        )
+        loadInfo.toComplete
       )
 
-    case AssetBundleLoaderEvent.Failure(_, _) =>
+    case AssetBundleLoaderEvent.Failure(key, message) if key == loadBindingKey =>
+      IndigoLogger.info("Asset load failure")
       Outcome(
-        loadInfo.copy(
-          state = LoadingState.Error
-        )
+        loadInfo.toError(message)
       )
 
     case _ =>
@@ -127,23 +125,11 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    // TODO Move all this inside the loader object
-    val loader       = Loader(context, loadInfo.state)
-    val textBounds   = loader.textBounds
-    val loaderBounds = loader.getBounds(textBounds)
-    val midX         = context.startUpData.width * 0.5
-    val midY         = context.startUpData.height * 0.5
-
     Outcome(
       SceneUpdateFragment(
         Layer(
-            // TODO Move all this inside the loaded
-          loader
-            .view(textBounds)
-            .moveTo(
-              (midX - (loaderBounds.width * 0.5)).toInt,
-              (midY - (loaderBounds.height * 0.5)).toInt
-            )
+          Loader
+            .view(context, loadInfo.state, context.startUpData)
         )
       )
     )

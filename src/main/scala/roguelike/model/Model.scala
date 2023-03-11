@@ -43,9 +43,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
       hostiles.toJSArray.sortBy(_.isAlive))
-      .filter(e =>
-        gameMap.visible.contains(e.position) && e.position != stairsPosition
-      ) :+ player
+      .filter(e => gameMap.visible.contains(e.position) && e.position != stairsPosition) :+ player
 
   def closeAllWindows: Model =
     this.copy(
@@ -62,8 +60,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def toggleLookAround(radius: Int): Model =
     val show = !gameState.lookingAround
     this.copy(
-      gameState =
-        if show then GameState.LookAround(radius) else GameState.WaitForInput,
+      gameState = if show then GameState.LookAround(radius) else GameState.WaitForInput,
       lookAtTarget = player.position
     )
 
@@ -137,8 +134,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         this.copy(
           gameState = GameState.LookAround(Ranged.ConfusionScroll.radius),
           lookAtTarget = player.position,
-          targetingWithRangedAt =
-            Option((Ranged.ConfusionScroll, inventoryPosition))
+          targetingWithRangedAt = Option((Ranged.ConfusionScroll, inventoryPosition))
         )
       )
 
@@ -150,8 +146,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         this.copy(
           gameState = GameState.LookAround(Ranged.FireballScroll.radius),
           lookAtTarget = player.position,
-          targetingWithRangedAt =
-            Option((Ranged.FireballScroll, inventoryPosition))
+          targetingWithRangedAt = Option((Ranged.FireballScroll, inventoryPosition))
         )
       )
   }
@@ -502,8 +497,7 @@ object Model:
               stairsPosition = dungeon.stairsPosition,
               gameMap = gm,
               currentFloor = dungeon.currentFloor,
-              hostiles = HostilesPool(Batch.fromList(dungeon.hostiles)),
-              loadInfo = currentModel.loadInfo
+              hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
             )
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)

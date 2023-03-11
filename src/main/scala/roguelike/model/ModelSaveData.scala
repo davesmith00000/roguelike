@@ -21,14 +21,13 @@ final case class ModelSaveData(
 
 object ModelSaveData:
 
-  def fromJsonString(json: String): Option[ModelSaveData] =
+  def fromJsonString(json: String): Either[String, ModelSaveData] =
     decode[ModelSaveData](json) match
       case Left(e) =>
-        IndigoLogger.debug(e.toString)
-        None
+        Left(e.toString)
 
       case Right(d) =>
-        Option(d)
+        Right(d)
 
   val saveKey: String = "indigo_roguelike"
 
