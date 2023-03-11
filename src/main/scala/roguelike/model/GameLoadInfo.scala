@@ -9,11 +9,20 @@ final case class GameLoadInfo(
   def start: GameLoadInfo =
     this.copy(state = LoadingState.InProgress(Some(0)))
 
+  def toInProgress(percent: Int): GameLoadInfo =
+    this.copy(state = LoadingState.InProgress(Option(percent)))
+
+  def toComplete: GameLoadInfo =
+    this.copy(state = LoadingState.Complete)
+
+  def toError(msg: String): GameLoadInfo =
+    this.copy(state = LoadingState.Error(msg))
+
+  def withSaveData(data: ModelSaveData): GameLoadInfo =
+    this.copy(loadedData = Option(data))
+
 object GameLoadInfo:
   def initial: GameLoadInfo =
-    GameLoadInfo(LoadingState.NotStarted, None)
-
-  def withTimeOut(loadingTimeOut: Seconds): GameLoadInfo =
     GameLoadInfo(LoadingState.NotStarted, None)
 
   def withSaveData(saveData: ModelSaveData): GameLoadInfo =
@@ -23,7 +32,7 @@ enum LoadingState:
   case NotStarted
   case InProgress(percent: Option[Int])
   case Complete
-  case Error
+  case Error(msg: String)
 
   def isComplete: Boolean =
     this match
