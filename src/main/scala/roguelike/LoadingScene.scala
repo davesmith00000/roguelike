@@ -15,7 +15,6 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
-import roguelike.viewmodel.ui.GameUi
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 

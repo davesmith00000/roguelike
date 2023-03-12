@@ -9,7 +9,7 @@ final case class MainMenuUi(
     newGame: ButtonComponent,
     loadGame: Option[ButtonComponent],
     position: Point
-) extends UiViewModel:
+):
   val scale: Int = newGame.scale
 
   def view(context: SceneContext[Size]): Batch[SceneNode] =

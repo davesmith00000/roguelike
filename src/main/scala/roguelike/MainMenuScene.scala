@@ -31,11 +31,8 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
   val viewModelLens: Lens[ViewModel, MainMenuUi] =
     Lens(
-      _.ui match {
-        case m: MainMenuUi => m
-        case ui            => MainMenuUi(Batch(NewGame))
-      },
-      (vm, mainMenu) => vm.copy(ui = mainMenu)
+      _.mainMenu,
+      (vm, mainMenu) => vm.copy(mainMenu = mainMenu)
     )
 
   val eventFilters: EventFilters =
@@ -49,6 +46,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       model: Model
   ): GlobalEvent => Outcome[Model] =
     case SceneEvent.SceneChange(_, _, _) =>
+      // TODO: Can this be replaced with the new scene time thingy?
       Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
 
     case NewGame =>
