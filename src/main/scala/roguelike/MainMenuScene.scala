@@ -41,10 +41,110 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val subSystems: Set[SubSystem] =
     Set()
 
+  def updateModel(
+      context: SceneContext[Size],
+      model: Model
+  ): GlobalEvent => Outcome[Model] =
+    case SceneEvent.SceneChange(_, _, _) =>
+      Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
+
+    case NewGame =>
+      Outcome(model)
+        .addGlobalEvents(
+          SceneEvent.JumpTo(GeneratingLevelScene.name),
+          GenerateLevel
+        )
+
+    case LoadGame =>
+      model.loadInfo.loadedData match
+        case None =>
+          Outcome(model)
+
+        case Some(data) =>
+          Outcome(Model.fromSaveData(model, data))
+            .addGlobalEvents(
+              SceneEvent.JumpTo(GameScene.name)
+            )
+
+    case FrameTick =>
+      // TODO: Can this be replaced with the new scene time thingy?
+      if (model.sceneTime.time < MainMenuHelper.totalTime && model.sceneTime.skip == false)
+        Outcome(
+          model.copy(sceneTime =
+            model.sceneTime.copy(time = model.sceneTime.time + context.delta)
+          )
+        )
+      else if (model.sceneTime.time >= MainMenuHelper.totalTime)
+        Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
+      else
+        Outcome(model)
+
+    case KeyboardEvent.KeyDown(_) if model.sceneTime.skip == false =>
+      Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
+
+    case KeyboardEvent.KeyUp(Key.KEY_N) if model.sceneTime.skip == true =>
+      Outcome(model).addGlobalEvents(NewGame)
+
+    case KeyboardEvent.KeyUp(Key.KEY_C) if model.sceneTime.skip == true =>
+      Outcome(model).addGlobalEvents(LoadGame)
+
+    case _ =>
+      Outcome(model)
+
+  def updateViewModel(
+      context: SceneContext[Size],
+      model: Model,
+      viewModel: MainMenuUi
+  ): GlobalEvent => Outcome[MainMenuUi] =
+    case FrameTick =>
+      val buttonSize = viewModel.newGame.width
+      val halfWidth = context.startUpData.width * 0.5
+      val menuMagnification = 2
+
+      val mainMenu = {
+        if (model.loadInfo.loadedData.isDefined && viewModel.loadGame.isEmpty)
+          MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
+        else
+          viewModel
+      }
+      .withScale(menuMagnification)
+      .moveTo(
+        new Point(
+          (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
+          200
+        )
+      )
+
+      val newGame = mainMenu.newGame.update(context.mouse)
+
+      Outcome(mainMenu).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
+
+    case _ =>
+      Outcome(viewModel)
+
+  def present(
+      context: SceneContext[Size],
+      model: Model,
+      viewModel: MainMenuUi
+  ): Outcome[SceneUpdateFragment] =
+    Outcome(
+      SceneUpdateFragment.empty
+        .addLayer(
+          Layer(MainMenuHelper.getBackground(context))
+            .withBlendMaterial(InnerGlow(context.startUpData, RGBA(0, 0, 0, 0.5), 0.4))
+        )
+        .addLayer(MainMenuHelper.getMenu(context, model, viewModel))
+        .addLayer(MainMenuHelper.getTitle(context, model.sceneTime.skip))
+        .withAudio(MainMenuHelper.getBackgroundAudio(context))
+    )
+
+object MainMenuHelper:
+
   val slideInTime    = Seconds(4)
   val titlePauseTime = Seconds(1)
   val menuFadeInTime = Seconds(2)
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
+
   val moveGroup: Group => SignalFunction[Point, Group] = g =>
     SignalFunction(pt => g.withPosition(pt))
 
@@ -64,103 +164,6 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
   val changeVolume: Track => SignalFunction[Double, Track] = t =>
     SignalFunction( d => t.copy(volume = Volume.Max * d))
-
-  def updateModel(
-      context: SceneContext[Size],
-      model: Model
-  ): GlobalEvent => Outcome[Model] =
-    case e: SceneEvent =>
-      e match {
-        case SceneEvent.SceneChange(_, _, _) =>
-          Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
-        case _ => Outcome(model)
-      }
-
-    case NewGame =>
-      Outcome(model)
-        .addGlobalEvents(
-          SceneEvent.JumpTo(GeneratingLevelScene.name),
-          GenerateLevel
-        )
-
-    case LoadGame if model.loadInfo.loadedData.isDefined =>
-      model.loadInfo.loadedData match
-        case None =>
-          Outcome(model) // should not happen...
-
-        case Some(data) =>
-          Outcome(Model.fromSaveData(model, data))
-            .addGlobalEvents(
-              SceneEvent.JumpTo(GameScene.name)
-            )
-
-    case FrameTick =>
-      if (model.sceneTime.time < totalTime && model.sceneTime.skip == false)
-        Outcome(
-          model.copy(sceneTime =
-            model.sceneTime.copy(time = model.sceneTime.time + context.delta)
-          )
-        )
-      else if (model.sceneTime.time >= totalTime)
-        Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
-      else
-        Outcome(model)
-
-    case KeyboardEvent.KeyDown(_) if model.sceneTime.skip == false =>
-      Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
-
-    case KeyboardEvent.KeyUp(Key.KEY_N) if model.sceneTime.skip == true =>
-      Outcome(model).addGlobalEvents(NewGame)
-
-    case KeyboardEvent.KeyUp(Key.KEY_C) if model.sceneTime.skip == true =>
-      Outcome(model).addGlobalEvents(LoadGame)
-    case _ =>
-      Outcome(model)
-
-  def updateViewModel(
-      context: SceneContext[Size],
-      model: Model,
-      viewModel: MainMenuUi
-  ): GlobalEvent => Outcome[MainMenuUi] =
-    case FrameTick =>
-      val buttonSize = viewModel.newGame.width
-      val halfWidth = context.startUpData.width * 0.5
-      val menuMagnification = 2
-      val mainMenu =
-      (
-        if (!model.loadInfo.loadedData.isEmpty && viewModel.loadGame == None)
-          MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
-        else
-          viewModel
-      )
-      .withScale(menuMagnification)
-      .moveTo(
-        new Point(
-          (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
-          200
-        )
-      )
-
-      val newGame = mainMenu.newGame.update(context.mouse)
-      Outcome(mainMenu).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
-    case _ =>
-      Outcome(viewModel)
-
-  def present(
-      context: SceneContext[Size],
-      model: Model,
-      viewModel: MainMenuUi
-  ): Outcome[SceneUpdateFragment] =
-    Outcome(
-      SceneUpdateFragment.empty
-        .addLayer(
-          Layer(getBackground(context))
-            .withBlendMaterial(InnerGlow(context.startUpData, RGBA(0, 0, 0, 0.5), 0.4))
-        )
-        .addLayer(getMenu(context, model, viewModel))
-        .addLayer(getTitle(context, model.sceneTime.skip))
-        .withAudio(getBackgroundAudio(context))
-    )
 
   def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
     val graphic = Graphic(
@@ -247,6 +250,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             animate(2.seconds){ lerp >>> applyAlpha(_) }
           )
         )
+
       menuAnimation.at(context.running - context.sceneStartTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
         case Some(l) => l
         case None => Layer.empty
@@ -256,7 +260,8 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       halfWidth: Double,
       viewModel: MainMenuUi
-  ) = Layer(Group(viewModel.view(context)))
+  ): Layer = 
+    Layer(Group(viewModel.view(context)))
 
   def getBackgroundAudio(context: SceneContext[Size]): SceneAudio =
     val track = Track(GameAssets.MenuBackgroundAudio)
@@ -279,7 +284,6 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         )
       )
     )
-
 
 case object GenerateLevel extends GlobalEvent
 case object NewGame extends GlobalEvent
