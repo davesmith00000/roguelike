@@ -4,8 +4,8 @@ import indigo.*
 import indigoextras.geometry.Vertex
 import roguelike.GameEvent
 
-/** ActorPosition is a view model helper to track the position actors should be
-  * rendered at on the screen.
+/** ActorPosition is a view model helper to track the position actors should be rendered at on the
+  * screen.
   * @param fromPosition
   *   The position in the world we are moving from.
   * @param target
@@ -44,10 +44,12 @@ final case class ActorPosition(
       .at(timeElapsed)
 
   def attacking: Double =
-    Signal.SmoothPulse.map { d =>
-      if fromPosition == target then d * 0.55
-      else d * 0.35
-    }.at(timeElapsed / animationDuration)
+    Signal.SmoothPulse
+      .map { d =>
+        if fromPosition == target then d * 0.55
+        else d * 0.35
+      }
+      .at(timeElapsed / animationDuration)
 
 object ActorPosition:
   val DefaultMoveDuration: Seconds = Seconds(0.2)

@@ -89,9 +89,8 @@ object DungeonGen:
       val l = possibilities
         .map(p => (p.entity, p.weight.toDouble / total.toDouble))
         .sortBy(_._2)
-        .foldLeft((0.0d, List.empty[(String, Double)])) {
-          case ((total, acc), next) =>
-            (total + next._2, acc :+ (next._1, total + next._2))
+        .foldLeft((0.0d, List.empty[(String, Double)])) { case ((total, acc), next) =>
+          (total + next._2, acc :+ (next._1, total + next._2))
         }
         ._2
 

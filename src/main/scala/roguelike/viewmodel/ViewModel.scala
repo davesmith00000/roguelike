@@ -55,14 +55,12 @@ final case class GameViewModel(
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[GameViewModel] =
-    case KeyboardEvent.KeyDown(KeyMapping.ZoomIn1) |
-        KeyboardEvent.KeyDown(KeyMapping.ZoomIn2) =>
+    case KeyboardEvent.KeyDown(KeyMapping.ZoomIn1) | KeyboardEvent.KeyDown(KeyMapping.ZoomIn2) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))
       )
 
-    case KeyboardEvent.KeyDown(KeyMapping.ZoomOut1) |
-        KeyboardEvent.KeyDown(KeyMapping.ZoomOut2) =>
+    case KeyboardEvent.KeyDown(KeyMapping.ZoomOut1) | KeyboardEvent.KeyDown(KeyMapping.ZoomOut2) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
@@ -72,8 +70,7 @@ final case class GameViewModel(
         this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))
       )
 
-    case FrameTick
-        if context.mouse.scrolled.exists(_ == MouseWheel.ScrollDown) =>
+    case FrameTick if context.mouse.scrolled.exists(_ == MouseWheel.ScrollDown) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
@@ -133,17 +130,15 @@ final case class GameViewModel(
       val history =
         model.messageLog
           .toTerminal(Size(50, 30), false, 0, true)
-          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
+          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
+            Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
           }
 
       val shortLog =
         model.messageLog
           .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
+          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
+            Graphic(10, 10, TerminalText(GameAssets.TileMap, fg, bg))
           }
 
       Outcome(
@@ -312,8 +307,7 @@ object GameViewModel:
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
         hostilePositions = hps.hostilePositions,
-        lookAtPosition =
-          (model.lookAtTarget * viewModel.squareSize) - (viewModel.squareSize.x / 2),
+        lookAtPosition = (model.lookAtTarget * viewModel.squareSize) - (viewModel.squareSize.x / 2),
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),

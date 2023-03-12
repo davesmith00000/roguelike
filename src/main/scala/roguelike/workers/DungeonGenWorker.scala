@@ -50,8 +50,7 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
     )
 
 @JSExportTopLevel("DungeonGenWorker")
-object DungeonGenWorker
-    extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapTuple] {
+object DungeonGenWorker extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapTuple] {
   val name: WorkerName = WorkerName("assets/dungeon-gen-worker")
 
   def process(config: DungeonGenConfig) = {

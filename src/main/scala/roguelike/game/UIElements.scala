@@ -168,11 +168,11 @@ object UIElements:
       |Attack: ${player.fighter.power}$powerBonus
       |Defense: ${player.fighter.defense}$defenseBonus
       |Weapon: ${player.inventory.equipment.weapon
-        .map(_.name)
-        .getOrElse("--none--")}
+          .map(_.name)
+          .getOrElse("--none--")}
       |Armour: ${player.inventory.equipment.armour
-        .map(_.name)
-        .getOrElse("--none--")}
+          .map(_.name)
+          .getOrElse("--none--")}
       |""".stripMargin
 
     Text(
@@ -203,6 +203,6 @@ object UIElements:
         Stroke(2, RGBA.SlateGray)
       ) :: shortLogClones
     ).moveTo(
-      ((viewportSize.width - windowSize.width) / 2),
-      (viewportSize.height - windowSize.height - 5)
+      (viewportSize.width - windowSize.width) / 2,
+      viewportSize.height - windowSize.height - 5
     )

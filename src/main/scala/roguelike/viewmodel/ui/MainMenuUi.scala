@@ -38,9 +38,7 @@ object MainMenuUi:
     val buttonSize = 208
     MainMenuUi(
       ButtonComponent("[n] Play a new game", buttonSize, newGame),
-      loadGame.map(l =>
-        ButtonComponent("[c] Continue last game", buttonSize, l)
-      ),
+      loadGame.map(l => ButtonComponent("[c] Continue last game", buttonSize, l)),
       Point.zero
     )
 

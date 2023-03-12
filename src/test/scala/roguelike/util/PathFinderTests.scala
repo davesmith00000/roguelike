@@ -43,7 +43,7 @@ class PathFinderTests extends munit.FunSuite {
   }
 
   test("No path") {
-    val start: Point = Point(0,0)
+    val start: Point = Point(0, 0)
     val end: Point   = Point(2, 2)
 
     // Wall in the way down column (1)
@@ -67,7 +67,7 @@ class PathFinderTests extends munit.FunSuite {
   }
 
   test("Destination is invalid") {
-    val start: Point = Point(0,0)
+    val start: Point = Point(0, 0)
     val end: Point   = Point(50, 15)
 
     val walkable: Batch[Point] =
