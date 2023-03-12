@@ -52,6 +52,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
           )
         )
       )
+
     case workerSubSystem.WorkerEvent.Receive(msg) =>
       Model
         .assignDungeon(
