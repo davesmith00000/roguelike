@@ -29,7 +29,7 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
     case HandleInput(Key.KEY_1) if model.player.isAlive =>
       val saveData = model.toSaveData
       Outcome(
-        model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)),
+        model.copy(loadInfo = model.loadInfo.withSaveData(saveData)),
         Batch(
           StorageEvent.Save(
             ModelSaveData.saveKey,
@@ -42,7 +42,7 @@ object QuitMenu extends Component[Size, Model, GameViewModel]:
     case HandleInput(Key.KEY_2) if model.player.isAlive =>
       val saveData = model.toSaveData
       Outcome(
-        model.copy(loadInfo = GameLoadInfo.withSaveData(saveData)),
+        model.copy(loadInfo = model.loadInfo.withSaveData(saveData)),
         Batch(
           StorageEvent.Save(ModelSaveData.saveKey, saveData.toJsonString),
           SceneEvent.JumpTo(MainMenuScene.name)
