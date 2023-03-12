@@ -43,20 +43,15 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       loadInfo: GameLoadInfo
   ): GlobalEvent => Outcome[GameLoadInfo] =
-    case FrameTick =>
-      loadInfo.state match
-        case LoadingState.NotStarted =>
-          Outcome(GameLoadInfo.initial.start)
-            .addGlobalEvents(
-              AssetBundleLoaderEvent.Load(
-                loadBindingKey,
-                GameAssets.lazyAssets
-              ),
-              StorageEvent.Load(ModelSaveData.saveKey)
-            )
-
-        case _ =>
-          Outcome(loadInfo)
+    case FrameTick if loadInfo.state.hasNotStarted =>
+      Outcome(GameLoadInfo.initial.start)
+        .addGlobalEvents(
+          AssetBundleLoaderEvent.Load(
+            loadBindingKey,
+            GameAssets.lazyAssets
+          ),
+          StorageEvent.Load(ModelSaveData.saveKey)
+        )
 
     case StorageEvent.Loaded(ModelSaveData.saveKey, Some(data)) =>
       ModelSaveData.fromJsonString(data) match
@@ -70,6 +65,10 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
 
     case StorageEvent.Loaded(ModelSaveData.saveKey, None) =>
       IndigoLogger.info("No saved data found")
+      Outcome(loadInfo)
+
+    case AssetBundleLoaderEvent.Started(key) if key == loadBindingKey =>
+      IndigoLogger.info("Asset load started")
       Outcome(loadInfo)
 
     case AssetBundleLoaderEvent.LoadProgress(key, percent, _, _) if key == loadBindingKey =>
@@ -98,24 +97,25 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
-    // case LoadEvent.SpritesLoaded(sprites) =>
-    //   val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
+    case LoadEvent.SpritesLoaded(sprites) =>
+      val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
 
-    //   val gameSprite: Option[GameSprites] =
-    //     player.map { plr =>
-    //       GameSprites(
-    //         player = plr
-    //       )
-    //     }
+      val gameSprite: Option[GameSprites] =
+        player.map { plr =>
+          GameSprites(
+            player = plr
+          )
+        }
 
-    //   Outcome(
-    //     viewModel.copy(
-    //       sprites = gameSprite
-    //     )
-    //   )
+      Outcome(
+        viewModel.copy(
+          sprites = gameSprite
+        )
+      )
 
-    // case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
-    //   Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+    case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
+      Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
+
 
     case _ =>
       Outcome(viewModel)

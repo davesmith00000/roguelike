@@ -75,6 +75,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
         case _ => Outcome(model)
       }
+
     case NewGame =>
       Outcome(model)
         .addGlobalEvents(
@@ -88,10 +89,11 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           Outcome(model) // should not happen...
 
         case Some(data) =>
-          Outcome(Model.fromSaveData(data))
+          Outcome(Model.fromSaveData(model, data))
             .addGlobalEvents(
               SceneEvent.JumpTo(GameScene.name)
             )
+
     case FrameTick =>
       if (model.sceneTime.time < totalTime && model.sceneTime.skip == false)
         Outcome(

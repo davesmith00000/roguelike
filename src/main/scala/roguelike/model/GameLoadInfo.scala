@@ -25,9 +25,6 @@ object GameLoadInfo:
   def initial: GameLoadInfo =
     GameLoadInfo(LoadingState.NotStarted, None)
 
-  def withSaveData(saveData: ModelSaveData): GameLoadInfo =
-    GameLoadInfo(LoadingState.NotStarted, Option(saveData))
-
 enum LoadingState:
   case NotStarted
   case InProgress(percent: Option[Int])
@@ -38,3 +35,8 @@ enum LoadingState:
     this match
       case LoadingState.Complete => true
       case _                     => false
+
+  def hasNotStarted: Boolean =
+    this match
+      case LoadingState.NotStarted => true
+      case _                       => false

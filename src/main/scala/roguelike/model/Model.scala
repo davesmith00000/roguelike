@@ -465,14 +465,14 @@ object Model:
       SceneTime(Seconds(0), false)
     )
 
-  def fromSaveData(saveData: ModelSaveData): Model =
+  def fromSaveData(model: Model, saveData: ModelSaveData): Model =
     // Can use Dice.fromSeed(0) here since player is overwritten with saved data.
     blank(Dice.fromSeed(0)).copy(
       player = saveData.player,
       stairsPosition = saveData.stairsPosition,
       gameMap = saveData.gameMap,
       messageLog = saveData.messageLog,
-      loadInfo = GameLoadInfo.withSaveData(saveData),
+      loadInfo = model.loadInfo.withSaveData(saveData),
       currentFloor = saveData.currentFloor
     )
 
