@@ -30,10 +30,13 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
     Lens.keepLatest
 
   val viewModelLens: Lens[ViewModel, MainMenuUi] =
-    Lens({_.ui match {
-      case m: MainMenuUi => m
-      case ui => MainMenuUi(Batch(NewGame))
-    }}, (vm, mainMenu) => vm.copy(ui = mainMenu))
+    Lens(
+      _.ui match {
+        case m: MainMenuUi => m
+        case ui            => MainMenuUi(Batch(NewGame))
+      },
+      (vm, mainMenu) => vm.copy(ui = mainMenu)
+    )
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
@@ -70,9 +73,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       // TODO: Can this be replaced with the new scene time thingy?
       if (model.sceneTime.time < MainMenuHelper.totalTime && model.sceneTime.skip == false)
         Outcome(
-          model.copy(sceneTime =
-            model.sceneTime.copy(time = model.sceneTime.time + context.delta)
-          )
+          model.copy(sceneTime = model.sceneTime.copy(time = model.sceneTime.time + context.delta))
         )
       else if (model.sceneTime.time >= MainMenuHelper.totalTime)
         Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
@@ -97,8 +98,8 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       viewModel: MainMenuUi
   ): GlobalEvent => Outcome[MainMenuUi] =
     case FrameTick =>
-      val buttonSize = viewModel.newGame.width
-      val halfWidth = context.startUpData.width * 0.5
+      val buttonSize        = viewModel.newGame.width
+      val halfWidth         = context.startUpData.width * 0.5
       val menuMagnification = 2
 
       val mainMenu = {
@@ -107,13 +108,13 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
         else
           viewModel
       }
-      .withScale(menuMagnification)
-      .moveTo(
-        new Point(
-          (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
-          200
+        .withScale(menuMagnification)
+        .moveTo(
+          new Point(
+            (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
+            200
+          )
         )
-      )
 
       val newGame = mainMenu.newGame.update(context.mouse)
 
@@ -145,25 +146,22 @@ object MainMenuHelper:
   val menuFadeInTime = Seconds(2)
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
 
-  val moveGroup: Group => SignalFunction[Point, Group] = g =>
-    SignalFunction(pt => g.withPosition(pt))
+  val moveGroup: Group => SignalFunction[Point, Group] = g => SignalFunction(pt => g.withPosition(pt))
 
   val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
-    SignalFunction( d =>
-      val material = l.blending.map(b => b.blendMaterial) match {
+    SignalFunction { d =>
+      val material = l.blending.map(b => b.blendMaterial) match
         case Some(m) => m
         case None    => BlendMaterial.BlendEffects.None
-      }
 
-      material match {
+      material match
         case m: BlendMaterial.BlendEffects =>
           l.withBlendMaterial(m.withAlpha(d))
         case _ => l
-      }
-    )
 
-  val changeVolume: Track => SignalFunction[Double, Track] = t =>
-    SignalFunction( d => t.copy(volume = Volume.Max * d))
+    }
+
+  val changeVolume: Track => SignalFunction[Double, Track] = t => SignalFunction(d => t.copy(volume = Volume.Max * d))
 
   def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
     val graphic = Graphic(
@@ -191,7 +189,7 @@ object MainMenuHelper:
     else
       graphicTimeline.at(time)(graphic) match {
         case Some(g) => g
-        case None => graphic
+        case None    => graphic
       }
 
   def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
@@ -216,7 +214,7 @@ object MainMenuHelper:
         .withScale(new Vector2(textMagnification, textMagnification))
         .withPosition(titleStart)
 
-    val time = context.running - context.sceneStartTime
+    val time     = context.running - context.sceneStartTime
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     if (skipAnimations || time >= slideInTime) group.moveTo(titleEnd)
@@ -231,7 +229,7 @@ object MainMenuHelper:
         )
       titleAnimation.at(context.running - context.sceneStartTime)(group) match {
         case Some(g) => g
-        case None => Group.empty
+        case None    => Group.empty
       }
 
   def getMenu(context: SceneContext[Size], model: Model, viewModel: MainMenuUi): Layer =
@@ -247,30 +245,32 @@ object MainMenuHelper:
         timeline(
           layer(
             startAfter[Layer](6.seconds),
-            animate(2.seconds){ lerp >>> applyAlpha(_) }
+            animate(2.seconds)(lerp >>> applyAlpha(_))
           )
         )
 
-      menuAnimation.at(context.running - context.sceneStartTime)(menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))) match {
+      menuAnimation.at(context.running - context.sceneStartTime)(
+        menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
+      ) match {
         case Some(l) => l
-        case None => Layer.empty
+        case None    => Layer.empty
       }
 
   def getMenuFragment(
       context: SceneContext[Size],
       halfWidth: Double,
       viewModel: MainMenuUi
-  ): Layer = 
+  ): Layer =
     Layer(Group(viewModel.view(context)))
 
   def getBackgroundAudio(context: SceneContext[Size]): SceneAudio =
     val track = Track(GameAssets.MenuBackgroundAudio)
     val soundTimeline: Timeline[Track] =
-        timeline(
-          layer(
-            animate(1.seconds){ lerp >>> changeVolume(_) }
-          )
+      timeline(
+        layer(
+          animate(1.seconds)(lerp >>> changeVolume(_))
         )
+      )
 
     SceneAudio(
       SceneAudioSource(
@@ -286,5 +286,5 @@ object MainMenuHelper:
     )
 
 case object GenerateLevel extends GlobalEvent
-case object NewGame extends GlobalEvent
-case object LoadGame extends GlobalEvent
+case object NewGame       extends GlobalEvent
+case object LoadGame      extends GlobalEvent
