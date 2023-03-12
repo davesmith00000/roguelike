@@ -1,2 +1,2 @@
-importScripts("../scripts/roguelike-fastopt.js");
+importScripts("../scripts/main.js");
 DungeonGenWorker.doWork();
