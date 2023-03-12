@@ -9,4 +9,4 @@ jobs:
       with:
         java-version: adopt@1.11
     - name: Compile & Test
-      run: sbt clean compile test
+      run: sbt clean compile test scalafmtCheckAll

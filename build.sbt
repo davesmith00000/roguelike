@@ -78,7 +78,7 @@ lazy val roguelike =
               )
         }
 
-        cachedFun(IO.listFiles((baseDirectory.value / "gamedata")).toSet).toSeq
+        cachedFun(IO.listFiles(baseDirectory.value / "gamedata").toSet).toSeq
       }.taskValue
     )
     .settings(
@@ -122,6 +122,7 @@ addCommandAlias("buildGameFull", ";compile;fullOptJS;indigoBuildFull")
 addCommandAlias(
   "publishGame",
   List(
+    "scalafmtCheckAll",
     "buildGameFull",
     "makeSite",
     "ghpagesPushSite"
