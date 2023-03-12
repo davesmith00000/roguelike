@@ -8,7 +8,7 @@ import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
-import roguelike.model.Loader
+import roguelike.model.LoaderAnim
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
@@ -116,7 +116,6 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
     case FrameTick if viewModel.sprites.isDefined && loadInfo.state.isComplete =>
       Outcome(viewModel).addGlobalEvents(SceneEvent.JumpTo(MainMenuScene.name))
 
-
     case _ =>
       Outcome(viewModel)
 
@@ -125,11 +124,25 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
+    val textCopy =
+      loadInfo.state match
+        case LoadingState.NotStarted =>
+          "Started loading..."
+
+        case LoadingState.InProgress(percent) =>
+          "Loaded..." + (percent match
+            case Some(p) => s"${p.toString}%"
+            case None    => ""
+          )
+
+        case LoadingState.Complete =>
+          "Loaded successfully!"
+
+        case LoadingState.Error(msg) =>
+          s"Error, some assets could not be loaded.\nError: $msg"
+
     Outcome(
       SceneUpdateFragment(
-        Layer(
-          Loader
-            .view(context, loadInfo.state, context.startUpData)
-        )
+        LoaderAnim.present(context, textCopy, context.startUpData)
       )
     )

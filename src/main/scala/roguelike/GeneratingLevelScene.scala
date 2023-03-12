@@ -7,6 +7,7 @@ import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.DungeonGenConfig
+import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.js.JsDungeon
@@ -82,10 +83,6 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        Text(
-          "Generating level.",
-          RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-        )
+        LoaderAnim.present(context, "Generating level.", context.startUpData)
       )
     )
