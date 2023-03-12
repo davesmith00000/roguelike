@@ -196,7 +196,8 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       player
         .addXp(amount)
         .createGlobalEvents(p =>
-          if p.level > player.level then Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
+          if p.level > player.level then
+            Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowLevelUp))
           else Batch.empty
         )
   }

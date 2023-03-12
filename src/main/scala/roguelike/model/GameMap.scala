@@ -25,8 +25,7 @@ final case class GameMap(
 
   def exploredWalls: js.Array[Point] =
     tileMap.zipWithIndex.collect {
-      case (Some(tile), index)
-          if tile.isWall && explored.contains(pointFromIndex(index)) =>
+      case (Some(tile), index) if tile.isWall && explored.contains(pointFromIndex(index)) =>
         pointFromIndex(index)
     }.toJSArray
 
@@ -155,9 +154,7 @@ object GameMap:
         case l =>
           val lineOfSight = FOV.bresenhamLine(l.head, center).dropRight(1)
 
-          if lineOfSight.forall(pt =>
-              tiles.exists(t => t._2 == pt && !t._1.blockSight)
-            )
+          if lineOfSight.forall(pt => tiles.exists(t => t._2 == pt && !t._1.blockSight))
           then
             visibleTiles(
               l.drop(1),

@@ -136,10 +136,10 @@ object HostileComponent extends Component[Size, Hostile, HostilesManager.Hostile
 
     val radius: Double =
       hostile match
-        case h: Orc if h.isAlive   => (viewModel.squareSize.x * 0.25)
-        case _: Orc                => (viewModel.squareSize.x * 0.35)
-        case h: Troll if h.isAlive => (viewModel.squareSize.x * 0.4)
-        case _: Troll              => (viewModel.squareSize.x * 0.5)
+        case h: Orc if h.isAlive   => viewModel.squareSize.x * 0.25
+        case _: Orc                => viewModel.squareSize.x * 0.35
+        case h: Troll if h.isAlive => viewModel.squareSize.x * 0.4
+        case _: Troll              => viewModel.squareSize.x * 0.5
 
     val size =
       viewModel.hostilePositions.get(hostile.id) match

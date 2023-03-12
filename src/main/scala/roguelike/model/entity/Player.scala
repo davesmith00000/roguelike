@@ -83,7 +83,7 @@ final case class Player(
           .addGlobalEvents(
             GameEvent.PlayerAttack(
               name,
-              (fighter.power + inventory.equipment.powerBonus),
+              fighter.power + inventory.equipment.powerBonus,
               target.id
             ),
             GameEvent.PlayerTurnEnd

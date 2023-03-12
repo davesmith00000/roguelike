@@ -43,8 +43,7 @@ object GameSceneUpdate:
         .map(_.closeAllWindows)
 
     // Quit window toggle
-    case KeyboardEvent.KeyUp(KeyMapping.Quit1) |
-        KeyboardEvent.KeyUp(KeyMapping.Quit2)
+    case KeyboardEvent.KeyUp(KeyMapping.Quit1) | KeyboardEvent.KeyUp(KeyMapping.Quit2)
         if model.gameState.isWaitForInput =>
       WindowManager.updateModel(
         context,
@@ -61,20 +60,16 @@ object GameSceneUpdate:
       )
 
     // Looking around
-    case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
-        if model.gameState.lookingAround =>
+    case KeyboardEvent.KeyDown(KeyMapping.MoveUp) if model.gameState.lookingAround =>
       model.lookUp
 
-    case KeyboardEvent.KeyDown(KeyMapping.MoveDown)
-        if model.gameState.lookingAround =>
+    case KeyboardEvent.KeyDown(KeyMapping.MoveDown) if model.gameState.lookingAround =>
       model.lookDown
 
-    case KeyboardEvent.KeyDown(KeyMapping.MoveLeft)
-        if model.gameState.lookingAround =>
+    case KeyboardEvent.KeyDown(KeyMapping.MoveLeft) if model.gameState.lookingAround =>
       model.lookLeft
 
-    case KeyboardEvent.KeyDown(KeyMapping.MoveRight)
-        if model.gameState.lookingAround =>
+    case KeyboardEvent.KeyDown(KeyMapping.MoveRight) if model.gameState.lookingAround =>
       model.lookRight
 
     // Game controls
@@ -155,8 +150,7 @@ object GameSceneUpdate:
         if model.gameState.isWaitForInput || model.gameState.lookingAround =>
       Outcome(model.toggleLookAround(0))
 
-    case KeyboardEvent.KeyUp(KeyMapping.Target)
-        if model.gameState.lookingAround =>
+    case KeyboardEvent.KeyUp(KeyMapping.Target) if model.gameState.lookingAround =>
       Outcome(model.toggleLookAround(0))
         .addGlobalEvents(GameEvent.Targeted(model.lookAtTarget))
 

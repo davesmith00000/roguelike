@@ -36,8 +36,7 @@ final case class ButtonComponent(
 
   def withScale(scale: Int): ButtonComponent =
     copy(
-      hitArea =
-        hitArea.copy(area = hitArea.area.scaleBy(Vertex(scale.toDouble))),
+      hitArea = hitArea.copy(area = hitArea.area.scaleBy(Vertex(scale.toDouble))),
       scale = scale
     )
 

@@ -51,11 +51,9 @@ object FloatingMessage:
       }
 
     val newPosition: AutomatonSeedValues => Signal[Point] =
-      seed =>
-        Signal.product(multiplierS(seed), spawnPositionS(seed)) |> positionSF
+      seed => Signal.product(multiplierS(seed), spawnPositionS(seed)) |> positionSF
 
-    val signal
-        : SignalReader[(AutomatonSeedValues, SceneNode), AutomatonUpdate] =
+    val signal: SignalReader[(AutomatonSeedValues, SceneNode), AutomatonUpdate] =
       SignalReader { case (seed, sceneGraphNode) =>
         sceneGraphNode match
           case t: Text[_] =>

@@ -49,9 +49,8 @@ final case class HostilesPool(
           )
         )
 
-  /** Runs through the queued hostiles until it finds one that is alive,
-    * processes that one, and drops out. If it reaches the end of the list, it
-    * ends the NPC turn.
+  /** Runs through the queued hostiles until it finds one that is alive, processes that one, and
+    * drops out. If it reaches the end of the list, it ends the NPC turn.
     */
   def updateNextQueued(
       visibleTiles: Batch[Point],

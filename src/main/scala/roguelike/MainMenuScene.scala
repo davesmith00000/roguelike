@@ -146,7 +146,8 @@ object MainMenuHelper:
   val menuFadeInTime = Seconds(2)
   val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
 
-  val moveGroup: Group => SignalFunction[Point, Group] = g => SignalFunction(pt => g.withPosition(pt))
+  val moveGroup: Group => SignalFunction[Point, Group] = g =>
+    SignalFunction(pt => g.withPosition(pt))
 
   val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
     SignalFunction { d =>
@@ -161,7 +162,8 @@ object MainMenuHelper:
 
     }
 
-  val changeVolume: Track => SignalFunction[Double, Track] = t => SignalFunction(d => t.copy(volume = Volume.Max * d))
+  val changeVolume: Track => SignalFunction[Double, Track] = t =>
+    SignalFunction(d => t.copy(volume = Volume.Max * d))
 
   def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
     val graphic = Graphic(
