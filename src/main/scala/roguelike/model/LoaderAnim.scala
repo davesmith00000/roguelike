@@ -5,30 +5,15 @@ import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 
-object Loader:
+object LoaderAnim:
 
   val paddingToText = 72
 
-  def view(context: SceneContext[Size], state: LoadingState, viewportSize: Size): Group =
+  def present(context: SceneContext[Size], textCopy: String, viewportSize: Size): Group =
 
     val text =
       Text(
-        state match
-          case LoadingState.NotStarted =>
-            "Started loading..."
-
-          case LoadingState.InProgress(percent) =>
-            "Loaded..." + (percent match
-              case Some(p) => s"${p.toString}%"
-              case None    => ""
-            )
-
-          case LoadingState.Complete =>
-            "Loaded successfully!"
-
-          case LoadingState.Error(msg) =>
-            s"Error, some assets could not be loaded.\nError: $msg"
-        ,
+        textCopy,
         RoguelikeTiles.Size10x10.Fonts.fontKey,
         TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
       )
