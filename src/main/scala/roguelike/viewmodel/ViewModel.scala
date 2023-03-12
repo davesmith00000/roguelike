@@ -6,6 +6,7 @@ import indigo.shared.materials.Material.Bitmap
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.InventoryEvent
+import roguelike.NewGame
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
@@ -24,14 +25,14 @@ import roguelike.viewmodel.ui.*
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class ViewModel(game: GameViewModel, ui: UiViewModel)
+final case class ViewModel(game: GameViewModel, mainMenu: MainMenuUi)
 
 object ViewModel:
 
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(
       GameViewModel.initial(player, initialViewportSize),
-      GameUi()
+      MainMenuUi(Batch(NewGame))
     )
 
 final case class GameViewModel(
