@@ -82,14 +82,13 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       val menuMagnification = 2
 
       val mainMenu = {
-        if (model.loadInfo.loadedData.isDefined && viewModel.loadGame.isEmpty)
+        if model.loadInfo.loadedData.isDefined && viewModel.loadGame.isEmpty then
           MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
-        else
-          viewModel
+        else viewModel
       }
         .withScale(menuMagnification)
         .moveTo(
-          new Point(
+          Point(
             (halfWidth - (buttonSize * menuMagnification * 0.5)).toInt,
             200
           )
@@ -97,7 +96,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
       val newGame = mainMenu.newGame.update(context.mouse)
 
-      Outcome(mainMenu).merge(newGame)((vm, ng) => vm.copy(newGame = ng))
+      (Outcome(mainMenu), newGame).map2((vm, ng) => vm.copy(newGame = ng))
 
     case _ =>
       Outcome(viewModel)
@@ -134,15 +133,12 @@ object MainMenuHelper:
 
   val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
     SignalFunction { d =>
-      val material = l.blending.map(b => b.blendMaterial) match
-        case Some(m) => m
-        case None    => BlendMaterial.BlendEffects.None
+      val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
 
       material match
         case m: BlendMaterial.BlendEffects =>
           l.withBlendMaterial(m.withAlpha(d))
         case _ => l
-
     }
 
   val changeVolume: Track => SignalFunction[Double, Track] = t =>
@@ -168,18 +164,11 @@ object MainMenuHelper:
       )
     )
 
-    if (time >= 1.second)
-      graphic.modifyMaterial(_.withAlpha(1))
-    else
-      graphicTimeline.at(time)(graphic) match {
-        case Some(g) => g
-        case None    => graphic
-      }
+    if time >= 1.second then graphic.modifyMaterial(_.withAlpha(1))
+    else graphicTimeline.at(time)(graphic).getOrElse(graphic)
 
   def getTitle(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
-    // TODO: No need for the separate components.
-    val halfWidth         = viewportSize.width * 0.5
-    val halfHeight        = viewportSize.height * 0.5
+    val halfSize          = viewportSize * 0.5
     val textMagnification = 3
 
     val titleText = Text(
@@ -187,12 +176,12 @@ object MainMenuHelper:
       RoguelikeTiles.Size10x10.Fonts.fontKey,
       TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
     )
+
     val titleTextBound =
       boundaryLocator.textBounds(titleText)
-    val titleStart = Point(
-      (halfWidth - (titleTextBound.size.width * textMagnification * 0.5)).toInt,
-      (halfHeight - (titleTextBound.size.height * textMagnification * 0.5)).toInt
-    )
+
+    val titleStart =
+      (halfSize - (titleTextBound.size * textMagnification.toDouble * 0.5)).toPoint
 
     val group =
       Group(titleText)
@@ -209,10 +198,8 @@ object MainMenuHelper:
           }
         )
       )
-    titleAnimation.at(time)(group) match {
-      case Some(g) => g
-      case None    => Group.empty
-    }
+
+    titleAnimation.at(time)(group).getOrElse(Group.empty)
 
   def getMenu(time: Seconds, viewportSize: Size, model: Model, viewModel: MainMenuUi): Layer =
 
@@ -230,12 +217,11 @@ object MainMenuHelper:
         )
       )
 
-    menuAnimation.at(time)(
-      menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
-    ) match {
-      case Some(l) => l
-      case None    => Layer.empty
-    }
+    menuAnimation
+      .at(time)(
+        menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
+      )
+      .getOrElse(Layer.empty)
 
   def getMenuFragment(
       halfWidth: Double,
@@ -256,10 +242,7 @@ object MainMenuHelper:
       SceneAudioSource(
         BindingKey(GameAssets.MenuBackgroundAudio.toString),
         PlaybackPattern.SingleTrackLoop(
-          soundTimeline.at(time)(track) match {
-            case Some(t) => t
-            case None    => track
-          }
+          soundTimeline.at(time)(track).getOrElse(track)
         )
       )
     )
