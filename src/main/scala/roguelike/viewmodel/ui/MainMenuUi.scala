@@ -12,7 +12,7 @@ final case class MainMenuUi(
 ):
   val scale: Int = newGame.scale
 
-  def view(context: SceneContext[Size]): Batch[SceneNode] =
+  def view: Batch[SceneNode] =
     loadGame match {
       case Some(b) => newGame.draw ++ b.draw
       case None    => newGame.draw

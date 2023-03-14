@@ -37,8 +37,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     autoMovePath: Batch[Point],
     windowManager: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool,
-    sceneTime: SceneTime
+    hostiles: HostilesPool
 ):
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
@@ -461,8 +460,7 @@ object Model:
       Batch.empty,
       WindowManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty),
-      SceneTime(Seconds(0), false)
+      HostilesPool(Batch.empty)
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -514,8 +512,7 @@ object Model:
               Batch.empty,
               WindowManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles)),
-              SceneTime(Seconds(0), false)
+              HostilesPool(Batch.fromList(dungeon.hostiles))
             )
         }
       }

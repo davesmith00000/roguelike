@@ -13,7 +13,6 @@ import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.SceneTime
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.MainMenuUi
@@ -45,10 +44,6 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
-    case SceneEvent.SceneChange(_, _, _) =>
-      // TODO: Can this be replaced with the new scene time thingy?
-      Outcome(model.copy(sceneTime = SceneTime(Seconds(0), skip = false)))
-
     case NewGame =>
       Outcome(model)
         .addGlobalEvents(
@@ -67,24 +62,10 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
               SceneEvent.JumpTo(GameScene.name)
             )
 
-    case FrameTick =>
-      // TODO: Can this be replaced with the new scene time thingy?
-      if (model.sceneTime.time < MainMenuHelper.totalTime && model.sceneTime.skip == false)
-        Outcome(
-          model.copy(sceneTime = model.sceneTime.copy(time = model.sceneTime.time + context.delta))
-        )
-      else if (model.sceneTime.time >= MainMenuHelper.totalTime)
-        Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
-      else
-        Outcome(model)
-
-    case KeyboardEvent.KeyDown(_) if model.sceneTime.skip == false =>
-      Outcome(model.copy(sceneTime = model.sceneTime.copy(skip = true)))
-
-    case KeyboardEvent.KeyUp(Key.KEY_N) if model.sceneTime.skip == true =>
+    case KeyboardEvent.KeyUp(Key.KEY_N) =>
       Outcome(model).addGlobalEvents(NewGame)
 
-    case KeyboardEvent.KeyUp(Key.KEY_C) if model.sceneTime.skip == true =>
+    case KeyboardEvent.KeyUp(Key.KEY_C) =>
       Outcome(model).addGlobalEvents(LoadGame)
 
     case _ =>
@@ -126,15 +107,19 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       model: Model,
       viewModel: MainMenuUi
   ): Outcome[SceneUpdateFragment] =
+    val time            = context.sceneRunning
+    val viewportSize    = context.startUpData
+    val boundaryLocator = context.boundaryLocator
+
     Outcome(
       SceneUpdateFragment.empty
         .addLayer(
-          Layer(MainMenuHelper.getBackground(context))
-            .withBlendMaterial(InnerGlow(context.startUpData, RGBA(0, 0, 0, 0.5), 0.4))
+          Layer(MainMenuHelper.getBackground(time, viewportSize))
+            .withBlendMaterial(InnerGlow(viewportSize, RGBA(0, 0, 0, 0.5), 0.4))
         )
-        .addLayer(MainMenuHelper.getMenu(context, model, viewModel))
-        .addLayer(MainMenuHelper.getTitle(context, model.sceneTime.skip))
-        .withAudio(MainMenuHelper.getBackgroundAudio(context))
+        .addLayer(MainMenuHelper.getMenu(time, viewportSize, model, viewModel))
+        .addLayer(MainMenuHelper.getTitle(time, viewportSize, boundaryLocator))
+        .withAudio(MainMenuHelper.getBackgroundAudio(time))
     )
 
 object MainMenuHelper:
@@ -163,9 +148,9 @@ object MainMenuHelper:
   val changeVolume: Track => SignalFunction[Double, Track] = t =>
     SignalFunction(d => t.copy(volume = Volume.Max * d))
 
-  def getBackground(context: SceneContext[Size]): Graphic[Material.ImageEffects] =
+  def getBackground(time: Seconds, viewportSize: Size): Graphic[Material.ImageEffects] =
     val graphic = Graphic(
-      context.startUpData,
+      viewportSize,
       Material
         .Bitmap(GameAssets.MenuBg)
         .tile
@@ -173,7 +158,6 @@ object MainMenuHelper:
         .withAlpha(0)
     )
 
-    val time = context.running - context.sceneStartTime
     val graphicTimeline: Timeline[Graphic[Material.ImageEffects]] = timeline(
       layer(
         animate(1.seconds) { g =>
@@ -192,9 +176,10 @@ object MainMenuHelper:
         case None    => graphic
       }
 
-  def getTitle(context: SceneContext[Size], skipAnimations: Boolean): Group =
-    val halfWidth         = context.startUpData.width * 0.5
-    val halfHeight        = context.startUpData.height * 0.5
+  def getTitle(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
+    // TODO: No need for the separate components.
+    val halfWidth         = viewportSize.width * 0.5
+    val halfHeight        = viewportSize.height * 0.5
     val textMagnification = 3
 
     val titleText = Text(
@@ -203,7 +188,7 @@ object MainMenuHelper:
       TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
     )
     val titleTextBound =
-      context.boundaryLocator.textBounds(titleText)
+      boundaryLocator.textBounds(titleText)
     val titleStart = Point(
       (halfWidth - (titleTextBound.size.width * textMagnification * 0.5)).toInt,
       (halfHeight - (titleTextBound.size.height * textMagnification * 0.5)).toInt
@@ -214,56 +199,51 @@ object MainMenuHelper:
         .withScale(new Vector2(textMagnification, textMagnification))
         .withPosition(titleStart)
 
-    val time     = context.running - context.sceneStartTime
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
-    if (skipAnimations || time >= slideInTime) group.moveTo(titleEnd)
-    else
-      val titleAnimation: Timeline[Group] =
-        timeline(
-          layer(
-            animate(slideInTime) {
-              easeOut >>> lerp(titleStart, titleEnd) >>> moveGroup(_)
-            }
-          )
+    val titleAnimation: Timeline[Group] =
+      timeline(
+        layer(
+          animate(slideInTime) {
+            easeOut >>> lerp(titleStart, titleEnd) >>> moveGroup(_)
+          }
         )
-      titleAnimation.at(context.running - context.sceneStartTime)(group) match {
-        case Some(g) => g
-        case None    => Group.empty
-      }
+      )
+    titleAnimation.at(time)(group) match {
+      case Some(g) => g
+      case None    => Group.empty
+    }
 
-  def getMenu(context: SceneContext[Size], model: Model, viewModel: MainMenuUi): Layer =
+  def getMenu(time: Seconds, viewportSize: Size, model: Model, viewModel: MainMenuUi): Layer =
+
     val menuItems =
       getMenuFragment(
-        context,
-        context.startUpData.width * 0.5,
+        viewportSize.width * 0.5,
         viewModel
       )
-    if (model.sceneTime.skip) menuItems.withBlendMaterial(BlendMaterial.BlendEffects.None)
-    else
-      val menuAnimation: Timeline[Layer] =
-        timeline(
-          layer(
-            startAfter[Layer](6.seconds),
-            animate(2.seconds)(lerp >>> applyAlpha(_))
-          )
-        )
 
-      menuAnimation.at(context.running - context.sceneStartTime)(
-        menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
-      ) match {
-        case Some(l) => l
-        case None    => Layer.empty
-      }
+    val menuAnimation: Timeline[Layer] =
+      timeline(
+        layer(
+          startAfter[Layer](6.seconds),
+          animate(2.seconds)(lerp >>> applyAlpha(_))
+        )
+      )
+
+    menuAnimation.at(time)(
+      menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
+    ) match {
+      case Some(l) => l
+      case None    => Layer.empty
+    }
 
   def getMenuFragment(
-      context: SceneContext[Size],
       halfWidth: Double,
       viewModel: MainMenuUi
   ): Layer =
-    Layer(Group(viewModel.view(context)))
+    Layer(Group(viewModel.view))
 
-  def getBackgroundAudio(context: SceneContext[Size]): SceneAudio =
+  def getBackgroundAudio(time: Seconds): SceneAudio =
     val track = Track(GameAssets.MenuBackgroundAudio)
     val soundTimeline: Timeline[Track] =
       timeline(
@@ -276,11 +256,10 @@ object MainMenuHelper:
       SceneAudioSource(
         BindingKey(GameAssets.MenuBackgroundAudio.toString),
         PlaybackPattern.SingleTrackLoop(
-          track
-          // soundTimeline.at(context.running - context.sceneTime)(track) match {
-          //   case Some(t) => t
-          //   case None => track
-          // }
+          soundTimeline.at(time)(track) match {
+            case Some(t) => t
+            case None    => track
+          }
         )
       )
     )
