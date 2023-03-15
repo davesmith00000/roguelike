@@ -146,32 +146,32 @@ object MainMenuBackground:
 
 object MainMenuTitle:
 
+  val slideInTime       = Seconds(1)
+  val textMagnification = 3
+
+  val moveGroup: Group => SignalFunction[Point, Group] = g => SignalFunction(pt => g.moveTo(pt))
+
+  val titleText = Text(
+    "My Generic Roguelite",
+    RoguelikeTiles.Size10x10.Fonts.fontKey,
+    TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
+  )
+
+  val group =
+    Group(titleText)
+      .withScale(Vector2(textMagnification, textMagnification))
+
   def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
-    val slideInTime       = Seconds(4)
-    val halfSize          = viewportSize * 0.5
-    val textMagnification = 3
-
-    val moveGroup: Group => SignalFunction[Point, Group] = g =>
-      SignalFunction(pt => g.withPosition(pt))
-
-    val titleText = Text(
-      "My Generic Roguelite",
-      RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
-    )
-
-    val titleTextBound =
-      boundaryLocator.textBounds(titleText)
+    val halfSize       = viewportSize * 0.5
+    val titleTextBound = boundaryLocator.textBounds(titleText)
 
     val titleStart =
       (halfSize - (titleTextBound.size * textMagnification.toDouble * 0.5)).toPoint
 
-    val group =
-      Group(titleText)
-        .withScale(new Vector2(textMagnification, textMagnification))
-        .withPosition(titleStart)
-
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
+
+    val groupAtStart = group.moveTo(titleStart)
+    val groupAtEnd   = group.moveTo(titleEnd)
 
     val titleAnimation: Timeline[Group] =
       timeline(
@@ -182,7 +182,7 @@ object MainMenuTitle:
         )
       )
 
-    titleAnimation.at(time)(group).getOrElse(Group.empty)
+    titleAnimation.at(time)(groupAtStart).getOrElse(groupAtEnd)
 
 object MainMenuItems:
 
@@ -207,16 +207,18 @@ object MainMenuItems:
     val menuAnimation: Timeline[Layer] =
       timeline(
         layer(
-          startAfter[Layer](6.seconds),
-          animate(2.seconds)(lerp >>> applyAlpha(_))
+          startAfter[Layer](1.seconds),
+          animate(1.seconds)(lerp >>> applyAlpha(_))
         )
       )
 
-    menuAnimation
-      .at(time)(
-        menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
-      )
-      .getOrElse(Layer.empty)
+    if time > menuAnimation.duration then menuItems
+    else
+      menuAnimation
+        .at(time) {
+          menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
+        }
+        .getOrElse(Layer.empty)
 
   def getMenuFragment(
       halfWidth: Double,
@@ -225,24 +227,26 @@ object MainMenuItems:
     Layer(Group(viewModel.view))
 
 object MainMenuAudio:
+  val track = Track(GameAssets.MenuBackgroundAudio)
 
   val changeVolume: Track => SignalFunction[Double, Track] = t =>
     SignalFunction(d => t.copy(volume = Volume.Max * d))
 
-  def present(time: Seconds): SceneAudio =
-    val track = Track(GameAssets.MenuBackgroundAudio)
-    val soundTimeline: Timeline[Track] =
-      timeline(
-        layer(
-          animate(1.seconds)(lerp >>> changeVolume(_))
-        )
+  val soundTimeline: Timeline[Track] =
+    timeline(
+      layer(
+        animate(1.seconds)(lerp >>> changeVolume(_))
       )
+    )
 
+  def present(time: Seconds): SceneAudio =
     SceneAudio(
       SceneAudioSource(
         BindingKey(GameAssets.MenuBackgroundAudio.toString),
         PlaybackPattern.SingleTrackLoop(
-          soundTimeline.at(time)(track).getOrElse(track)
+          track
+          // TODO: We need some sort of "play forever" here
+          // soundTimeline.at(time)(track).getOrElse(track)
         )
       )
     )
