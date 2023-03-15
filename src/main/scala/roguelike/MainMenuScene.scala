@@ -113,48 +113,27 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
     Outcome(
       SceneUpdateFragment.empty
         .addLayer(
-          Layer(MainMenuHelper.getBackground(time, viewportSize))
+          Layer(MainMenuBackground.present(time, viewportSize))
             .withBlendMaterial(InnerGlow(viewportSize, RGBA(0, 0, 0, 0.5), 0.4))
         )
-        .addLayer(MainMenuHelper.getMenu(time, viewportSize, model, viewModel))
-        .addLayer(MainMenuHelper.getTitle(time, viewportSize, boundaryLocator))
-        .withAudio(MainMenuHelper.getBackgroundAudio(time))
+        .addLayer(MainMenuItems.present(time, viewportSize, model, viewModel))
+        .addLayer(MainMenuTitle.present(time, viewportSize, boundaryLocator))
+        .withAudio(MainMenuAudio.present(time))
     )
 
-object MainMenuHelper:
+object MainMenuBackground:
+  val graphic = Graphic(
+    Size(100),
+    Material
+      .Bitmap(GameAssets.MenuBg)
+      .tile
+      .toImageEffects
+  )
 
-  val slideInTime    = Seconds(4)
-  val titlePauseTime = Seconds(1)
-  val menuFadeInTime = Seconds(2)
-  val totalTime      = slideInTime + titlePauseTime + menuFadeInTime
+  def present(time: Seconds, viewportSize: Size): Graphic[Material.ImageEffects] =
+    val resized = graphic.withCrop(Rectangle(viewportSize))
 
-  val moveGroup: Group => SignalFunction[Point, Group] = g =>
-    SignalFunction(pt => g.withPosition(pt))
-
-  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
-    SignalFunction { d =>
-      val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
-
-      material match
-        case m: BlendMaterial.BlendEffects =>
-          l.withBlendMaterial(m.withAlpha(d))
-        case _ => l
-    }
-
-  val changeVolume: Track => SignalFunction[Double, Track] = t =>
-    SignalFunction(d => t.copy(volume = Volume.Max * d))
-
-  def getBackground(time: Seconds, viewportSize: Size): Graphic[Material.ImageEffects] =
-    val graphic = Graphic(
-      viewportSize,
-      Material
-        .Bitmap(GameAssets.MenuBg)
-        .tile
-        .toImageEffects
-        .withAlpha(0)
-    )
-
-    val graphicTimeline: Timeline[Graphic[Material.ImageEffects]] = timeline(
+    timeline[Graphic[Material.ImageEffects]](
       layer(
         animate(1.seconds) { g =>
           lerp >>> SignalFunction { d =>
@@ -162,14 +141,18 @@ object MainMenuHelper:
           }
         }
       )
-    )
+    ).at(time)(resized)
+      .getOrElse(resized)
 
-    if time >= 1.second then graphic.modifyMaterial(_.withAlpha(1))
-    else graphicTimeline.at(time)(graphic).getOrElse(graphic)
+object MainMenuTitle:
 
-  def getTitle(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
+  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
+    val slideInTime       = Seconds(4)
     val halfSize          = viewportSize * 0.5
     val textMagnification = 3
+
+    val moveGroup: Group => SignalFunction[Point, Group] = g =>
+      SignalFunction(pt => g.withPosition(pt))
 
     val titleText = Text(
       "My Generic Roguelite",
@@ -201,7 +184,19 @@ object MainMenuHelper:
 
     titleAnimation.at(time)(group).getOrElse(Group.empty)
 
-  def getMenu(time: Seconds, viewportSize: Size, model: Model, viewModel: MainMenuUi): Layer =
+object MainMenuItems:
+
+  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
+    SignalFunction { d =>
+      val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
+
+      material match
+        case m: BlendMaterial.BlendEffects =>
+          l.withBlendMaterial(m.withAlpha(d))
+        case _ => l
+    }
+
+  def present(time: Seconds, viewportSize: Size, model: Model, viewModel: MainMenuUi): Layer =
 
     val menuItems =
       getMenuFragment(
@@ -229,7 +224,12 @@ object MainMenuHelper:
   ): Layer =
     Layer(Group(viewModel.view))
 
-  def getBackgroundAudio(time: Seconds): SceneAudio =
+object MainMenuAudio:
+
+  val changeVolume: Track => SignalFunction[Double, Track] = t =>
+    SignalFunction(d => t.copy(volume = Volume.Max * d))
+
+  def present(time: Seconds): SceneAudio =
     val track = Track(GameAssets.MenuBackgroundAudio)
     val soundTimeline: Timeline[Track] =
       timeline(
