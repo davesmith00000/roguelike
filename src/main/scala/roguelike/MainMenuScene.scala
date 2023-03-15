@@ -246,7 +246,3 @@ object MainMenuHelper:
         )
       )
     )
-
-case object GenerateLevel extends GlobalEvent
-case object NewGame       extends GlobalEvent
-case object LoadGame      extends GlobalEvent

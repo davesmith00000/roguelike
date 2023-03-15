@@ -63,3 +63,7 @@ enum InventoryEvent:
 
 enum LoadEvent extends GlobalEvent:
   case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
+
+case object GenerateLevel extends GlobalEvent
+case object NewGame       extends GlobalEvent
+case object LoadGame      extends GlobalEvent
