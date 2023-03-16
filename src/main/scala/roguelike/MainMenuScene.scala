@@ -130,7 +130,7 @@ object MainMenuBackground:
       .toImageEffects
   )
 
-  def present(time: Seconds, viewportSize: Size): Graphic[Material.ImageEffects] =
+  def present(time: Seconds, viewportSize: Size): Batch[Graphic[Material.ImageEffects]] =
     val resized = graphic.withCrop(Rectangle(viewportSize))
 
     timeline[Graphic[Material.ImageEffects]](
@@ -141,8 +141,7 @@ object MainMenuBackground:
           }
         }
       )
-    ).at(time)(resized)
-      .getOrElse(resized)
+    ).atOrLast(time)(resized).toBatch
 
 object MainMenuTitle:
 
@@ -161,7 +160,7 @@ object MainMenuTitle:
     Group(titleText)
       .withScale(Vector2(textMagnification, textMagnification))
 
-  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Group =
+  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Batch[Group] =
     val halfSize       = viewportSize * 0.5
     val titleTextBound = boundaryLocator.textBounds(titleText)
 
@@ -182,7 +181,7 @@ object MainMenuTitle:
         )
       )
 
-    titleAnimation.at(time)(groupAtStart).getOrElse(groupAtEnd)
+    titleAnimation.atOrLast(time)(groupAtStart).toBatch
 
 object MainMenuItems:
 
@@ -215,10 +214,9 @@ object MainMenuItems:
     if time > menuAnimation.duration then menuItems
     else
       menuAnimation
-        .at(time) {
+        .atOrElse(time, Layer.empty) {
           menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
         }
-        .getOrElse(Layer.empty)
 
   def getMenuFragment(
       halfWidth: Double,
