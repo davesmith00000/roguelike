@@ -116,8 +116,10 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           Layer(MainMenuBackground.present(time, viewportSize))
             .withBlendMaterial(InnerGlow(viewportSize, RGBA(0, 0, 0, 0.5), 0.4))
         )
-        .addLayer(MainMenuItems.present(time, viewportSize, model, viewModel))
-        .addLayer(MainMenuTitle.present(time, viewportSize, boundaryLocator))
+        .addLayers(
+          MainMenuItems.present(time, viewportSize, model, viewModel) ++
+            MainMenuTitle.present(time, viewportSize, boundaryLocator)
+        )
         .withAudio(MainMenuAudio.present(time))
     )
 
@@ -145,7 +147,7 @@ object MainMenuBackground:
 
 object MainMenuTitle:
 
-  val slideInTime       = Seconds(1)
+  val slideInTime       = Seconds(1.5)
   val textMagnification = 3
 
   val moveGroup: Group => SignalFunction[Point, Group] = g => SignalFunction(pt => g.moveTo(pt))
@@ -160,7 +162,11 @@ object MainMenuTitle:
     Group(titleText)
       .withScale(Vector2(textMagnification, textMagnification))
 
-  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Batch[Group] =
+  def presentTitleText(
+      time: Seconds,
+      viewportSize: Size,
+      boundaryLocator: BoundaryLocator
+  ): Batch[Group] =
     val halfSize       = viewportSize * 0.5
     val titleTextBound = boundaryLocator.textBounds(titleText)
 
@@ -183,7 +189,59 @@ object MainMenuTitle:
 
     titleAnimation.atOrLast(time)(groupAtStart).toBatch
 
+  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Batch[Layer] =
+    MenuAnimFunctions
+      .layerFadeInAnimation(0.5.seconds, slideInTime)
+      .atOrLast(time) {
+        Layer(presentTitleText(time, viewportSize, boundaryLocator)).withBlendMaterial(BlendMaterial.BlendEffects(0))
+      }
+      .toBatch
+
 object MainMenuItems:
+
+  def menuItems(mainMenuUi: MainMenuUi): Layer =
+    Layer(Group(mainMenuUi.view)).withBlendMaterial(BlendMaterial.BlendEffects(0))
+
+  def present(
+      time: Seconds,
+      viewportSize: Size,
+      model: Model,
+      mainMenuUi: MainMenuUi
+  ): Batch[Layer] =
+    MenuAnimFunctions
+      .layerFadeInAnimation(1.5.second, 1.second)
+      .atOrLast(time) {
+        menuItems(mainMenuUi)
+      }
+      .toBatch
+
+object MainMenuAudio:
+  val track = Track(GameAssets.MenuBackgroundAudio)
+
+  val changeVolume: Track => SignalFunction[Double, Track] = t =>
+    SignalFunction { d =>
+      t.copy(volume = Volume(d))
+    }
+
+  val soundTimeline: Timeline[Track] =
+    timeline(
+      layer(
+        animate(1.seconds)(track => lerp >>> changeVolume(track))
+      )
+    )
+
+  def present(time: Seconds): SceneAudio =
+    SceneAudio(
+      SceneAudioSource(
+        BindingKey(GameAssets.MenuBackgroundAudio.toString),
+        PlaybackPattern.SingleTrackLoop(
+          track
+          // soundTimeline.atOrElse(time)(track) // Does not work...
+        )
+      )
+    )
+
+object MenuAnimFunctions:
 
   val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
     SignalFunction { d =>
@@ -195,56 +253,10 @@ object MainMenuItems:
         case _ => l
     }
 
-  def present(time: Seconds, viewportSize: Size, model: Model, viewModel: MainMenuUi): Layer =
-
-    val menuItems =
-      getMenuFragment(
-        viewportSize.width * 0.5,
-        viewModel
-      )
-
-    val menuAnimation: Timeline[Layer] =
-      timeline(
-        layer(
-          startAfter[Layer](1.seconds),
-          animate(1.seconds)(lerp >>> applyAlpha(_))
-        )
-      )
-
-    if time > menuAnimation.duration then menuItems
-    else
-      menuAnimation
-        .atOrElse(time, Layer.empty) {
-          menuItems.withBlendMaterial(BlendMaterial.BlendEffects(0))
-        }
-
-  def getMenuFragment(
-      halfWidth: Double,
-      viewModel: MainMenuUi
-  ): Layer =
-    Layer(Group(viewModel.view))
-
-object MainMenuAudio:
-  val track = Track(GameAssets.MenuBackgroundAudio)
-
-  val changeVolume: Track => SignalFunction[Double, Track] = t =>
-    SignalFunction(d => t.copy(volume = Volume.Max * d))
-
-  val soundTimeline: Timeline[Track] =
+  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer] =
     timeline(
       layer(
-        animate(1.seconds)(lerp >>> changeVolume(_))
-      )
-    )
-
-  def present(time: Seconds): SceneAudio =
-    SceneAudio(
-      SceneAudioSource(
-        BindingKey(GameAssets.MenuBackgroundAudio.toString),
-        PlaybackPattern.SingleTrackLoop(
-          track
-          // TODO: We need some sort of "play forever" here
-          // soundTimeline.at(time)(track).getOrElse(track)
-        )
+        startAfter[Layer](delay),
+        animate(over)(lerp >>> applyAlpha(_))
       )
     )
