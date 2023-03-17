@@ -193,7 +193,9 @@ object MainMenuTitle:
     MenuAnimFunctions
       .layerFadeInAnimation(0.5.seconds, slideInTime)
       .atOrLast(time) {
-        Layer(presentTitleText(time, viewportSize, boundaryLocator)).withBlendMaterial(BlendMaterial.BlendEffects(0))
+        Layer(presentTitleText(time, viewportSize, boundaryLocator)).withBlendMaterial(
+          BlendMaterial.BlendEffects(0)
+        )
       }
       .toBatch
 
@@ -226,7 +228,7 @@ object MainMenuAudio:
   val soundTimeline: Timeline[Track] =
     timeline(
       layer(
-        animate(1.seconds)(track => lerp >>> changeVolume(track))
+        animate(2.seconds)(track => lerp >>> changeVolume(track))
       )
     )
 
@@ -235,8 +237,7 @@ object MainMenuAudio:
       SceneAudioSource(
         BindingKey(GameAssets.MenuBackgroundAudio.toString),
         PlaybackPattern.SingleTrackLoop(
-          track
-          // soundTimeline.atOrElse(time)(track) // Does not work...
+          soundTimeline.atOrElse(time)(track)
         )
       )
     )
