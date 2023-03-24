@@ -102,7 +102,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       val gameSprite: Option[GameSprites] =
         player.map { plr =>
           GameSprites(
-            player = plr
+            player = plr.withRef(13, 28)
           )
         }
 
