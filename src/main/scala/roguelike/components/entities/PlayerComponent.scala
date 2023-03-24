@@ -16,6 +16,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.Consumables
 import roguelike.model.items.Item
+import roguelike.viewmodel.ActorMoveState
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
 
@@ -37,7 +38,6 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
           vm.playerPosition,
           vm.squareSize,
           vm.sprites.map(_.player)
-          /*, vm.phase*/
         ),
       (vm, p) => vm.copy(playerPosition = p.playerPosition)
     )
@@ -108,10 +108,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
               )
           } yield viewModel.copy(
             playerPosition = pp,
-            sprite = viewModel.sprite.map {
-              _.changeCycle(CycleLabel("Idle"))
-                .play()
-            }
+            sprite = viewModel.sprite
           )
 
         case _ =>
@@ -128,21 +125,41 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     val radius =
       ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
 
-    val graphic =
-      Clip(
-        Point(0),
-        Size(32),
-        ClipSheet(4, Seconds(0.25)),
-        Material.Bitmap(GameAssets.Loader)
-      ).withRef(16, 30)
+    val playerCycle: CycleLabel =
+      viewModel.playerPosition.state match
+        case ActorMoveState.Idle           => PlayerVM.IdleCycle
+        case ActorMoveState.MovingUp       => PlayerVM.WalkCycle
+        case ActorMoveState.MovingDown     => PlayerVM.WalkCycle
+        case ActorMoveState.MovingLeft     => PlayerVM.WalkCycle
+        case ActorMoveState.MovingRight    => PlayerVM.WalkCycle
+        case ActorMoveState.AttackingUp    => PlayerVM.AttackCycle
+        case ActorMoveState.AttackingDown  => PlayerVM.AttackCycle
+        case ActorMoveState.AttackingLeft  => PlayerVM.AttackCycle
+        case ActorMoveState.AttackingRight => PlayerVM.AttackCycle
 
     val player: Outcome[Sprite[Bitmap]] =
-      viewModel.sprite match
-        case None => Outcome.raiseError(new Exception("Player sprite missing."))
+      viewModel.sprite match // TODO: Can we not do this match every frame?!?
         case Some(plr) =>
-          Outcome(
-            plr.moveTo(viewModel.playerPosition.moving(viewModel.squareSize) - Point(50))
-          )
+          val p =
+            plr
+              .moveTo(viewModel.playerPosition.moving(viewModel.squareSize))
+              .changeCycle(playerCycle)
+              .play()
+
+          // TODO: This is poor, we need the state to be stored between frames so that we can stay flipped.
+          viewModel.playerPosition.state match
+            case ActorMoveState.Idle           => Outcome(p)
+            case ActorMoveState.MovingUp       => Outcome(p)
+            case ActorMoveState.MovingDown     => Outcome(p)
+            case ActorMoveState.MovingLeft     => Outcome(p.flipHorizontal(true))
+            case ActorMoveState.MovingRight    => Outcome(p)
+            case ActorMoveState.AttackingUp    => Outcome(p)
+            case ActorMoveState.AttackingDown  => Outcome(p)
+            case ActorMoveState.AttackingLeft  => Outcome(p.flipHorizontal(true))
+            case ActorMoveState.AttackingRight => Outcome(p)
+
+        case None =>
+          Outcome.raiseError(new Exception("Player sprite missing."))
 
     player.map { plr =>
       Batch(
@@ -152,7 +169,6 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
           Fill.Color(RGBA.Black.withAlpha(0.5)),
           Stroke.None
         ),
-        graphic.moveTo(viewModel.playerPosition.moving(viewModel.squareSize)),
         plr
       )
     }
@@ -211,6 +227,12 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       squareSize: Point,
       sprite: Option[Sprite[Bitmap]]
   )
+  object PlayerVM:
+    val PlayerCycle: CycleLabel = CycleLabel("Player")
+    val IdleCycle: CycleLabel   = CycleLabel("Idle")
+    val WalkCycle: CycleLabel   = CycleLabel("walk")
+    val AttackCycle: CycleLabel = CycleLabel("attack")
+    val HitCycle: CycleLabel    = CycleLabel("hit")
 
   enum Cmds:
     case Update

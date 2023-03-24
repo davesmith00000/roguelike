@@ -21,6 +21,14 @@ final case class ActorPosition(
     timeElapsed: Seconds,
     animationDuration: Seconds
 ):
+  val state: ActorMoveState =
+    if attacking > 0.0 && target == fromPosition then ActorMoveState.AttackingRight // TODO
+    else if target.y < fromPosition.y then ActorMoveState.MovingUp
+    else if target.y > fromPosition.y then ActorMoveState.MovingDown
+    else if target.x < fromPosition.x then ActorMoveState.MovingLeft
+    else if target.x > fromPosition.x then ActorMoveState.MovingRight
+    else ActorMoveState.Idle
+
   def next(
       timeDelta: Seconds,
       currentTarget: Point,
@@ -73,3 +81,14 @@ object ActorPosition:
       Seconds.zero,
       animationDuration
     )
+
+enum ActorMoveState:
+  case Idle
+  case MovingUp
+  case MovingDown
+  case MovingLeft
+  case MovingRight
+  case AttackingUp
+  case AttackingDown
+  case AttackingLeft
+  case AttackingRight
