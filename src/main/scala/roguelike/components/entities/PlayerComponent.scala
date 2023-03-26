@@ -16,6 +16,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.Consumables
 import roguelike.model.items.Item
+import roguelike.viewmodel.ActorDirection
 import roguelike.viewmodel.ActorMoveState
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
@@ -127,15 +128,9 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
     val playerCycle: CycleLabel =
       viewModel.playerPosition.state match
-        case ActorMoveState.Idle           => PlayerVM.IdleCycle
-        case ActorMoveState.MovingUp       => PlayerVM.WalkCycle
-        case ActorMoveState.MovingDown     => PlayerVM.WalkCycle
-        case ActorMoveState.MovingLeft     => PlayerVM.WalkCycle
-        case ActorMoveState.MovingRight    => PlayerVM.WalkCycle
-        case ActorMoveState.AttackingUp    => PlayerVM.AttackCycle
-        case ActorMoveState.AttackingDown  => PlayerVM.AttackCycle
-        case ActorMoveState.AttackingLeft  => PlayerVM.AttackCycle
-        case ActorMoveState.AttackingRight => PlayerVM.AttackCycle
+        case ActorMoveState.Idle      => PlayerVM.IdleCycle
+        case ActorMoveState.Moving    => PlayerVM.WalkCycle
+        case ActorMoveState.Attacking => PlayerVM.AttackCycle
 
     val player: Outcome[Sprite[Bitmap]] =
       viewModel.sprite match // TODO: Can we not do this match every frame?!?
@@ -146,17 +141,11 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
               .changeCycle(playerCycle)
               .play()
 
-          // TODO: This is poor, we need the state to be stored between frames so that we can stay flipped.
-          viewModel.playerPosition.state match
-            case ActorMoveState.Idle           => Outcome(p)
-            case ActorMoveState.MovingUp       => Outcome(p)
-            case ActorMoveState.MovingDown     => Outcome(p)
-            case ActorMoveState.MovingLeft     => Outcome(p.flipHorizontal(true))
-            case ActorMoveState.MovingRight    => Outcome(p)
-            case ActorMoveState.AttackingUp    => Outcome(p)
-            case ActorMoveState.AttackingDown  => Outcome(p)
-            case ActorMoveState.AttackingLeft  => Outcome(p.flipHorizontal(true))
-            case ActorMoveState.AttackingRight => Outcome(p)
+          viewModel.playerPosition.facing match
+            case ActorDirection.Up    => Outcome(p)
+            case ActorDirection.Down  => Outcome(p)
+            case ActorDirection.Left  => Outcome(p.flipHorizontal(true))
+            case ActorDirection.Right => Outcome(p)
 
         case None =>
           Outcome.raiseError(new Exception("Player sprite missing."))
