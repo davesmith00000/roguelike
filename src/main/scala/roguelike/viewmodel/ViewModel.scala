@@ -223,7 +223,7 @@ final case class GameViewModel(
 
 object GameViewModel:
 
-  val SquareSize: Point = Point(24)
+  val SquareSize: Point = Point(32)
 
   def initial(player: Player, initialViewportSize: Size): GameViewModel =
     val separator = " | "

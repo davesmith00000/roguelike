@@ -41,32 +41,32 @@ object GameView:
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
 
+    val (visible, invisible) = viewModel.tiles
+      .map { p =>
+        val pos = (p._2 * viewModel.squareSize) - (viewModel.squareSize / 2)
+        (p._1, pos, model.gameMap.visible.contains(p._2))
+      }
+      .partition(_._3)
+
     val gameGridData: Batch[CloneTileData] =
-      viewModel.tiles
-        .map { p =>
-          val pos = (p._2 * viewModel.squareSize) - (viewModel.squareSize / 2)
-          p._1 match
-            case GameTile.Wall if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.wallTile(pos)
+      visible.map {
+        case (GameTile.Wall, pos, _)       => GameGraphics.wallTile(pos)
+        case (GameTile.Ground, pos, _)     => GameGraphics.floorTile(pos)
+        case (GameTile.DownStairs, pos, _) => GameGraphics.stairsTile(pos)
+      }
 
-            case GameTile.Wall =>
-              GameGraphics.wallInShadowTile(pos)
-
-            case GameTile.Ground if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.floorTile(pos)
-
-            case GameTile.Ground =>
-              GameGraphics.floorInShadowTile(pos)
-
-            case GameTile.DownStairs if model.gameMap.visible.contains(p._2) =>
-              GameGraphics.stairsTile(pos)
-
-            case GameTile.DownStairs =>
-              GameGraphics.stairsInShadowTile(pos)
-        }
+    val gameGridShadowData: Batch[CloneTileData] =
+      invisible.map {
+        case (GameTile.Wall, pos, _)       => GameGraphics.wallTile(pos)
+        case (GameTile.Ground, pos, _)     => GameGraphics.floorTile(pos)
+        case (GameTile.DownStairs, pos, _) => GameGraphics.stairsTile(pos)
+      }
 
     val gameGrid: Batch[CloneTiles] =
-      Batch(CloneTiles(GameGraphics.tileClone.id, gameGridData))
+      Batch(
+        CloneTiles(GameGraphics.tileShadowClone.id, gameGridShadowData),
+        CloneTiles(GameGraphics.tileClone.id, gameGridData)
+      )
 
     val hover =
       Batch(
@@ -213,6 +213,6 @@ object GameView:
           ) ++ windows
         )
       ).addCloneBlanks(
-        GameGraphics.tileClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
+        GameGraphics.tileClone :: GameGraphics.tileShadowClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
       )
     }

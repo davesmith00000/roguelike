@@ -7,39 +7,31 @@ object GameGraphics:
   val tileClone: CloneBlank =
     CloneBlank(
       CloneId("rogue bg tiles"),
-      Graphic(24, 24, Material.Bitmap(GameAssets.Icons))
+      Graphic(32, 32, Material.Bitmap(GameAssets.Tileset))
+    )
+
+  val tileShadowClone: CloneBlank =
+    CloneBlank(
+      CloneId("rogue bg shadow tiles"),
+      Graphic(
+        32,
+        32,
+        Material
+          .Bitmap(GameAssets.Tileset)
+          .toImageEffects
+          .withOverlay(Fill.Color(RGBA.Black.withAmount(0.7)))
+      )
     )
 
   // Bg tiles
-  val wall: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(0, 0, 24, 24)
-  val wallInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(24, 0, 24, 24)
-
-  val floor: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(0, 24, 24, 24)
-  val floorInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(24, 24, 24, 24)
-
-  val stairs: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(48, 0, 24, 24)
-  val stairsInShadow: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(48, 24, 24, 24)
-
   def wallTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 0, 0, 24, 24)
-  def wallInShadowTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 24, 0, 24, 24)
+    CloneTileData(position.x, position.y, 0, 96, 32, 32)
 
   def floorTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 0, 24, 24, 24)
-  def floorInShadowTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 24, 24, 24, 24)
+    CloneTileData(position.x, position.y, 384, 0, 32, 32)
 
   def stairsTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 48, 0, 24, 24)
-  def stairsInShadowTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 48, 24, 24, 24)
+    CloneTileData(position.x, position.y, 32, 288, 32, 32)
 
   //
 
