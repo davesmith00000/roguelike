@@ -45,7 +45,7 @@ class GameMapTests extends munit.FunSuite {
     val gameMap =
       GameMap
         .initial(Size(5, 7))
-        .insert(walkable.map(pt => pt -> GameTile.Ground))
+        .insert(walkable.map(pt => pt -> GameTile.Ground(0)))
 
     val possiblePaths: List[List[Point]] =
       List(
@@ -129,13 +129,13 @@ class GameMapTests extends munit.FunSuite {
     val gameMap =
       GameMap
         .initial(mapSize)
-        .insert(Point(0, 0), GameTile.Wall)   // Out
-        .insert(Point(0, 2), GameTile.Wall)   // Out
-        .insert(Point(1, 3), GameTile.Wall)   // In
-        .insert(Point(2, 2), GameTile.Ground) // In
-        .insert(Point(2, 4), GameTile.Wall)   // Out
-        .insert(Point(3, 1), GameTile.Wall)   // Out
-        .insert(Point(4, 4), GameTile.Wall)   // Out
+        .insert(Point(0, 0), GameTile.Wall)      // Out
+        .insert(Point(0, 2), GameTile.Wall)      // Out
+        .insert(Point(1, 3), GameTile.Wall)      // In
+        .insert(Point(2, 2), GameTile.Ground(0)) // In
+        .insert(Point(2, 4), GameTile.Wall)      // Out
+        .insert(Point(3, 1), GameTile.Wall)      // Out
+        .insert(Point(4, 4), GameTile.Wall)      // Out
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
@@ -143,7 +143,7 @@ class GameMapTests extends munit.FunSuite {
     val expected =
       js.Array[(Point, GameTile)](
         (Point(1, 3), GameTile.Wall),
-        (Point(2, 2), GameTile.Ground)
+        (Point(2, 2), GameTile.Ground(0))
       )
 
     assert(actual.length == expected.length)
