@@ -43,30 +43,18 @@ final case class ButtonComponent(
   def update(mouse: Mouse) =
     hitArea.update(mouse).map(ha => this.copy(hitArea = ha))
 
-  def draw: Batch[Group] =
+  def draw(textColor: RGB, shadowColor: RGB): Batch[Group] =
+    val t =
+      Text(
+        text,
+        RoguelikeTiles.Size10x10.Fonts.fontKey,
+        TerminalText(GameAssets.TileMap, textColor, RGBA.Zero)
+      ).alignCenter
+        .moveTo(Point((width * 0.5).toInt, 4))
     Batch(
       Group(
-        Graphic(16, 16, Material.Bitmap(GameAssets.UI))
-          .withCrop(108, 308, 16, 16)
-          .withScale(Vector2(ButtonComponent.multiplier)),
-        Graphic(
-          width - (tileWidth * 2),
-          16,
-          Material.Bitmap(GameAssets.UI).tile
-        )
-          .withCrop(126, 308, 16, 16)
-          .moveTo(Point(tileWidth, 0))
-          .withScale(Vector2(ButtonComponent.multiplier)),
-        Graphic(16, 16, Material.Bitmap(GameAssets.UI))
-          .withCrop(144, 308, 16, 16)
-          .moveTo(Point(width - tileWidth, 0))
-          .withScale(Vector2(ButtonComponent.multiplier)),
-        Text(
-          text,
-          RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
-        ).alignCenter
-          .moveTo(Point((width * 0.5).toInt, 4))
+        t.withMaterial(TerminalText(GameAssets.TileMap, shadowColor, RGBA.Zero)).moveBy(Point(1)),
+        t
       ).moveTo(position)
         .scaleBy(Vector2(scale))
     )

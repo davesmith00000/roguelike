@@ -32,7 +32,7 @@ object ViewModel:
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(
       GameViewModel.initial(player, initialViewportSize),
-      MainMenuUi(Batch(NewGame))
+      MainMenuUi(Batch(NewGame), Batch.empty, false)
     )
 
 final case class GameViewModel(

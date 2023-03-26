@@ -82,8 +82,8 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       val menuMagnification = 2
 
       val mainMenu = {
-        if model.loadInfo.loadedData.isDefined && viewModel.loadGame.isEmpty then
-          MainMenuUi(Batch(NewGame), Some(Batch(LoadGame)))
+        if model.loadInfo.loadedData.isDefined then
+          MainMenuUi(Batch(NewGame), Batch(LoadGame), true)
         else viewModel
       }
         .withScale(menuMagnification)
