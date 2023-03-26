@@ -100,20 +100,24 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     case Cmds.Update =>
       model.gameState match
         case GameState.UpdatingPlayer =>
-          for {
-            pp <- viewModel.playerPosition
-              .next(
-                context.delta,
-                model.player.position,
-                GameEvent.PlayerMoveComplete
+          viewModel.playerPosition
+            .next(
+              context.delta,
+              model.player.position,
+              GameEvent.PlayerMoveComplete
+            )
+            .map { pp =>
+              viewModel.copy(
+                playerPosition = pp
               )
-          } yield viewModel.copy(
-            playerPosition = pp,
-            sprite = viewModel.sprite
-          )
+            }
 
         case _ =>
-          Outcome(viewModel)
+          viewModel.playerPosition.tidyUp.map { pp =>
+            viewModel.copy(
+              playerPosition = pp
+            )
+          }
 
     case _ =>
       Outcome(viewModel)

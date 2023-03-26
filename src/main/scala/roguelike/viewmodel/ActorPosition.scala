@@ -53,6 +53,14 @@ final case class ActorPosition(
       if moveIsComplete then Batch(onCompleteEvent) else Batch.empty
     )
 
+  def tidyUp: Outcome[ActorPosition] =
+    Outcome(
+      this.copy(
+        fromPosition = target,
+        timeElapsed = Seconds.zero
+      )
+    )
+
   def moving(squareSize: Point): Point =
     Signal
       .Lerp(fromPosition * squareSize, target * squareSize, animationDuration)
