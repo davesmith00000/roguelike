@@ -122,13 +122,18 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     case _ =>
       Outcome(viewModel)
 
+  val lookRightRefOffset: Point = Point(13, 28)
+  val lookLeftRefOffset: Point = Point(19, 28)
+  val shadowSquash = Vector2(0.9, 0.5)
+  val shadowOffset = Point(0, 7)
+
   def view(
       context: SceneContext[Size],
       model: PlayerM,
       viewModel: PlayerVM
   ): Outcome[Batch[SceneNode]] =
     val radius =
-      ((viewModel.squareSize.x / 2.5d) * (viewModel.playerPosition.attacking + 1.0)).toInt
+      ((viewModel.squareSize.x / 2.5d) * ((viewModel.playerPosition.attacking * 0.75) + 1.0)).toInt
 
     val playerCycle: CycleLabel =
       viewModel.playerPosition.state match
@@ -148,8 +153,8 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
           viewModel.playerPosition.facing match
             case ActorDirection.Up    => Outcome(p)
             case ActorDirection.Down  => Outcome(p)
-            case ActorDirection.Left  => Outcome(p.flipHorizontal(true))
-            case ActorDirection.Right => Outcome(p)
+            case ActorDirection.Left  => Outcome(p.withRef(lookLeftRefOffset).flipHorizontal(true))
+            case ActorDirection.Right => Outcome(p.withRef(lookRightRefOffset))
 
         case None =>
           Outcome.raiseError(new Exception("Player sprite missing."))
@@ -157,11 +162,11 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
     player.map { plr =>
       Batch(
         Shape.Circle(
-          viewModel.playerPosition.moving(viewModel.squareSize),
+          viewModel.playerPosition.moving(viewModel.squareSize) + shadowOffset,
           radius,
           Fill.Color(RGBA.Black.withAlpha(0.5)),
           Stroke.None
-        ),
+        ).withScale(shadowSquash),
         plr
       )
     }
