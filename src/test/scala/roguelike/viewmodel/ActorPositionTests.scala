@@ -8,7 +8,7 @@ class ActorPositionTests extends munit.FunSuite {
 
   test("Does not move if arrived at target") {
     val actorPosition =
-      ActorPosition(Point(10), Point(10), Seconds.zero, Seconds(1))
+      ActorPosition(Point(10), Point(10), Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
@@ -25,7 +25,7 @@ class ActorPositionTests extends munit.FunSuite {
     val target = Point(1)
 
     val actorPosition =
-      ActorPosition(Point(0), target, Seconds.zero, Seconds(1))
+      ActorPosition(Point(0), target, Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
@@ -43,7 +43,7 @@ class ActorPositionTests extends munit.FunSuite {
     val current = Point(0)
     val target  = Point(1)
     val actorPosition =
-      ActorPosition(current, target, Seconds.zero, Seconds(1))
+      ActorPosition(current, target, Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
@@ -61,7 +61,7 @@ class ActorPositionTests extends munit.FunSuite {
     val current = Point(0, 1)
     val target  = Point(1, 1)
     val actorPosition =
-      ActorPosition(current, target, Seconds.zero, Seconds(1))
+      ActorPosition(current, target, Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
@@ -79,7 +79,7 @@ class ActorPositionTests extends munit.FunSuite {
     val current = Point(2)
     val target  = Point(1)
     val actorPosition =
-      ActorPosition(current, target, Seconds.zero, Seconds(1))
+      ActorPosition(current, target, Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
@@ -97,7 +97,7 @@ class ActorPositionTests extends munit.FunSuite {
     val current = Point(0)
     val target  = Point(5)
     val actorPosition =
-      ActorPosition(current, target, Seconds.zero, Seconds(1))
+      ActorPosition(current, target, Seconds.zero, Seconds(1), ActorDirection.Right)
 
     val actual =
       actorPosition
