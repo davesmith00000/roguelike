@@ -192,26 +192,20 @@ object DungeonGen:
         Nil
     }.distinct
 
-  def createRoom(rect: Rectangle): List[(Point, GameTile)] =
+  def createRoom(dice: Dice, rect: Rectangle): List[(Point, GameTile)] =
     (rect.top + 1 until rect.bottom).flatMap { y =>
       (rect.left + 1 until rect.right).map { x =>
         val tile =
           if x == rect.left + 1 || x == rect.right - 1 then GameTile.Wall
           else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall
-          else GameTile.Ground
+          else GameTile.Ground(dice.rollFromZero(7))
 
         (Point(x, y), tile)
       }
     }.toList
-  def createRoom(
-      x: Int,
-      y: Int,
-      width: Int,
-      height: Int
-  ): List[(Point, GameTile)] =
-    createRoom(Rectangle(x, y, width, height))
 
   def createHorizontalTunnel(
+      dice: Dice,
       x1: Int,
       x2: Int,
       y: Int
@@ -226,7 +220,7 @@ object DungeonGen:
         ) ++
           List(
             (Point(x, y - 1), GameTile.Wall),
-            (Point(x, y), GameTile.Ground),
+            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
             (Point(x, y + 1), GameTile.Wall)
           )
       else if x == end then
@@ -236,18 +230,18 @@ object DungeonGen:
         ) ++
           List(
             (Point(x, y - 1), GameTile.Wall),
-            (Point(x, y), GameTile.Ground),
+            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
             (Point(x, y + 1), GameTile.Wall)
           )
       else
         List(
           (Point(x, y - 1), GameTile.Wall),
-          (Point(x, y), GameTile.Ground),
+          (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
           (Point(x, y + 1), GameTile.Wall)
         )
     }
 
-  def createVerticalTunnel(y1: Int, y2: Int, x: Int): List[(Point, GameTile)] =
+  def createVerticalTunnel(dice: Dice, y1: Int, y2: Int, x: Int): List[(Point, GameTile)] =
     val start = Math.min(y1, y2)
     val end   = Math.max(y1, y2)
     (start to end).toList.flatMap { y =>
@@ -258,7 +252,7 @@ object DungeonGen:
         ) ++
           List(
             (Point(x - 1, y), GameTile.Wall),
-            (Point(x, y), GameTile.Ground),
+            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
             (Point(x + 1, y), GameTile.Wall)
           )
       else if y == end then
@@ -268,13 +262,13 @@ object DungeonGen:
         ) ++
           List(
             (Point(x - 1, y), GameTile.Wall),
-            (Point(x, y), GameTile.Ground),
+            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
             (Point(x + 1, y), GameTile.Wall)
           )
       else
         List(
           (Point(x - 1, y), GameTile.Wall),
-          (Point(x, y), GameTile.Ground),
+          (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
           (Point(x + 1, y), GameTile.Wall)
         )
     }
@@ -380,7 +374,7 @@ object DungeonGen:
             stairsPosition
           )
         else
-          val newRoomTiles = createRoom(newRoom)
+          val newRoomTiles = createRoom(dice, newRoom)
           val roomCenter   = newRoom.center
           val roomHostiles =
             if numOfRooms == 0 then Nil
@@ -412,11 +406,11 @@ object DungeonGen:
 
               case Some(prev) =>
                 if dice.roll(2) == 1 then
-                  createHorizontalTunnel(prev.x, roomCenter.x, prev.y) ++
-                    createVerticalTunnel(prev.y, roomCenter.y, roomCenter.x)
+                  createHorizontalTunnel(dice, prev.x, roomCenter.x, prev.y) ++
+                    createVerticalTunnel(dice, prev.y, roomCenter.y, roomCenter.x)
                 else
-                  createVerticalTunnel(prev.y, roomCenter.y, prev.x) ++
-                    createHorizontalTunnel(prev.x, roomCenter.x, roomCenter.y)
+                  createVerticalTunnel(dice, prev.y, roomCenter.y, prev.x) ++
+                    createHorizontalTunnel(dice, prev.x, roomCenter.x, roomCenter.y)
 
           rec(
             numOfRooms + 1,

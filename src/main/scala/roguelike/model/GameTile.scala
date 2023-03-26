@@ -20,7 +20,7 @@ object GameTile:
     val isGround: Boolean     = false
     val isWall: Boolean       = true
 
-  case object Ground extends GameTile:
+  final case class Ground(style: Int) extends GameTile:
     val blocked: Boolean      = false
     val blockSight: Boolean   = false
     val isDownStairs: Boolean = false
@@ -35,7 +35,7 @@ object GameTile:
     val isWall: Boolean       = false
 
   val scoreAs: GameTile => Int = {
-    case Ground     => 1
+    case Ground(_)  => 1
     case DownStairs => 5
     case Wall       => Int.MaxValue
   }
@@ -48,9 +48,9 @@ object GameTile:
             ("tileType", Json.fromString("w"))
           )
 
-        case Ground =>
+        case Ground(style) =>
           Json.obj(
-            ("tileType", Json.fromString("g"))
+            ("tileType", Json.fromString("g" + style.toString))
           )
 
         case DownStairs =>
@@ -65,8 +65,9 @@ object GameTile:
         case "w" =>
           Right(Wall)
 
-        case "g" =>
-          Right(Ground)
+        case s if s.startsWith("g") =>
+          val style = s.drop(1).toInt
+          Right(Ground(style))
 
         case "s" =>
           Right(DownStairs)

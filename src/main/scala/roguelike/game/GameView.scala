@@ -50,16 +50,16 @@ object GameView:
 
     val gameGridData: Batch[CloneTileData] =
       visible.map {
-        case (GameTile.Wall, pos, _)       => GameGraphics.wallTile(pos)
-        case (GameTile.Ground, pos, _)     => GameGraphics.floorTile(pos)
-        case (GameTile.DownStairs, pos, _) => GameGraphics.stairsTile(pos)
+        case (GameTile.Wall, pos, _)          => GameGraphics.wallTile(pos)
+        case (GameTile.Ground(style), pos, _) => GameGraphics.floorTile(style, pos)
+        case (GameTile.DownStairs, pos, _)    => GameGraphics.stairsTile(pos)
       }
 
     val gameGridShadowData: Batch[CloneTileData] =
       invisible.map {
-        case (GameTile.Wall, pos, _)       => GameGraphics.wallTile(pos)
-        case (GameTile.Ground, pos, _)     => GameGraphics.floorTile(pos)
-        case (GameTile.DownStairs, pos, _) => GameGraphics.stairsTile(pos)
+        case (GameTile.Wall, pos, _)          => GameGraphics.wallTile(pos)
+        case (GameTile.Ground(style), pos, _) => GameGraphics.floorTile(style, pos)
+        case (GameTile.DownStairs, pos, _)    => GameGraphics.stairsTile(pos)
       }
 
     val gameGrid: Batch[CloneTiles] =

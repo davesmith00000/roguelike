@@ -27,8 +27,19 @@ object GameGraphics:
   def wallTile(position: Point): CloneTileData =
     CloneTileData(position.x, position.y, 0, 96, 32, 32)
 
-  def floorTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 384, 0, 32, 32)
+  def floorTile(style: Int, position: Point): CloneTileData =
+    val startX = 384
+    val startY = 0
+    style match
+      case 1 => CloneTileData(position.x, position.y, startX + 32, startY, 32, 32)
+      case 2 => CloneTileData(position.x, position.y, startX + 32 + 32, startY, 32, 32)
+      case 3 => CloneTileData(position.x, position.y, startX + 32 + 32 + 32, startY, 32, 32)
+      case 4 => CloneTileData(position.x, position.y, startX + 32, startY + 32, 32, 32)
+      case 5 => CloneTileData(position.x, position.y, startX + 32 + 32, startY + 32, 32, 32)
+      case 6 => CloneTileData(position.x, position.y, startX + 32 + 32 + 32, startY + 32, 32, 32)
+      case 7 => CloneTileData(position.x, position.y, startX + 32 + 32, startY + 32 + 32, 32, 32)
+      case _ => // includes 0
+        CloneTileData(position.x, position.y, startX, startY, 32, 32)
 
   def stairsTile(position: Point): CloneTileData =
     CloneTileData(position.x, position.y, 32, 288, 32, 32)
