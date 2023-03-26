@@ -19,14 +19,12 @@ final case class ActorPosition(
     fromPosition: Point,
     target: Point,
     timeElapsed: Seconds,
-    animationDuration: Seconds
+    animationDuration: Seconds,
+    facing: ActorDirection
 ):
   val state: ActorMoveState =
-    if attacking > 0.0 && target == fromPosition then ActorMoveState.AttackingRight // TODO
-    else if target.y < fromPosition.y then ActorMoveState.MovingUp
-    else if target.y > fromPosition.y then ActorMoveState.MovingDown
-    else if target.x < fromPosition.x then ActorMoveState.MovingLeft
-    else if target.x > fromPosition.x then ActorMoveState.MovingRight
+    if attacking > 0.0 && target == fromPosition then ActorMoveState.Attacking
+    else if target != fromPosition then ActorMoveState.Moving
     else ActorMoveState.Idle
 
   def next(
@@ -37,11 +35,20 @@ final case class ActorPosition(
     val elapsed        = timeElapsed + timeDelta
     val moveIsComplete = elapsed >= animationDuration
 
+    val nextFacing =
+      if target.y < fromPosition.y then facing // ActorDirection.Up // This is no up for the knight
+      else if target.y > fromPosition.y then
+        facing // ActorDirection.Up // This is no down for the knight
+      else if target.x < fromPosition.x then ActorDirection.Left
+      else if target.x > fromPosition.x then ActorDirection.Right
+      else facing
+
     Outcome(
       this.copy(
         fromPosition = if moveIsComplete then currentTarget else fromPosition,
         target = currentTarget,
-        timeElapsed = if moveIsComplete then Seconds.zero else elapsed
+        timeElapsed = if moveIsComplete then Seconds.zero else elapsed,
+        facing = nextFacing
       ),
       if moveIsComplete then Batch(onCompleteEvent) else Batch.empty
     )
@@ -79,16 +86,12 @@ object ActorPosition:
       position,
       position,
       Seconds.zero,
-      animationDuration
+      animationDuration,
+      ActorDirection.Right
     )
 
 enum ActorMoveState:
-  case Idle
-  case MovingUp
-  case MovingDown
-  case MovingLeft
-  case MovingRight
-  case AttackingUp
-  case AttackingDown
-  case AttackingLeft
-  case AttackingRight
+  case Idle, Moving, Attacking
+
+enum ActorDirection:
+  case Up, Down, Left, Right
