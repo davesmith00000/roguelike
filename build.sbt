@@ -37,8 +37,7 @@ lazy val roguelike =
       ),
       scalafixOnCompile := true,
       semanticdbEnabled := true,
-      semanticdbVersion := scalafixSemanticdb.revision,
-      resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+      semanticdbVersion := scalafixSemanticdb.revision
     )
     .settings(
       code := { "code ." ! },
