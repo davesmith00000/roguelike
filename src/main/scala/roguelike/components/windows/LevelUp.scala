@@ -95,7 +95,7 @@ object LevelUp extends Component[Size, Model, GameViewModel]:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+            TerminalText(GameAssets.TileMap, RGBA.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)

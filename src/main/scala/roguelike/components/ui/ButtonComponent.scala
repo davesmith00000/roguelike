@@ -43,7 +43,7 @@ final case class ButtonComponent(
   def update(mouse: Mouse) =
     hitArea.update(mouse).map(ha => this.copy(hitArea = ha))
 
-  def draw(textColor: RGB, shadowColor: RGB): Batch[Group] =
+  def draw(textColor: RGBA, shadowColor: RGBA): Batch[Group] =
     val t =
       Text(
         text,

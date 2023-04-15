@@ -2,7 +2,7 @@ package roguelike.model
 
 import indigo.shared.IndigoLogger
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGB
+import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
 import io.circe.*
 import io.circe.parser.decode
@@ -40,20 +40,22 @@ object SharedCodecs:
       } yield new Point(x, y)
   }
 
-  given Encoder[RGB] = new Encoder[RGB] {
-    final def apply(data: RGB): Json =
+  given Encoder[RGBA] = new Encoder[RGBA] {
+    final def apply(data: RGBA): Json =
       Json.obj(
         ("r", Json.fromDoubleOrNull(data.r)),
         ("g", Json.fromDoubleOrNull(data.g)),
-        ("b", Json.fromDoubleOrNull(data.b))
+        ("b", Json.fromDoubleOrNull(data.b)),
+        ("a", Json.fromDoubleOrNull(data.a))
       )
   }
 
-  given Decoder[RGB] = new Decoder[RGB] {
-    final def apply(c: HCursor): Decoder.Result[RGB] =
+  given Decoder[RGBA] = new Decoder[RGBA] {
+    final def apply(c: HCursor): Decoder.Result[RGBA] =
       for {
         r <- c.downField("r").as[Double]
         g <- c.downField("g").as[Double]
         b <- c.downField("b").as[Double]
-      } yield new RGB(r, g, b)
+        a <- c.downField("a").as[Double]
+      } yield new RGBA(r, g, b, a)
   }

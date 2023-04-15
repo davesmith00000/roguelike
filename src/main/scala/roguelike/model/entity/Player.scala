@@ -62,7 +62,7 @@ final case class Player(
               .Log(
                 Message(
                   s"You picked up the ${collectable.item.name}!",
-                  RGB(0.0, 0.85, 0.0)
+                  RGBA(0.0, 0.85, 0.0)
                 )
               ),
             GameEvent.PlayerTurnEnd
@@ -129,13 +129,13 @@ final case class Player(
         )
       ).addGlobalEvents(
         GameEvent.Log(
-          Message(s"You gain $additionalXp experience points.", RGB.White)
+          Message(s"You gain $additionalXp experience points.", RGBA.White)
         )
       ).createGlobalEvents(p =>
         if levelUp then
           Batch(
             GameEvent
-              .Log(Message(s"You advance to level ${p.level}!", RGB.White))
+              .Log(Message(s"You advance to level ${p.level}!", RGBA.White))
           )
         else Batch.empty
       )
@@ -149,7 +149,7 @@ final case class Player(
         )
       )
     ).addGlobalEvents(
-      GameEvent.Log(Message("Your health improves!", RGB.White))
+      GameEvent.Log(Message("Your health improves!", RGBA.White))
     )
 
   def increasePower(amount: Int): Outcome[Player] =
@@ -159,7 +159,7 @@ final case class Player(
           power = fighter.power + amount
         )
       )
-    ).addGlobalEvents(GameEvent.Log(Message("You feel stronger!", RGB.White)))
+    ).addGlobalEvents(GameEvent.Log(Message("You feel stronger!", RGBA.White)))
 
   def increaseDefense(amount: Int): Outcome[Player] =
     Outcome(
@@ -169,7 +169,7 @@ final case class Player(
         )
       )
     ).addGlobalEvents(
-      GameEvent.Log(Message("Your movements are getting swifter!", RGB.White))
+      GameEvent.Log(Message("Your movements are getting swifter!", RGBA.White))
     )
 
 object Player:

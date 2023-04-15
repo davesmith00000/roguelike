@@ -1,7 +1,6 @@
 package roguelike.model
 
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGB
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
 import io.circe.*
@@ -13,7 +12,7 @@ import roguelike.assets.GameAssets
 
 final case class Message(
     text: String,
-    fgColor: RGB,
+    fgColor: RGBA,
     count: Int,
     stackable: Boolean
 ):
@@ -24,7 +23,7 @@ final case class Message(
   def withText(newText: String): Message =
     this.copy(text = newText)
 
-  def withFgColor(newColor: RGB): Message =
+  def withFgColor(newColor: RGBA): Message =
     this.copy(fgColor = newColor)
 
   def withCount(newCount: Int): Message =
@@ -57,13 +56,13 @@ object Message:
     final def apply(c: HCursor): Decoder.Result[Message] =
       for {
         text      <- c.downField("text").as[String]
-        fgColor   <- c.downField("fgColor").as[RGB]
+        fgColor   <- c.downField("fgColor").as[RGBA]
         count     <- c.downField("count").as[Int]
         stackable <- c.downField("stackable").as[Boolean]
       } yield Message(text, fgColor, count, stackable)
   }
 
-  def apply(text: String, fgColor: RGB): Message =
+  def apply(text: String, fgColor: RGBA): Message =
     Message(text, fgColor, 1, true)
 
   val thatWayIsBlocked: Message =

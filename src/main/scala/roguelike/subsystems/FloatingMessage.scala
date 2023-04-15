@@ -9,7 +9,7 @@ import roguelike.assets.GameAssets
 
 object FloatingMessage:
 
-  final case class Message(text: String, colour: RGB) extends AutomatonPayload
+  final case class Message(text: String, colour: RGBA) extends AutomatonPayload
 
   private val poolKey = AutomataPoolKey("floating messages")
 
@@ -21,7 +21,7 @@ object FloatingMessage:
           Text(
             "",
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+            TerminalText(GameAssets.TileMap, RGBA.White, RGBA.Zero)
           ).alignCenter
         ),
         Seconds(1.5d)
