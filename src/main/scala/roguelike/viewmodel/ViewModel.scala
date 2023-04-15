@@ -114,7 +114,7 @@ final case class GameViewModel(
         .addGlobalEvents(
           FloatingMessage.spawnEvent(
             playerPosition.moving(squareSize),
-            FloatingMessage.Message("+1 " + item.name, RGB.Green)
+            FloatingMessage.Message("+1 " + item.name, RGBA.Green)
           )
         )
 
@@ -123,7 +123,7 @@ final case class GameViewModel(
         .addGlobalEvents(
           FloatingMessage.spawnEvent(
             playerPosition.moving(squareSize),
-            FloatingMessage.Message("-1 " + item.name, RGB.Red)
+            FloatingMessage.Message("-1 " + item.name, RGBA.Red)
           )
         )
 

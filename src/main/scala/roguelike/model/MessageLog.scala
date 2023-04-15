@@ -1,7 +1,6 @@
 package roguelike.model
 
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGB
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
 import io.circe.*
@@ -105,7 +104,7 @@ object MessageLog:
           t.putLine(
             Point(0, r),
             m.fullText,
-            m.fgColor.mix(RGB.Black, darkenAmount),
+            m.fgColor.mix(RGBA.Black, darkenAmount),
             RGBA.Black
           ),
           r + 1

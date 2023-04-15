@@ -15,7 +15,7 @@ object LoaderAnim:
       Text(
         textCopy,
         RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssets.TileMap, RGB.White, RGBA.Zero)
+        TerminalText(GameAssets.TileMap, RGBA.White, RGBA.Zero)
       )
 
     val textBounds: Rectangle =

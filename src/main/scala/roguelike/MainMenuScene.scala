@@ -155,7 +155,7 @@ object MainMenuTitle:
   val titleText = Text(
     "My Generic Roguelite",
     RoguelikeTiles.Size10x10.Fonts.fontKey,
-    TerminalText(GameAssets.TileMap, RGB.Yellow, RGBA.Zero)
+    TerminalText(GameAssets.TileMap, RGBA.Yellow, RGBA.Zero)
   )
 
   val group =

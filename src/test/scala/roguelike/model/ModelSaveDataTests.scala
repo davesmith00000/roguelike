@@ -1,7 +1,7 @@
 // package roguelike.model
 
 // import indigo.shared.datatypes.Point
-// import indigo.shared.datatypes.RGB
+// import indigo.shared.datatypes.RGBA
 // import indigo.shared.datatypes.Size
 // import indigo.shared.dice.Dice
 // import indigoextras.trees.QuadTree
@@ -189,9 +189,9 @@
 //   val messageLog: MessageLog =
 //     MessageLog(
 //       List(
-//         Message("a", RGB.Red),
-//         Message("b", RGB.Green),
-//         Message("c", RGB.Blue)
+//         Message("a", RGBA.Red),
+//         Message("b", RGBA.Green),
+//         Message("c", RGBA.Blue)
 //       ),
 //       None
 //     )

@@ -14,9 +14,10 @@ final case class MainMenuUi(
   val scale: Int = newGame.scale
 
   def view: Batch[SceneNode] =
-    val activeShadowColor = RGB.Orange.mix(RGB.Black, 0.25)
-    newGame.draw(RGB.White, activeShadowColor) ++
-      (if canLoadGame then loadGame.draw(RGB.White, activeShadowColor) else loadGame.draw(RGB.SlateGray, RGB.Black))
+    val activeShadowColor = RGBA.Orange.mix(RGBA.Black, 0.25)
+    newGame.draw(RGBA.White, activeShadowColor) ++
+      (if canLoadGame then loadGame.draw(RGBA.White, activeShadowColor)
+       else loadGame.draw(RGBA.SlateGray, RGBA.Black))
 
   def moveTo(pos: Point): MainMenuUi =
     copy(

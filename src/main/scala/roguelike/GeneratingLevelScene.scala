@@ -63,7 +63,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
         .addGlobalEvents(
           SceneEvent.JumpTo(GameScene.name),
           GameEvent.CameraSnapToPlayer,
-          GameEvent.Log(Message("Welcome!", RGB.Cyan))
+          GameEvent.Log(Message("Welcome!", RGBA.Cyan))
         )
 
     case _ =>
