@@ -40,8 +40,7 @@ lazy val roguelike =
       semanticdbVersion := scalafixSemanticdb.revision
     )
     .settings(
-      code := { "code ." ! },
-      oni2 := { "oni2 ." ! }
+      code := { "code ." ! }
     )
     .settings(
       Compile / sourceGenerators += Def.task {
@@ -131,8 +130,6 @@ addCommandAlias(
 
 lazy val code =
   taskKey[Unit]("Launch VSCode in the current directory")
-lazy val oni2 =
-  taskKey[Unit]("Launch Onivim 2 in the current directory")
 
 // format: off
 lazy val rawLogo: String =
