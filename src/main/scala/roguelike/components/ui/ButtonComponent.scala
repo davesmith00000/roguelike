@@ -44,17 +44,14 @@ final case class ButtonComponent(
     hitArea.update(mouse).map(ha => this.copy(hitArea = ha))
 
   def draw(textColor: RGBA, shadowColor: RGBA): Batch[Group] =
-    val t =
-      Text(
-        text,
-        RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssets.TileMap, textColor, RGBA.Zero)
-      ).alignCenter
-        .moveTo(Point((width * 0.5).toInt, 4))
     Batch(
       Group(
-        t.withMaterial(TerminalText(GameAssets.TileMap, shadowColor, RGBA.Zero)).moveBy(Point(1)),
-        t
+        Text(
+          text,
+          RoguelikeTiles.Size10x10.Fonts.fontKey,
+          TerminalText(GameAssets.TileMap, textColor, RGBA.Zero, shadowColor)
+        ).alignCenter
+          .moveTo(Point((width * 0.5).toInt, 4))
       ).moveTo(position)
         .scaleBy(Vector2(scale))
     )
