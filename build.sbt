@@ -33,7 +33,7 @@ lazy val roguelike =
         "io.indigoengine" %%% "indigo-json-circe"    % "0.15.0-RC1",
         "io.indigoengine" %%% "indigo"               % "0.15.0-RC1",
         "io.indigoengine" %%% "indigo-extras"        % "0.15.0-RC1",
-        "io.indigoengine" %%% "roguelike-starterkit" % "0.2.1-SNAPSHOT"
+        "io.indigoengine" %%% "roguelike-starterkit" % "0.3.0-RC1"
       ),
       scalafixOnCompile := true,
       semanticdbEnabled := true,
