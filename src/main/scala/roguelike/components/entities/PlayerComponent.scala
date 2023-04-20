@@ -123,9 +123,9 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       Outcome(viewModel)
 
   val lookRightRefOffset: Point = Point(13, 28)
-  val lookLeftRefOffset: Point = Point(19, 28)
-  val shadowSquash = Vector2(0.9, 0.5)
-  val shadowOffset = Point(0, 7)
+  val lookLeftRefOffset: Point  = Point(19, 28)
+  val shadowSquash              = Vector2(0.9, 0.5)
+  val shadowOffset              = Point(0, 7)
 
   def view(
       context: SceneContext[Size],
@@ -161,12 +161,14 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
     player.map { plr =>
       Batch(
-        Shape.Circle(
-          viewModel.playerPosition.moving(viewModel.squareSize) + shadowOffset,
-          radius,
-          Fill.Color(RGBA.Black.withAlpha(0.5)),
-          Stroke.None
-        ).withScale(shadowSquash),
+        Shape
+          .Circle(
+            viewModel.playerPosition.moving(viewModel.squareSize) + shadowOffset,
+            radius,
+            Fill.Color(RGBA.Black.withAlpha(0.5)),
+            Stroke.None
+          )
+          .withScale(shadowSquash),
         plr
       )
     }
