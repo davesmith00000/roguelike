@@ -45,7 +45,7 @@ class GameMapTests extends munit.FunSuite {
     val gameMap =
       GameMap
         .initial(Size(5, 7))
-        .insert(walkable.map(pt => pt -> GameTile.Ground(0)))
+        .insert(walkable.map(pt => PositionedTile(pt, GameTile.Ground(0))))
 
     val possiblePaths: List[List[Point]] =
       List(
