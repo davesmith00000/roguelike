@@ -192,7 +192,7 @@ object DungeonGen:
         Nil
     }.distinct
 
-  def createRoom(dice: Dice, rect: Rectangle): List[(Point, GameTile)] =
+  def createRoom(dice: Dice, rect: Rectangle): List[PositionedTile] =
     (rect.top + 1 until rect.bottom).flatMap { y =>
       (rect.left + 1 until rect.right).map { x =>
         val tile =
@@ -200,7 +200,7 @@ object DungeonGen:
           else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall
           else GameTile.Ground(dice.rollFromZero(7))
 
-        (Point(x, y), tile)
+        PositionedTile(Point(x, y), tile)
       }
     }.toList
 
@@ -209,97 +209,97 @@ object DungeonGen:
       x1: Int,
       x2: Int,
       y: Int
-  ): List[(Point, GameTile)] =
+  ): List[PositionedTile] =
     val start = Math.min(x1, x2)
     val end   = Math.max(x1, x2)
     (start to end).toList.flatMap { x =>
       if x == start then
         List(
-          (Point(x - 1, y - 1), GameTile.Wall),
-          (Point(x - 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall),
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall)
         ) ++
           List(
-            (Point(x, y - 1), GameTile.Wall),
-            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            (Point(x, y + 1), GameTile.Wall)
+            PositionedTile(Point(x, y - 1), GameTile.Wall),
+            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+            PositionedTile(Point(x, y + 1), GameTile.Wall)
           )
       else if x == end then
         List(
-          (Point(x + 1, y - 1), GameTile.Wall),
-          (Point(x + 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall)
         ) ++
           List(
-            (Point(x, y - 1), GameTile.Wall),
-            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            (Point(x, y + 1), GameTile.Wall)
+            PositionedTile(Point(x, y - 1), GameTile.Wall),
+            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+            PositionedTile(Point(x, y + 1), GameTile.Wall)
           )
       else
         List(
-          (Point(x, y - 1), GameTile.Wall),
-          (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          (Point(x, y + 1), GameTile.Wall)
+          PositionedTile(Point(x, y - 1), GameTile.Wall),
+          PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+          PositionedTile(Point(x, y + 1), GameTile.Wall)
         )
     }
 
-  def createVerticalTunnel(dice: Dice, y1: Int, y2: Int, x: Int): List[(Point, GameTile)] =
+  def createVerticalTunnel(dice: Dice, y1: Int, y2: Int, x: Int): List[PositionedTile] =
     val start = Math.min(y1, y2)
     val end   = Math.max(y1, y2)
     (start to end).toList.flatMap { y =>
       if y == start then
         List(
-          (Point(x - 1, y - 1), GameTile.Wall),
-          (Point(x + 1, y - 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall),
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall)
         ) ++
           List(
-            (Point(x - 1, y), GameTile.Wall),
-            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            (Point(x + 1, y), GameTile.Wall)
+            PositionedTile(Point(x - 1, y), GameTile.Wall),
+            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+            PositionedTile(Point(x + 1, y), GameTile.Wall)
           )
       else if y == end then
         List(
-          (Point(x - 1, y + 1), GameTile.Wall),
-          (Point(x + 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall)
         ) ++
           List(
-            (Point(x - 1, y), GameTile.Wall),
-            (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            (Point(x + 1, y), GameTile.Wall)
+            PositionedTile(Point(x - 1, y), GameTile.Wall),
+            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+            PositionedTile(Point(x + 1, y), GameTile.Wall)
           )
       else
         List(
-          (Point(x - 1, y), GameTile.Wall),
-          (Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          (Point(x + 1, y), GameTile.Wall)
+          PositionedTile(Point(x - 1, y), GameTile.Wall),
+          PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+          PositionedTile(Point(x + 1, y), GameTile.Wall)
         )
     }
 
   @tailrec
   def finaliseTiles(
-      remaining: List[(Point, GameTile)],
-      accepted: List[(Point, GameTile)]
-  ): List[(Point, GameTile)] =
+      remaining: List[PositionedTile],
+      accepted: List[PositionedTile]
+  ): List[PositionedTile] =
     remaining match
       case Nil =>
         accepted
 
-      case t :: ts if t._2.isDownStairs =>
-        finaliseTiles(ts, t :: accepted.filterNot(p => p._1 == t._1))
+      case t :: ts if t.tile.isDownStairs =>
+        finaliseTiles(ts, t :: accepted.filterNot(p => p.position == t.position))
 
-      case t :: ts if t._2.isGround =>
-        accepted.find(_._1 == t._1) match
+      case t :: ts if t.tile.isGround =>
+        accepted.find(_.position == t.position) match
           case None =>
             finaliseTiles(ts, t :: accepted)
 
-          case Some(tile) if tile._2.isDownStairs =>
+          case Some(tile) if tile.tile.isDownStairs =>
             finaliseTiles(ts, accepted)
 
           case Some(tile) =>
-            finaliseTiles(ts, t :: accepted.filterNot(p => p._1 == t._1))
+            finaliseTiles(ts, t :: accepted.filterNot(p => p.position == t.position))
 
-      case (pt, GameTile.Wall) :: ts =>
-        accepted.find(_._1 == pt) match
+      case PositionedTile(pt, GameTile.Wall) :: ts =>
+        accepted.find(_.position == pt) match
           case None =>
-            finaliseTiles(ts, (pt, GameTile.Wall) :: accepted)
+            finaliseTiles(ts, PositionedTile(pt, GameTile.Wall) :: accepted)
 
           case Some(_) =>
             finaliseTiles(ts, accepted)
@@ -322,8 +322,8 @@ object DungeonGen:
         numOfRooms: Int,
         lastRoomCenter: Option[Point],
         rooms: List[Rectangle],
-        roomTiles: List[(Point, GameTile)],
-        tunnelTiles: List[(Point, GameTile)],
+        roomTiles: List[PositionedTile],
+        tunnelTiles: List[PositionedTile],
         hostiles: List[Hostile],
         collectables: List[Collectable],
         playerStart: Point,
@@ -346,7 +346,7 @@ object DungeonGen:
               playerStart,
               center,
               finaliseTiles(
-                roomTiles ++ tunnelTiles ++ List((center, GameTile.DownStairs)),
+                roomTiles ++ tunnelTiles ++ List(PositionedTile(center, GameTile.DownStairs)),
                 Nil
               ),
               hostiles,
@@ -399,7 +399,7 @@ object DungeonGen:
                 roomCenter
               )
 
-          val newTunnelTiles =
+          val newTunnelTiles: List[PositionedTile] =
             lastRoomCenter match
               case None =>
                 Nil
@@ -429,8 +429,10 @@ object DungeonGen:
 final case class Dungeon(
     playerStart: Point,
     stairsPosition: Point,
-    positionedTiles: List[(Point, GameTile)],
+    positionedTiles: List[PositionedTile],
     hostiles: List[Hostile],
     collectables: List[Collectable],
     currentFloor: Int
 )
+
+final case class PositionedTile(position: Point, tile: GameTile)

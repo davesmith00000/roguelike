@@ -50,10 +50,12 @@ final case class GameMap(
       this.copy(tileMap = tileMap.update(indexFromPoint(coords), Option(tile)))
     else this
 
-  def insert(tiles: Batch[(Point, GameTile)]): GameMap =
-    tiles.foldLeft(this) { case (acc, (pt, tile)) => acc.insert(pt, tile) }
+  def insert(tiles: Batch[PositionedTile]): GameMap =
+    tiles.foldLeft(this) { case (acc, positionedTile) =>
+      acc.insert(positionedTile.position, positionedTile.tile)
+    }
 
-  def insert(tiles: (Point, GameTile)*): GameMap =
+  def insert(tiles: PositionedTile*): GameMap =
     insert(tiles.toBatch)
 
   def lookUp(at: Point): Option[GameTile] =

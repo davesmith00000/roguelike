@@ -1,6 +1,7 @@
 package roguelike.model.js
 
 import roguelike.model.Dungeon
+import roguelike.model.PositionedTile
 
 import scala.scalajs.js
 
@@ -20,9 +21,7 @@ object JsDungeon:
       val playerStart: JsPoint    = JsPoint.fromPoint(d.playerStart)
       val stairsPosition: JsPoint = JsPoint.fromPoint(d.stairsPosition)
       val positionedTiles: js.Array[JsPointGameTileTuple] =
-        d.positionedTiles.map {
-          JsPointGameTileTuple.fromTuple(_)
-        }.toJSArray
+        d.positionedTiles.map(JsPointGameTileTuple.fromPositionedTile).toJSArray
       val hostiles: js.Array[JsHostile] =
         d.hostiles.map(JsHostile.fromHostile(_)).toJSArray
       val collectables: js.Array[JsCollectable] = d.collectables.map {
@@ -35,9 +34,7 @@ object JsDungeon:
     Dungeon(
       JsPoint.toPoint(d.playerStart),
       JsPoint.toPoint(d.stairsPosition),
-      d.positionedTiles.map {
-        JsPointGameTileTuple.toTuple(_)
-      }.toList,
+      d.positionedTiles.map(JsPointGameTileTuple.toPositionedTile).toList,
       d.hostiles.map {
         JsHostile.toHostile(_)
       }.toList,
