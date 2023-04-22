@@ -104,13 +104,13 @@ class GameMapTests extends munit.FunSuite {
     val gameMap =
       GameMap
         .initial(mapSize)
-        .insert(Point(1, 1), GameTile.Wall(None))
+        .insert(Point(1, 1), GameTile.Wall(WallCode.Wall))
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
 
     val expected =
-      js.Array[(Point, GameTile)]((Point(1, 1), GameTile.Wall(None)))
+      js.Array[(Point, GameTile)]((Point(1, 1), GameTile.Wall(WallCode.Wall)))
 
     assertEquals(actual.toList, expected.toList)
   }
@@ -129,20 +129,20 @@ class GameMapTests extends munit.FunSuite {
     val gameMap =
       GameMap
         .initial(mapSize)
-        .insert(Point(0, 0), GameTile.Wall(None)) // Out
-        .insert(Point(0, 2), GameTile.Wall(None)) // Out
-        .insert(Point(1, 3), GameTile.Wall(None)) // In
+        .insert(Point(0, 0), GameTile.Wall(WallCode.Wall)) // Out
+        .insert(Point(0, 2), GameTile.Wall(WallCode.Wall)) // Out
+        .insert(Point(1, 3), GameTile.Wall(WallCode.Wall)) // In
         .insert(Point(2, 2), GameTile.Ground(0))  // In
-        .insert(Point(2, 4), GameTile.Wall(None)) // Out
-        .insert(Point(3, 1), GameTile.Wall(None)) // Out
-        .insert(Point(4, 4), GameTile.Wall(None)) // Out
+        .insert(Point(2, 4), GameTile.Wall(WallCode.Wall)) // Out
+        .insert(Point(3, 1), GameTile.Wall(WallCode.Wall)) // Out
+        .insert(Point(4, 4), GameTile.Wall(WallCode.Wall)) // Out
 
     val actual =
       GameMap.searchByBoundsWithPosition(gameMap, bounds)
 
     val expected =
       js.Array[(Point, GameTile)](
-        (Point(1, 3), GameTile.Wall(None)),
+        (Point(1, 3), GameTile.Wall(WallCode.Wall)),
         (Point(2, 2), GameTile.Ground(0))
       )
 
