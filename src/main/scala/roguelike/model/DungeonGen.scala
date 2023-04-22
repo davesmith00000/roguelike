@@ -1,6 +1,9 @@
 package roguelike.model
 
 import indigo.*
+import roguelike.model.GameTile.DownStairs
+import roguelike.model.GameTile.Ground
+import roguelike.model.GameTile.Wall
 import roguelike.model.entity.*
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
@@ -196,8 +199,8 @@ object DungeonGen:
     (rect.top + 1 until rect.bottom).flatMap { y =>
       (rect.left + 1 until rect.right).map { x =>
         val tile =
-          if x == rect.left + 1 || x == rect.right - 1 then GameTile.Wall
-          else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall
+          if x == rect.left + 1 || x == rect.right - 1 then GameTile.Wall(None)
+          else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall(None)
           else GameTile.Ground(dice.rollFromZero(7))
 
         PositionedTile(Point(x, y), tile)
@@ -215,29 +218,29 @@ object DungeonGen:
     (start to end).toList.flatMap { x =>
       if x == start then
         List(
-          PositionedTile(Point(x - 1, y - 1), GameTile.Wall),
-          PositionedTile(Point(x - 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(None)),
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(None))
         ) ++
           List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall),
+            PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall)
+            PositionedTile(Point(x, y + 1), GameTile.Wall(None))
           )
       else if x == end then
         List(
-          PositionedTile(Point(x + 1, y - 1), GameTile.Wall),
-          PositionedTile(Point(x + 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(None)),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(None))
         ) ++
           List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall),
+            PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall)
+            PositionedTile(Point(x, y + 1), GameTile.Wall(None))
           )
       else
         List(
-          PositionedTile(Point(x, y - 1), GameTile.Wall),
+          PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
           PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x, y + 1), GameTile.Wall)
+          PositionedTile(Point(x, y + 1), GameTile.Wall(None))
         )
     }
 
@@ -247,29 +250,29 @@ object DungeonGen:
     (start to end).toList.flatMap { y =>
       if y == start then
         List(
-          PositionedTile(Point(x - 1, y - 1), GameTile.Wall),
-          PositionedTile(Point(x + 1, y - 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(None)),
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(None))
         ) ++
           List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall),
+            PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall)
+            PositionedTile(Point(x + 1, y), GameTile.Wall(None))
           )
       else if y == end then
         List(
-          PositionedTile(Point(x - 1, y + 1), GameTile.Wall),
-          PositionedTile(Point(x + 1, y + 1), GameTile.Wall)
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(None)),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(None))
         ) ++
           List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall),
+            PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall)
+            PositionedTile(Point(x + 1, y), GameTile.Wall(None))
           )
       else
         List(
-          PositionedTile(Point(x - 1, y), GameTile.Wall),
+          PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
           PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x + 1, y), GameTile.Wall)
+          PositionedTile(Point(x + 1, y), GameTile.Wall(None))
         )
     }
 
@@ -296,16 +299,79 @@ object DungeonGen:
           case Some(tile) =>
             finaliseTiles(ts, t :: accepted.filterNot(p => p.position == t.position))
 
-      case PositionedTile(pt, GameTile.Wall) :: ts =>
+      case PositionedTile(pt, GameTile.Wall(code)) :: ts =>
         accepted.find(_.position == pt) match
           case None =>
-            finaliseTiles(ts, PositionedTile(pt, GameTile.Wall) :: accepted)
+            finaliseTiles(ts, PositionedTile(pt, GameTile.Wall(code)) :: accepted)
 
           case Some(_) =>
             finaliseTiles(ts, accepted)
 
       case _ :: ts =>
         finaliseTiles(ts, accepted)
+
+  def positionedTileToWallCode(maybeTile: Option[PositionedTile]): String =
+    maybeTile match
+      case None                                         => "."
+      case Some(PositionedTile(_, GameTile.Wall(_)))    => "w"
+      case Some(PositionedTile(_, GameTile.Ground(_)))  => "g"
+      case Some(PositionedTile(_, GameTile.DownStairs)) => "s"
+
+  def chooseWallCode(
+      maybeWall: PositionedTile,
+      tl: Option[PositionedTile],
+      tm: Option[PositionedTile],
+      tr: Option[PositionedTile],
+      ml: Option[PositionedTile],
+      mr: Option[PositionedTile],
+      bl: Option[PositionedTile],
+      bm: Option[PositionedTile],
+      br: Option[PositionedTile]
+  ): PositionedTile =
+    maybeWall.tile match
+      case Wall(_) =>
+        val code =
+          positionedTileToWallCode(tl) +
+            positionedTileToWallCode(tm) +
+            positionedTileToWallCode(tr) +
+            positionedTileToWallCode(ml) +
+            "x" +
+            positionedTileToWallCode(mr) +
+            positionedTileToWallCode(bl) +
+            positionedTileToWallCode(bm) +
+            positionedTileToWallCode(br)
+
+        PositionedTile(maybeWall.position, Wall(Option(code)))
+
+      case _ =>
+        maybeWall
+
+  @tailrec
+  def allocateWallCodes(
+      all: List[PositionedTile],
+      remaining: List[PositionedTile],
+      acc: List[PositionedTile]
+  ): List[PositionedTile] =
+    remaining match
+      case Nil =>
+        acc
+
+      case head :: next =>
+        allocateWallCodes(
+          all,
+          next,
+          chooseWallCode(
+            head,
+            all.find(_.position == head.position + Point(-1, -1)),
+            all.find(_.position == head.position + Point(0, -1)),
+            all.find(_.position == head.position + Point(1, -1)),
+            all.find(_.position == head.position + Point(-1, 0)),
+            all.find(_.position == head.position + Point(1, 0)),
+            all.find(_.position == head.position + Point(-1, 1)),
+            all.find(_.position == head.position + Point(0, 1)),
+            all.find(_.position == head.position + Point(1, 1))
+          ) :: acc
+        )
 
   def makeMap(
       dice: Dice,
@@ -332,23 +398,31 @@ object DungeonGen:
       if numOfRooms == maxRooms then
         lastRoomCenter match
           case None =>
+            val tiles =
+              val f = finaliseTiles(roomTiles ++ tunnelTiles, Nil)
+              allocateWallCodes(f, f, Nil)
+
             Dungeon(
               playerStart,
               stairsPosition,
-              finaliseTiles(roomTiles ++ tunnelTiles, Nil),
+              tiles,
               hostiles,
               collectables,
               currentFloor
             )
 
           case Some(center) =>
+            val tiles =
+              val f = finaliseTiles(
+                roomTiles ++ tunnelTiles ++ List(PositionedTile(center, GameTile.DownStairs)),
+                Nil
+              )
+              allocateWallCodes(f, f, Nil)
+
             Dungeon(
               playerStart,
               center,
-              finaliseTiles(
-                roomTiles ++ tunnelTiles ++ List(PositionedTile(center, GameTile.DownStairs)),
-                Nil
-              ),
+              tiles,
               hostiles,
               collectables,
               currentFloor

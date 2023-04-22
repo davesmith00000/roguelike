@@ -13,7 +13,7 @@ sealed trait GameTile:
   def isWall: Boolean
 
 object GameTile:
-  case object Wall extends GameTile:
+  final case class Wall(code: Option[String]) extends GameTile:
     val blocked: Boolean      = true
     val blockSight: Boolean   = true
     val isDownStairs: Boolean = false
@@ -37,15 +37,15 @@ object GameTile:
   val scoreAs: GameTile => Int = {
     case Ground(_)  => 1
     case DownStairs => 5
-    case Wall       => Int.MaxValue
+    case Wall(_)    => Int.MaxValue
   }
 
   given Encoder[GameTile] = new Encoder[GameTile] {
     final def apply(data: GameTile): Json =
       data match
-        case Wall =>
+        case Wall(code) =>
           Json.obj(
-            ("tileType", Json.fromString("w"))
+            ("tileType", Json.fromString("w" + code))
           )
 
         case Ground(style) =>
@@ -62,8 +62,9 @@ object GameTile:
   given Decoder[GameTile] = new Decoder[GameTile] {
     final def apply(c: HCursor): Decoder.Result[GameTile] =
       c.downField("tileType").as[String].flatMap {
-        case "w" =>
-          Right(Wall)
+        case s if s.startsWith("w") =>
+          val code = s.drop(1)
+          Right(Wall(Option(code)))
 
         case s if s.startsWith("g") =>
           val style = s.drop(1).toInt

@@ -24,8 +24,38 @@ object GameGraphics:
     )
 
   // Bg tiles
-  def wallTile(position: Point): CloneTileData =
-    CloneTileData(position.x, position.y, 0, 96, 32, 32)
+  // TODO: Making this decision on every frame seems like a terrible idea. :-)
+  def wallTile(code: Option[String], position: Point): CloneTileData =
+    code match
+      // walls corner top right
+      case Some(c) if c == "...wx.gw." =>
+        CloneTileData(position.x, position.y, 96, 64, 32, 32)
+
+      // walls right side
+      case Some(c) if c == "gw.gx.gw." =>
+        CloneTileData(position.x, position.y, 96, 32, 32, 32)
+
+      // walls corner top left
+      case Some(c) if c == "....xw.wg" =>
+        CloneTileData(position.x, position.y, 96, 64, 32, 32)
+
+      // walls left side
+      case Some(c) if c == ".wg.xg.wg" =>
+        CloneTileData(position.x, position.y, 96, 32, 32, 32)
+
+      // drop off
+      case Some(c) if c.substring(6, 9) == "w.." =>
+        CloneTileData(position.x, position.y, 192, 256, 32, 32)
+
+      case Some(c) if c.substring(6, 9) == "..w" =>
+        CloneTileData(position.x, position.y, 256, 256, 32, 32)
+
+      case Some(c) if c.charAt(7) == '.' =>
+        CloneTileData(position.x, position.y, 224, 256, 32, 32)
+
+      // default
+      case _ =>
+        CloneTileData(position.x, position.y, 0, 96, 32, 32)
 
   def floorTile(style: Int, position: Point): CloneTileData =
     val startX = 384
