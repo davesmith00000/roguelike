@@ -331,9 +331,56 @@ object DungeonGen:
 
           val newWall =
             head.tile match
-              case Wall(_) =>
+              case Wall(WallCode.Wall) =>
                 val code =
                   if bm.isEmpty then WallCode.DropOff else WallCode.Wall
+
+                PositionedTile(head.position, Wall(code))
+
+              case _ =>
+                head
+
+          rec(
+            next,
+            newWall :: acc
+          )
+
+    rec(tiles, Nil)
+
+  def placeCaps(
+      tiles: List[PositionedTile]
+  ): List[PositionedTile] =
+    @tailrec
+    def rec(
+        remaining: List[PositionedTile],
+        acc: List[PositionedTile]
+    ): List[PositionedTile] =
+      remaining match
+        case Nil =>
+          acc
+
+        case head :: next =>
+          val others = next ++ acc
+          val surrounding =
+            List(
+              others.find(_.position == head.position + Point(-1, -1)).toList,
+              others.find(_.position == head.position + Point(0, -1)).toList,
+              others.find(_.position == head.position + Point(1, -1)).toList,
+              others.find(_.position == head.position + Point(-1, 0)).toList,
+              others.find(_.position == head.position + Point(1, 0)).toList
+            ).flatten
+
+          val alone = surrounding.map(_.tile).forall {
+            case GameTile.Wall(WallCode.DropOff) => true
+            case GameTile.Wall(_)                => false
+            case _                               => true
+          }
+
+          val newWall =
+            head.tile match
+              case Wall(WallCode.Wall) =>
+                val code =
+                  if alone then WallCode.Cap else WallCode.Wall
 
                 PositionedTile(head.position, Wall(code))
 
@@ -369,7 +416,7 @@ object DungeonGen:
         playerStart: Point,
         stairsPosition: Point
     ): Dungeon =
-      val processTiles = finaliseTiles andThen convertWallsToDropOffs
+      val processTiles = finaliseTiles andThen convertWallsToDropOffs andThen placeCaps
 
       if numOfRooms == maxRooms then
         lastRoomCenter match
@@ -487,6 +534,7 @@ final case class PositionedTile(position: Point, tile: GameTile)
 enum WallCode:
   case Wall
   case DropOff
+  case Cap
 
 object WallCode:
 
@@ -494,6 +542,7 @@ object WallCode:
     code match
       case "d" => DropOff
       case "w" => Wall
+      case "c" => Cap
       case _   => Wall
 
   extension (wc: WallCode)
@@ -501,3 +550,4 @@ object WallCode:
       wc match
         case Wall    => "w"
         case DropOff => "d"
+        case Cap     => "c"
