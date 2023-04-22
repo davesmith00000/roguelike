@@ -1,6 +1,7 @@
 package roguelike.model.js
 
 import roguelike.model.GameTile
+import roguelike.model.WallCode
 
 import scala.scalajs.js
 
@@ -11,10 +12,9 @@ object JsGameTile:
   def fromGameTile(gt: GameTile) =
     new JsGameTile {
       val name: String = gt match {
-        case GameTile.Ground(style)    => "g" + style.toString
-        case GameTile.DownStairs       => "d"
-        case GameTile.Wall(Some(code)) => "w" + code
-        case GameTile.Wall(None)       => "w"
+        case GameTile.Ground(style) => "g" + style.toString
+        case GameTile.DownStairs    => "d"
+        case GameTile.Wall(code)    => "w" + code.toCode
       }
     }
 
@@ -24,11 +24,11 @@ object JsGameTile:
 
     case s if s.startsWith("w") =>
       val c = s.drop(1)
-      GameTile.Wall(if c.isEmpty then None else Some(c))
+      GameTile.Wall(if c.isEmpty then WallCode.Wall else WallCode.fromCode(c))
 
     case "d" =>
       GameTile.DownStairs
 
     case _ =>
-      GameTile.Wall(None)
+      GameTile.Wall(WallCode.Wall)
   }

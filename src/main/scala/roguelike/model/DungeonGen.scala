@@ -199,8 +199,8 @@ object DungeonGen:
     (rect.top + 1 until rect.bottom).flatMap { y =>
       (rect.left + 1 until rect.right).map { x =>
         val tile =
-          if x == rect.left + 1 || x == rect.right - 1 then GameTile.Wall(None)
-          else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall(None)
+          if x == rect.left + 1 || x == rect.right - 1 then GameTile.Wall(WallCode.Wall)
+          else if y == rect.top + 1 || y == rect.bottom - 1 then GameTile.Wall(WallCode.Wall)
           else GameTile.Ground(dice.rollFromZero(7))
 
         PositionedTile(Point(x, y), tile)
@@ -218,29 +218,29 @@ object DungeonGen:
     (start to end).toList.flatMap { x =>
       if x == start then
         List(
-          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(None)),
-          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(None))
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(WallCode.Wall)),
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(WallCode.Wall))
         ) ++
           List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
+            PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall(None))
+            PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
           )
       else if x == end then
         List(
-          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(None)),
-          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(None))
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(WallCode.Wall)),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(WallCode.Wall))
         ) ++
           List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
+            PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall(None))
+            PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
           )
       else
         List(
-          PositionedTile(Point(x, y - 1), GameTile.Wall(None)),
+          PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x, y + 1), GameTile.Wall(None))
+          PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
         )
     }
 
@@ -250,128 +250,102 @@ object DungeonGen:
     (start to end).toList.flatMap { y =>
       if y == start then
         List(
-          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(None)),
-          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(None))
+          PositionedTile(Point(x - 1, y - 1), GameTile.Wall(WallCode.Wall)),
+          PositionedTile(Point(x + 1, y - 1), GameTile.Wall(WallCode.Wall))
         ) ++
           List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
+            PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall(None))
+            PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
           )
       else if y == end then
         List(
-          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(None)),
-          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(None))
+          PositionedTile(Point(x - 1, y + 1), GameTile.Wall(WallCode.Wall)),
+          PositionedTile(Point(x + 1, y + 1), GameTile.Wall(WallCode.Wall))
         ) ++
           List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
+            PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
             PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall(None))
+            PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
           )
       else
         List(
-          PositionedTile(Point(x - 1, y), GameTile.Wall(None)),
+          PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x + 1, y), GameTile.Wall(None))
+          PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
         )
     }
 
-  @tailrec
-  def finaliseTiles(
-      remaining: List[PositionedTile],
-      accepted: List[PositionedTile]
+  def finaliseTiles(tiles: List[PositionedTile]): List[PositionedTile] =
+    @tailrec
+    def rec(
+        remaining: List[PositionedTile],
+        accepted: List[PositionedTile]
+    ): List[PositionedTile] =
+      remaining match
+        case Nil =>
+          accepted
+
+        case t :: ts if t.tile.isDownStairs =>
+          rec(ts, t :: accepted.filterNot(p => p.position == t.position))
+
+        case t :: ts if t.tile.isGround =>
+          accepted.find(_.position == t.position) match
+            case None =>
+              rec(ts, t :: accepted)
+
+            case Some(tile) if tile.tile.isDownStairs =>
+              rec(ts, accepted)
+
+            case Some(tile) =>
+              rec(ts, t :: accepted.filterNot(p => p.position == t.position))
+
+        case PositionedTile(pt, GameTile.Wall(code)) :: ts =>
+          accepted.find(_.position == pt) match
+            case None =>
+              rec(ts, PositionedTile(pt, GameTile.Wall(code)) :: accepted)
+
+            case Some(_) =>
+              rec(ts, accepted)
+
+        case _ :: ts =>
+          rec(ts, accepted)
+
+    rec(tiles, Nil)
+
+  def convertWallsToDropOffs(
+      tiles: List[PositionedTile]
   ): List[PositionedTile] =
-    remaining match
-      case Nil =>
-        accepted
+    @tailrec
+    def rec(
+        remaining: List[PositionedTile],
+        acc: List[PositionedTile]
+    ): List[PositionedTile] =
+      remaining match
+        case Nil =>
+          acc
 
-      case t :: ts if t.tile.isDownStairs =>
-        finaliseTiles(ts, t :: accepted.filterNot(p => p.position == t.position))
+        case head :: next =>
+          val others = next ++ acc
+          val bm     = others.find(_.position == head.position + Point(0, 1))
 
-      case t :: ts if t.tile.isGround =>
-        accepted.find(_.position == t.position) match
-          case None =>
-            finaliseTiles(ts, t :: accepted)
+          val newWall =
+            head.tile match
+              case Wall(_) =>
+                val code =
+                  if bm.isEmpty then WallCode.DropOff else WallCode.Wall
 
-          case Some(tile) if tile.tile.isDownStairs =>
-            finaliseTiles(ts, accepted)
+                PositionedTile(head.position, Wall(code))
 
-          case Some(tile) =>
-            finaliseTiles(ts, t :: accepted.filterNot(p => p.position == t.position))
+              case _ =>
+                head
 
-      case PositionedTile(pt, GameTile.Wall(code)) :: ts =>
-        accepted.find(_.position == pt) match
-          case None =>
-            finaliseTiles(ts, PositionedTile(pt, GameTile.Wall(code)) :: accepted)
+          rec(
+            next,
+            newWall :: acc
+          )
 
-          case Some(_) =>
-            finaliseTiles(ts, accepted)
-
-      case _ :: ts =>
-        finaliseTiles(ts, accepted)
-
-  def positionedTileToWallCode(maybeTile: Option[PositionedTile]): String =
-    maybeTile match
-      case None                                         => "."
-      case Some(PositionedTile(_, GameTile.Wall(_)))    => "w"
-      case Some(PositionedTile(_, GameTile.Ground(_)))  => "g"
-      case Some(PositionedTile(_, GameTile.DownStairs)) => "s"
-
-  def chooseWallCode(
-      maybeWall: PositionedTile,
-      tl: Option[PositionedTile],
-      tm: Option[PositionedTile],
-      tr: Option[PositionedTile],
-      ml: Option[PositionedTile],
-      mr: Option[PositionedTile],
-      bl: Option[PositionedTile],
-      bm: Option[PositionedTile],
-      br: Option[PositionedTile]
-  ): PositionedTile =
-    maybeWall.tile match
-      case Wall(_) =>
-        val code =
-          positionedTileToWallCode(tl) +
-            positionedTileToWallCode(tm) +
-            positionedTileToWallCode(tr) +
-            positionedTileToWallCode(ml) +
-            "x" +
-            positionedTileToWallCode(mr) +
-            positionedTileToWallCode(bl) +
-            positionedTileToWallCode(bm) +
-            positionedTileToWallCode(br)
-
-        PositionedTile(maybeWall.position, Wall(Option(code)))
-
-      case _ =>
-        maybeWall
-
-  @tailrec
-  def allocateWallCodes(
-      all: List[PositionedTile],
-      remaining: List[PositionedTile],
-      acc: List[PositionedTile]
-  ): List[PositionedTile] =
-    remaining match
-      case Nil =>
-        acc
-
-      case head :: next =>
-        allocateWallCodes(
-          all,
-          next,
-          chooseWallCode(
-            head,
-            all.find(_.position == head.position + Point(-1, -1)),
-            all.find(_.position == head.position + Point(0, -1)),
-            all.find(_.position == head.position + Point(1, -1)),
-            all.find(_.position == head.position + Point(-1, 0)),
-            all.find(_.position == head.position + Point(1, 0)),
-            all.find(_.position == head.position + Point(-1, 1)),
-            all.find(_.position == head.position + Point(0, 1)),
-            all.find(_.position == head.position + Point(1, 1))
-          ) :: acc
-        )
+    rec(tiles, Nil)
 
   def makeMap(
       dice: Dice,
@@ -395,12 +369,13 @@ object DungeonGen:
         playerStart: Point,
         stairsPosition: Point
     ): Dungeon =
+      val processTiles = finaliseTiles andThen convertWallsToDropOffs
+
       if numOfRooms == maxRooms then
         lastRoomCenter match
           case None =>
             val tiles =
-              val f = finaliseTiles(roomTiles ++ tunnelTiles, Nil)
-              allocateWallCodes(f, f, Nil)
+              processTiles(roomTiles ++ tunnelTiles)
 
             Dungeon(
               playerStart,
@@ -413,11 +388,9 @@ object DungeonGen:
 
           case Some(center) =>
             val tiles =
-              val f = finaliseTiles(
-                roomTiles ++ tunnelTiles ++ List(PositionedTile(center, GameTile.DownStairs)),
-                Nil
+              processTiles(
+                roomTiles ++ tunnelTiles ++ List(PositionedTile(center, GameTile.DownStairs))
               )
-              allocateWallCodes(f, f, Nil)
 
             Dungeon(
               playerStart,
@@ -510,3 +483,21 @@ final case class Dungeon(
 )
 
 final case class PositionedTile(position: Point, tile: GameTile)
+
+enum WallCode:
+  case Wall
+  case DropOff
+
+object WallCode:
+
+  def fromCode(code: String): WallCode =
+    code match
+      case "d" => DropOff
+      case "w" => Wall
+      case _   => Wall
+
+  extension (wc: WallCode)
+    def toCode: String =
+      wc match
+        case Wall    => "w"
+        case DropOff => "d"
