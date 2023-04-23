@@ -394,6 +394,84 @@ object DungeonGen:
 
     rec(tiles, Nil)
 
+  def placeWallTops(
+      tiles: List[PositionedTile]
+  ): List[PositionedTile] =
+    @tailrec
+    def rec(
+        remaining: List[PositionedTile],
+        acc: List[PositionedTile]
+    ): List[PositionedTile] =
+      remaining match
+        case Nil =>
+          acc
+
+        case head :: next =>
+          val others = next ++ acc
+          val bm     = others.find(_.position == head.position + Point(0, 1)).map(_.tile)
+
+          val newWall =
+            head.tile match
+              case Wall(WallCode.Wall) =>
+                val code =
+                  bm match
+                    case Some(GameTile.Wall(WallCode.Wall)) =>
+                      WallCode.VerticalWallTop
+
+                    case _ =>
+                      WallCode.Wall
+
+                PositionedTile(head.position, Wall(code))
+
+              case _ =>
+                head
+
+          rec(
+            next,
+            newWall :: acc
+          )
+
+    rec(tiles, Nil)
+
+  def placeWallToCeilingTops(
+      tiles: List[PositionedTile]
+  ): List[PositionedTile] =
+    @tailrec
+    def rec(
+        remaining: List[PositionedTile],
+        acc: List[PositionedTile]
+    ): List[PositionedTile] =
+      remaining match
+        case Nil =>
+          acc
+
+        case head :: next =>
+          val others = next ++ acc
+          val bm     = others.find(_.position == head.position + Point(0, 1)).map(_.tile)
+
+          val newWall =
+            head.tile match
+              case Wall(WallCode.VerticalWallTop) =>
+                val code =
+                  bm match
+                    case Some(GameTile.Wall(WallCode.Wall)) =>
+                      WallCode.VerticalWallToCeilingTop
+
+                    case _ =>
+                      WallCode.VerticalWallTop
+
+                PositionedTile(head.position, Wall(code))
+
+              case _ =>
+                head
+
+          rec(
+            next,
+            newWall :: acc
+          )
+
+    rec(tiles, Nil)
+
   def makeMap(
       dice: Dice,
       maxRooms: Int,
@@ -416,7 +494,12 @@ object DungeonGen:
         playerStart: Point,
         stairsPosition: Point
     ): Dungeon =
-      val processTiles = finaliseTiles andThen convertWallsToDropOffs andThen placeCaps
+      val processTiles =
+        finaliseTiles andThen
+          convertWallsToDropOffs andThen
+          placeWallTops andThen
+          placeWallToCeilingTops andThen
+          placeCaps
 
       if numOfRooms == maxRooms then
         lastRoomCenter match
@@ -535,19 +618,25 @@ enum WallCode:
   case Wall
   case DropOff
   case Cap
+  case VerticalWallTop
+  case VerticalWallToCeilingTop
 
 object WallCode:
 
   def fromCode(code: String): WallCode =
     code match
-      case "d" => DropOff
-      case "w" => Wall
-      case "c" => Cap
-      case _   => Wall
+      case "d"    => DropOff
+      case "w"    => Wall
+      case "c"    => Cap
+      case "vwt"  => VerticalWallTop
+      case "vwct" => VerticalWallToCeilingTop
+      case _      => Wall
 
   extension (wc: WallCode)
     def toCode: String =
       wc match
-        case Wall    => "w"
-        case DropOff => "d"
-        case Cap     => "c"
+        case Wall                     => "w"
+        case DropOff                  => "d"
+        case Cap                      => "c"
+        case VerticalWallTop          => "vwt"
+        case VerticalWallToCeilingTop => "vwct"

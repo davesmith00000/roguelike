@@ -27,9 +27,20 @@ object GameGraphics:
   // Bg tiles
   def wallTile(code: WallCode, position: Point): CloneTileData =
     code match
-      case WallCode.DropOff => CloneTileData(position.x, position.y, 160, 256, 32, 32)
-      case WallCode.Wall    => CloneTileData(position.x, position.y, 0, 96, 32, 32)
-      case WallCode.Cap     => CloneTileData(position.x, position.y, 96, 160, 32, 32)
+      case WallCode.DropOff =>
+        CloneTileData(position.x, position.y, 160, 256, 32, 32)
+
+      case WallCode.Wall =>
+        CloneTileData(position.x, position.y, 0, 96, 32, 32)
+
+      case WallCode.Cap =>
+        CloneTileData(position.x, position.y, 96, 160, 32, 32)
+
+      case WallCode.VerticalWallTop =>
+        CloneTileData(position.x, position.y, 96, 32, 32, 32)
+
+      case WallCode.VerticalWallToCeilingTop =>
+        CloneTileData(position.x, position.y, 96, 64, 32, 32)
 
   def floorTile(style: Int, position: Point): CloneTileData =
     val startX = 384
