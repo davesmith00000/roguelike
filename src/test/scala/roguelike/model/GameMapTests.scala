@@ -132,7 +132,7 @@ class GameMapTests extends munit.FunSuite {
         .insert(Point(0, 0), GameTile.Wall(WallCode.Wall)) // Out
         .insert(Point(0, 2), GameTile.Wall(WallCode.Wall)) // Out
         .insert(Point(1, 3), GameTile.Wall(WallCode.Wall)) // In
-        .insert(Point(2, 2), GameTile.Ground(0))  // In
+        .insert(Point(2, 2), GameTile.Ground(0))           // In
         .insert(Point(2, 4), GameTile.Wall(WallCode.Wall)) // Out
         .insert(Point(3, 1), GameTile.Wall(WallCode.Wall)) // Out
         .insert(Point(4, 4), GameTile.Wall(WallCode.Wall)) // Out
