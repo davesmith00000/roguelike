@@ -20,6 +20,7 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelike.shaders.Hover
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
 
@@ -70,9 +71,9 @@ object GameView:
 
     val hover =
       Batch(
-        GameGraphics.highlight
+        Hover.view
           .moveTo(
-            (viewModel.hoverSquare * viewModel.squareSize) - (viewModel.squareSize / 2)
+            (viewModel.hoverSquare * viewModel.squareSize) - (viewModel.squareSize / 2) + Point(2)
           )
       )
 

@@ -61,9 +61,6 @@ object GameGraphics:
 
   //
 
-  val highlight: Graphic[Material.Bitmap] =
-    Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(0, 48, 24, 24)
-
   val target: Graphic[Material.Bitmap] =
     Graphic(24, 24, Material.Bitmap(GameAssets.Icons)).withCrop(24, 48, 24, 24)
 
