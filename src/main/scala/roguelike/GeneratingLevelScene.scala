@@ -6,10 +6,10 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
-import roguelike.model.DungeonGenConfig
 import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
+import roguelike.model.dungeon.DungeonGenConfig
 import roguelike.model.js.JsDungeon
 import roguelike.model.js.JsGameMap
 import roguelike.subsystems.WorkerSubSystem

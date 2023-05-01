@@ -1,7 +1,7 @@
 package roguelike.model.js
 
-import roguelike.model.Dungeon
-import roguelike.model.PositionedTile
+import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.PositionedTile
 
 import scala.scalajs.js
 

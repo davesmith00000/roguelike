@@ -6,6 +6,8 @@ import io.circe.*
 import io.circe.syntax.*
 import io.indigoengine.roguelike.starterkit.utils.FOV
 import roguelike.GameEvent
+import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.PositionedTile
 import roguelike.model.entity.*
 import roguelike.util.Indices
 import roguelike.util.PathFinder

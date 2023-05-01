@@ -1,4 +1,4 @@
-package roguelike.model
+package roguelike.model.dungeon
 
 import indigo.*
 import roguelike.model.gamedata.Armour
@@ -10,13 +10,13 @@ class DungeonGenTests extends munit.FunSuite {
 
   test("random choices floor 0") {
     val chances =
-      DungeonGen.collectableChances
+      DungeonRules.collectableChances
 
     val count: Int = 50
     val floor: Int = 0
 
     val actual =
-      DungeonGen.randomChoices(Dice.fromSeed(123), count, floor, chances)
+      DungeonRules.randomChoices(Dice.fromSeed(123), count, floor, chances)
 
     assert(actual.length == count)
     assert(actual.forall(_.name == Consumables.HealthPotion.name))
@@ -24,13 +24,13 @@ class DungeonGenTests extends munit.FunSuite {
 
   test("random choices floor 2") {
     val chances =
-      DungeonGen.collectableChances
+      DungeonRules.collectableChances
 
     val count: Int = 50
     val floor: Int = 2
 
     val actual =
-      DungeonGen.randomChoices(Dice.fromSeed(456), count, floor, chances)
+      DungeonRules.randomChoices(Dice.fromSeed(456), count, floor, chances)
 
     val possibilities = List(
       Consumables.HealthPotion.name,
@@ -43,13 +43,13 @@ class DungeonGenTests extends munit.FunSuite {
 
   test("random choices floor 4") {
     val chances =
-      DungeonGen.collectableChances
+      DungeonRules.collectableChances
 
     val count: Int = 50
     val floor: Int = 4
 
     val actual =
-      DungeonGen.randomChoices(Dice.fromSeed(789), count, floor, chances)
+      DungeonRules.randomChoices(Dice.fromSeed(789), count, floor, chances)
 
     val possibilities = List(
       Consumables.HealthPotion.name,
@@ -64,13 +64,13 @@ class DungeonGenTests extends munit.FunSuite {
 
   test("random choices floor 6") {
     val chances =
-      DungeonGen.collectableChances
+      DungeonRules.collectableChances
 
     val count: Int = 50
     val floor: Int = 6
 
     val actual =
-      DungeonGen.randomChoices(Dice.fromSeed(6181151), count, floor, chances)
+      DungeonRules.randomChoices(Dice.fromSeed(6181151), count, floor, chances)
 
     val possibilities = List(
       Consumables.HealthPotion.name,

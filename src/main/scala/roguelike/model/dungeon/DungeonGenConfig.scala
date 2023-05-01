@@ -1,4 +1,4 @@
-package roguelike.model
+package roguelike.model.dungeon
 
 import scala.scalajs.js
 

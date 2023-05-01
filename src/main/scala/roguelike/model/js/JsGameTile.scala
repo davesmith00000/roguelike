@@ -1,7 +1,7 @@
 package roguelike.model.js
 
 import roguelike.model.GameTile
-import roguelike.model.WallCode
+import roguelike.model.dungeon.WallCode
 
 import scala.scalajs.js
 

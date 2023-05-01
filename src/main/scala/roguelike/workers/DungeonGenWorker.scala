@@ -7,9 +7,10 @@ import indigo.shared.dice.Dice
 import org.scalajs.dom
 import org.scalajs.dom.Worker
 import roguelike.RogueLikeGame
-import roguelike.model.DungeonGen
-import roguelike.model.DungeonGenConfig
 import roguelike.model.GameMap
+import roguelike.model.dungeon.DungeonGen
+import roguelike.model.dungeon.DungeonGenConfig
+import roguelike.model.dungeon.DungeonRules
 import roguelike.model.js.JsDungeon
 import roguelike.model.js.JsDungeonGameMapTuple
 import roguelike.model.js.JsGameMap
@@ -58,12 +59,12 @@ object DungeonGenWorker extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapT
     val dungeonModel =
       DungeonGen.makeMap(
         dice,
-        DungeonGen.MaxRooms,
-        DungeonGen.RoomMinSize,
-        DungeonGen.RoomMaxSize,
+        DungeonRules.MaxRooms,
+        DungeonRules.RoomMinSize,
+        DungeonRules.RoomMaxSize,
         Size(50, 30),
-        DungeonGen.maxMonstersPerRoom(0),
-        DungeonGen.maxCollectablesPerRoom(0),
+        DungeonRules.maxMonstersPerRoom(0),
+        DungeonRules.maxCollectablesPerRoom(0),
         config.currentLevel
       )
 

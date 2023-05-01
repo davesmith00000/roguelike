@@ -2,7 +2,7 @@ package roguelike.model.js
 
 import indigo.shared.datatypes.Point
 import roguelike.model.GameTile
-import roguelike.model.PositionedTile
+import roguelike.model.dungeon.PositionedTile
 
 import scala.scalajs.js
 

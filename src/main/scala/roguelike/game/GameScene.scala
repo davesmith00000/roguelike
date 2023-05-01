@@ -4,9 +4,9 @@ import indigo.*
 import indigo.scenes.*
 import roguelike.GameEvent
 import roguelike.GenerateLevel
-import roguelike.model.Dungeon
-import roguelike.model.DungeonGenConfig
 import roguelike.model.Model
+import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.DungeonGenConfig
 import roguelike.model.js.JsDungeon
 import roguelike.model.js.JsDungeonGameMapTuple
 import roguelike.model.js.JsGameMap

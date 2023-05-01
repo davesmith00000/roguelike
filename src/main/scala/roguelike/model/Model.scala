@@ -13,6 +13,7 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
 import roguelike.components.windows.WindowManagerCommand
+import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.*
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
