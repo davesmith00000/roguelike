@@ -61,7 +61,7 @@ object DungeonGenWorker extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapT
         DungeonGen.MaxRooms,
         DungeonGen.RoomMinSize,
         DungeonGen.RoomMaxSize,
-        RogueLikeGame.screenSize - Size(0, 5),
+        Size(50, 30),
         DungeonGen.maxMonstersPerRoom(0),
         DungeonGen.maxCollectablesPerRoom(0),
         config.currentLevel

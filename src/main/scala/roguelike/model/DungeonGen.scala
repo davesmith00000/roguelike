@@ -15,8 +15,8 @@ import scala.annotation.tailrec
 
 object DungeonGen:
 
-  val RoomMaxSize: Int = 10
-  val RoomMinSize: Int = 6
+  val RoomMaxSize: Int = 12
+  val RoomMinSize: Int = 9
   val MaxRooms: Int    = 30
 
   final case class Limit(floor: Int, amount: Int)
@@ -215,65 +215,51 @@ object DungeonGen:
   ): List[PositionedTile] =
     val start = Math.min(x1, x2)
     val end   = Math.max(x1, x2)
+
+    def column(x: Int) =
+      List(
+        PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
+        PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+        PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
+      )
+
     (start to end).toList.flatMap { x =>
       if x == start then
         List(
           PositionedTile(Point(x - 1, y - 1), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x - 1, y + 1), GameTile.Wall(WallCode.Wall))
-        ) ++
-          List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
-            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
-          )
+        ) ++ column(x)
       else if x == end then
         List(
           PositionedTile(Point(x + 1, y - 1), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x + 1, y + 1), GameTile.Wall(WallCode.Wall))
-        ) ++
-          List(
-            PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
-            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
-          )
-      else
-        List(
-          PositionedTile(Point(x, y - 1), GameTile.Wall(WallCode.Wall)),
-          PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x, y + 1), GameTile.Wall(WallCode.Wall))
-        )
+        ) ++ column(x)
+      else column(x)
     }
 
   def createVerticalTunnel(dice: Dice, y1: Int, y2: Int, x: Int): List[PositionedTile] =
     val start = Math.min(y1, y2)
     val end   = Math.max(y1, y2)
+
+    def row(y: Int) =
+      List(
+        PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
+        PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
+        PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
+      )
+
     (start to end).toList.flatMap { y =>
       if y == start then
         List(
           PositionedTile(Point(x - 1, y - 1), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x + 1, y - 1), GameTile.Wall(WallCode.Wall))
-        ) ++
-          List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
-            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
-          )
+        ) ++ row(y)
       else if y == end then
         List(
           PositionedTile(Point(x - 1, y + 1), GameTile.Wall(WallCode.Wall)),
           PositionedTile(Point(x + 1, y + 1), GameTile.Wall(WallCode.Wall))
-        ) ++
-          List(
-            PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
-            PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-            PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
-          )
-      else
-        List(
-          PositionedTile(Point(x - 1, y), GameTile.Wall(WallCode.Wall)),
-          PositionedTile(Point(x, y), GameTile.Ground(dice.rollFromZero(7))),
-          PositionedTile(Point(x + 1, y), GameTile.Wall(WallCode.Wall))
-        )
+        ) ++ row(y)
+      else row(y)
     }
 
   def finaliseTiles(tiles: List[PositionedTile]): List[PositionedTile] =
@@ -536,7 +522,7 @@ object DungeonGen:
         val x = dice.rollFromZero(mapSize.width - w - 1)
         val y = dice.rollFromZero(mapSize.height - h - 1)
 
-        val newRoom = Rectangle(x, y, w, h)
+        val newRoom = Rectangle(x, y, w - 2, h - 2).moveBy(1, 1)
 
         if rooms.exists(_.overlaps(newRoom)) then
           rec(
@@ -570,7 +556,7 @@ object DungeonGen:
                 currentFloor,
                 collectables.length,
                 dice,
-                newRoom,
+                newRoom.contract(1),
                 maxCollectablesPerRoom,
                 roomHostiles,
                 roomCenter
