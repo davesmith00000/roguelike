@@ -1,4 +1,4 @@
-package dungeongen.dungeon
+package dungeongen.js
 
 import scala.scalajs.js
 

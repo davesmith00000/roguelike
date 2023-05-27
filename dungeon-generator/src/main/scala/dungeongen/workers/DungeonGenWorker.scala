@@ -1,8 +1,8 @@
 package dungeongen.workers
 
 import dungeongen.dungeon.DungeonGen
-import dungeongen.dungeon.DungeonGenConfig
 import dungeongen.dungeon.DungeonRules
+import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap

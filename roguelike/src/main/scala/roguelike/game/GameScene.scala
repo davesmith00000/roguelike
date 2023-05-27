@@ -1,6 +1,6 @@
 package roguelike.game
 
-import dungeongen.dungeon.DungeonGenConfig
+import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap
