@@ -13,7 +13,7 @@ lazy val roguelike =
     .settings(
       name         := "roguelike",
       version      := "0.0.1",
-      scalaVersion := "3.2.2",
+      scalaVersion := "3.3.0",
       organization := "roguelike",
       libraryDependencies ++= Seq(
         "org.scalameta" %%% "munit" % "0.7.29" % Test
