@@ -21,9 +21,21 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
+val indigoVersion              = "0.15.0-RC1"
+val roguelikeStarterKitVersion = "0.3.0-RC1"
+
+lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
+  libraryDependencies ++= Seq(
+    "io.indigoengine" %%% "indigo-json-circe"    % indigoVersion,
+    "io.indigoengine" %%% "indigo"               % indigoVersion,
+    "io.indigoengine" %%% "indigo-extras"        % indigoVersion,
+    "io.indigoengine" %%% "roguelike-starterkit" % roguelikeStarterKitVersion
+  )
+)
+
 lazy val roguelikeProject =
   (project in file("."))
-    .aggregate(roguelike, roguelikeGenerated)
+    .aggregate(roguelike, roguelikeGenerated, dungeonGenerator, dungeonViewer)
     .settings(commonSettings)
     .settings(
       name := "roguelike-game"
@@ -32,6 +44,7 @@ lazy val roguelikeProject =
       logo := rawLogo + "(v" + version.value.toString + ")",
       usefulTasks := Seq(
         UsefulTask("runGame", "Run the game (requires Electron)").noAlias,
+        UsefulTask("runViewer", "Run the Dungeon Viewer (requires Electron)").noAlias,
         UsefulTask("buildGame", "Build web version").noAlias,
         UsefulTask(
           "runGameFull",
@@ -57,14 +70,7 @@ lazy val roguelikeGenerated =
   (project in file("roguelike-generated"))
     .enablePlugins(ScalaJSPlugin)
     .settings(commonSettings)
-    .settings(
-      libraryDependencies ++= Seq(
-        "io.indigoengine" %%% "indigo-json-circe"    % "0.15.0-RC1",
-        "io.indigoengine" %%% "indigo"               % "0.15.0-RC1",
-        "io.indigoengine" %%% "indigo-extras"        % "0.15.0-RC1",
-        "io.indigoengine" %%% "roguelike-starterkit" % "0.3.0-RC1"
-      )
-    )
+    .settings(indigoDeps)
     .settings(
       Compile / sourceGenerators += Def.task {
         val cachedFun = FileFunction.cached(
@@ -103,6 +109,33 @@ lazy val roguelikeGenerated =
       }.taskValue
     )
 
+lazy val dungeonGenerator =
+  (project in file("dungeon-generator"))
+    .enablePlugins(ScalaJSPlugin)
+    .settings(commonSettings)
+    .settings(indigoDeps)
+
+lazy val dungeonViewer =
+  (project in file("dungeon-viewer"))
+    .enablePlugins(ScalaJSPlugin, SbtIndigo)
+    .settings(commonSettings)
+    .settings(
+      name := "dungeon-viewer",
+      Test / scalaJSLinkerConfig ~= {
+        _.withModuleKind(ModuleKind.CommonJSModule)
+      },
+      showCursor            := true,
+      title                 := "Dungeon Viewer",
+      gameAssetsDirectory   := "./assets",
+      windowStartWidth      := 1024,
+      windowStartHeight     := 768,
+      disableFrameRateLimit := false,
+      electronInstall       := indigoplugin.ElectronInstall.Latest,
+      backgroundColor       := "black"
+    )
+    .settings(indigoDeps)
+    .dependsOn(dungeonGenerator)
+
 lazy val roguelike =
   project
     .enablePlugins(ScalaJSPlugin, SbtIndigo)
@@ -119,13 +152,9 @@ lazy val roguelike =
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
       electronInstall       := indigoplugin.ElectronInstall.Latest,
-      libraryDependencies ++= Seq(
-        "io.indigoengine" %%% "indigo-json-circe"    % "0.15.0-RC1",
-        "io.indigoengine" %%% "indigo"               % "0.15.0-RC1",
-        "io.indigoengine" %%% "indigo-extras"        % "0.15.0-RC1",
-        "io.indigoengine" %%% "roguelike-starterkit" % "0.3.0-RC1"
-      )
+      backgroundColor       := "black"
     )
+    .settings(indigoDeps)
     .enablePlugins(GhpagesPlugin) // Website stuff
     .settings(
       siteSourceDirectory      := target.value / "indigoBuildFull",
@@ -134,14 +163,14 @@ lazy val roguelike =
       git.remoteRepo           := "git@github.com:davesmith00000/roguelike.git",
       ghpagesNoJekyll          := true
     )
-    .dependsOn(roguelikeGenerated)
+    .dependsOn(roguelikeGenerated, dungeonGenerator)
 
 // To use indigoBuild or indigoRun, first comment out the line above that says: `scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }`
 addCommandAlias(
   "runGame",
   List(
     "roguelike/compile",
-    "roguelike/fastOptJS",
+    "roguelike/fastLinkJS",
     "roguelike/indigoRun"
   ).mkString(";", ";", "")
 )
@@ -157,7 +186,7 @@ addCommandAlias(
   "buildGame",
   List(
     "roguelike/compile",
-    "roguelike/fastOptJS",
+    "roguelike/fastLinkJS",
     "roguelike/indigoBuild"
   ).mkString(";", ";", "")
 )
@@ -169,7 +198,14 @@ addCommandAlias(
     "roguelike/indigoBuildFull"
   ).mkString(";", ";", "")
 )
-
+addCommandAlias(
+  "runViewer",
+  List(
+    "dungeonViewer/compile",
+    "dungeonViewer/fastLinkJS",
+    "dungeonViewer/indigoRun"
+  ).mkString(";", ";", "")
+)
 addCommandAlias(
   "publishGame",
   List(
