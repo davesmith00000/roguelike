@@ -1,20 +1,21 @@
 package roguelike
 
+import dungeongen.dungeon.DungeonGenConfig
+import dungeongen.js.JsDungeon
+import dungeongen.js.JsGameMap
+import dungeongen.workers.DungeonGenWorker
 import indigo.*
 import indigo.scenes.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
+import roguelike.GenerateLevel
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.dungeon.DungeonGenConfig
-import roguelike.model.js.JsDungeon
-import roguelike.model.js.JsGameMap
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
-import roguelike.workers.DungeonGenWorker
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 
@@ -47,7 +48,9 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
         workerSubSystem.WorkerEvent.Send(
           DungeonGenConfig(
             context.dice.seed.toDouble,
-            model.currentFloor
+            model.currentFloor,
+            RogueLikeGame.screenSize.width,
+            RogueLikeGame.screenSize.height
           )
         )
       )

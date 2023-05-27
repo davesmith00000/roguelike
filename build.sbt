@@ -35,7 +35,13 @@ lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
 
 lazy val roguelikeProject =
   (project in file("."))
-    .aggregate(roguelike, roguelikeGenerated, dungeonGenerator, dungeonViewer)
+    .aggregate(
+      roguelike,
+      roguelikeGenerated,
+      dungeonGenerator,
+      dungeonViewer,
+      roguelikeShared
+    )
     .settings(commonSettings)
     .settings(
       name := "roguelike-game"
@@ -109,11 +115,19 @@ lazy val roguelikeGenerated =
       }.taskValue
     )
 
+lazy val roguelikeShared =
+  (project in file("roguelike-shared"))
+    .enablePlugins(ScalaJSPlugin)
+    .settings(commonSettings)
+    .settings(indigoDeps)
+    .dependsOn(roguelikeGenerated)
+
 lazy val dungeonGenerator =
   (project in file("dungeon-generator"))
     .enablePlugins(ScalaJSPlugin)
     .settings(commonSettings)
     .settings(indigoDeps)
+    .dependsOn(roguelikeShared)
 
 lazy val dungeonViewer =
   (project in file("dungeon-viewer"))
@@ -163,7 +177,7 @@ lazy val roguelike =
       git.remoteRepo           := "git@github.com:davesmith00000/roguelike.git",
       ghpagesNoJekyll          := true
     )
-    .dependsOn(roguelikeGenerated, dungeonGenerator)
+    .dependsOn(dungeonGenerator)
 
 // To use indigoBuild or indigoRun, first comment out the line above that says: `scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }`
 addCommandAlias(

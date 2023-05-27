@@ -26,7 +26,8 @@ object CloneTilesScene extends Scene[Unit, Unit, Unit]:
 
   def updateModel(context: SceneContext[Unit], model: Unit): GlobalEvent => Outcome[Unit] =
     case KeyboardEvent.KeyUp(Key.SPACE) =>
-      Outcome(model).addGlobalEvents(SceneEvent.JumpTo(TerminalTextScene.name))
+      // Maybe use this to regenerate?
+      Outcome(model)
 
     case _ =>
       Outcome(model)
@@ -38,7 +39,6 @@ object CloneTilesScene extends Scene[Unit, Unit, Unit]:
   ): GlobalEvent => Outcome[Unit] =
     _ => Outcome(viewModel)
 
-  // This shouldn't live here really, just keeping it simple for demo purposes.
   val terminal: TerminalEmulator =
     TerminalEmulator(Size(3, 3))
       .put(

@@ -143,16 +143,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
   def isUnCloseable(model: Model): Boolean =
     !modelLens.get(model).windowManager.closeable
 
-enum WindowManagerCommand:
-  case ShowQuit
-  case ShowLevelUp
-  case ShowDropMenu
-  case ShowEquipMenu
-  case ShowInventoryMenu
-  case ShowHistory
-  case CloseAll
-  case HandleQuitKeyPress
-  case DelegateInput(key: Key)
+
 
 enum ActiveWindow(val closeable: Boolean):
   case None          extends ActiveWindow(true)

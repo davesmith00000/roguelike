@@ -1,4 +1,4 @@
-// package roguelike.model
+package roguelike.model
 
 // import indigo.shared.datatypes.Point
 // import indigo.shared.datatypes.RGBA
@@ -16,7 +16,11 @@
 // import roguelike.model.entity.Troll
 // import roguelike.model.gamedata.Consumables
 
-// class ModelSaveDataTests extends munit.FunSuite {
+class ModelSaveDataTests extends munit.FunSuite:
+
+  test("placeholder") {
+    assert(1 == 1)
+  }
 
 //   import SharedCodecs.given
 

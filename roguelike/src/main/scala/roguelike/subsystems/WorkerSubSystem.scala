@@ -1,5 +1,6 @@
 package roguelike.subsystems
 
+import dungeongen.workers.IndigoWorker
 import indigo.shared.IndigoLogger
 import indigo.shared.Outcome
 import indigo.shared.collections.Batch
@@ -11,7 +12,6 @@ import indigo.shared.subsystems.SubSystemFrameContext
 import indigo.shared.subsystems.SubSystemId
 import org.scalajs.dom
 import org.scalajs.dom.Event
-import roguelike.workers.IndigoWorker
 
 import scala.annotation.nowarn.apply
 import scala.collection.mutable
