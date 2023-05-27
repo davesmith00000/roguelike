@@ -7,40 +7,63 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
 
-lazy val roguelike =
+lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
+  version      := "0.0.1",
+  organization := "purplekingdomgames",
+  scalaVersion := "3.3.0",
+  libraryDependencies ++= Seq(
+    "org.scalameta" %%% "munit" % "0.7.29" % Test
+  ),
+  testFrameworks += new TestFramework("munit.Framework"),
+  scalafixOnCompile := true,
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision,
+  autoAPIMappings   := true
+)
+
+lazy val roguelikeProject =
   (project in file("."))
-    .enablePlugins(ScalaJSPlugin, SbtIndigo)
+    .aggregate(roguelike, roguelikeGenerated)
+    .settings(commonSettings)
     .settings(
-      name         := "roguelike",
-      version      := "0.0.1",
-      scalaVersion := "3.3.0",
-      organization := "roguelike",
-      libraryDependencies ++= Seq(
-        "org.scalameta" %%% "munit" % "0.7.29" % Test
+      name := "roguelike-game"
+    )
+    .settings(
+      logo := rawLogo + "(v" + version.value.toString + ")",
+      usefulTasks := Seq(
+        UsefulTask("runGame", "Run the game (requires Electron)").noAlias,
+        UsefulTask("buildGame", "Build web version").noAlias,
+        UsefulTask(
+          "runGameFull",
+          "Run the fully optimised game (requires Electron)"
+        ).noAlias,
+        UsefulTask(
+          "buildGameFull",
+          "Build the fully optimised web version"
+        ).noAlias,
+        UsefulTask("publishGame", "Publish game to ghpages").noAlias,
+        UsefulTask("code", "Launch VSCode").noAlias
       ),
-      testFrameworks += new TestFramework("munit.Framework"),
-      Test / scalaJSLinkerConfig ~= {
-        _.withModuleKind(ModuleKind.CommonJSModule)
-      },
-      showCursor            := true,
-      title                 := "My Generic Roguelike",
-      gameAssetsDirectory   := "assets",
-      windowStartWidth      := 1280,
-      windowStartHeight     := 720,
-      disableFrameRateLimit := false,
-      electronInstall       := indigoplugin.ElectronInstall.Latest,
+      logoColor        := scala.Console.YELLOW,
+      aliasColor       := scala.Console.BLUE,
+      commandColor     := scala.Console.CYAN,
+      descriptionColor := scala.Console.WHITE
+    )
+    .settings(
+      code := { "code ." ! }
+    )
+
+lazy val roguelikeGenerated =
+  (project in file("roguelike-generated"))
+    .enablePlugins(ScalaJSPlugin)
+    .settings(commonSettings)
+    .settings(
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "indigo-json-circe"    % "0.15.0-RC1",
         "io.indigoengine" %%% "indigo"               % "0.15.0-RC1",
         "io.indigoengine" %%% "indigo-extras"        % "0.15.0-RC1",
         "io.indigoengine" %%% "roguelike-starterkit" % "0.3.0-RC1"
-      ),
-      scalafixOnCompile := true,
-      semanticdbEnabled := true,
-      semanticdbVersion := scalafixSemanticdb.revision
-    )
-    .settings(
-      code := { "code ." ! }
+      )
     )
     .settings(
       Compile / sourceGenerators += Def.task {
@@ -76,30 +99,32 @@ lazy val roguelike =
                 outDir
               )
         }
-
         cachedFun(IO.listFiles(baseDirectory.value / "gamedata").toSet).toSeq
       }.taskValue
     )
+
+lazy val roguelike =
+  project
+    .enablePlugins(ScalaJSPlugin, SbtIndigo)
+    .settings(commonSettings)
     .settings(
-      logo := rawLogo + "(v" + version.value.toString + ")",
-      usefulTasks := Seq(
-        UsefulTask("runGame", "Run the game (requires Electron)").noAlias,
-        UsefulTask("buildGame", "Build web version").noAlias,
-        UsefulTask(
-          "runGameFull",
-          "Run the fully optimised game (requires Electron)"
-        ).noAlias,
-        UsefulTask(
-          "buildGameFull",
-          "Build the fully optimised web version"
-        ).noAlias,
-        UsefulTask("publishGame", "Publish game to ghpages").noAlias,
-        UsefulTask("code", "Launch VSCode").noAlias
-      ),
-      logoColor        := scala.Console.YELLOW,
-      aliasColor       := scala.Console.BLUE,
-      commandColor     := scala.Console.CYAN,
-      descriptionColor := scala.Console.WHITE
+      name := "roguelike",
+      Test / scalaJSLinkerConfig ~= {
+        _.withModuleKind(ModuleKind.CommonJSModule)
+      },
+      showCursor            := true,
+      title                 := "My Generic Roguelike",
+      gameAssetsDirectory   := "../assets",
+      windowStartWidth      := 1280,
+      windowStartHeight     := 720,
+      disableFrameRateLimit := false,
+      electronInstall       := indigoplugin.ElectronInstall.Latest,
+      libraryDependencies ++= Seq(
+        "io.indigoengine" %%% "indigo-json-circe"    % "0.15.0-RC1",
+        "io.indigoengine" %%% "indigo"               % "0.15.0-RC1",
+        "io.indigoengine" %%% "indigo-extras"        % "0.15.0-RC1",
+        "io.indigoengine" %%% "roguelike-starterkit" % "0.3.0-RC1"
+      )
     )
     .enablePlugins(GhpagesPlugin) // Website stuff
     .settings(
@@ -109,12 +134,41 @@ lazy val roguelike =
       git.remoteRepo           := "git@github.com:davesmith00000/roguelike.git",
       ghpagesNoJekyll          := true
     )
+    .dependsOn(roguelikeGenerated)
 
 // To use indigoBuild or indigoRun, first comment out the line above that says: `scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }`
-addCommandAlias("runGame", ";compile;fastOptJS;indigoRun")
-addCommandAlias("runGameFull", ";compile;fullOptJS;indigoRunFull")
-addCommandAlias("buildGame", ";compile;fastOptJS;indigoBuild")
-addCommandAlias("buildGameFull", ";compile;fullOptJS;indigoBuildFull")
+addCommandAlias(
+  "runGame",
+  List(
+    "roguelike/compile",
+    "roguelike/fastOptJS",
+    "roguelike/indigoRun"
+  ).mkString(";", ";", "")
+)
+addCommandAlias(
+  "runGameFull",
+  List(
+    "roguelike/compile",
+    "roguelike/fullOptJS",
+    "roguelike/indigoRunFull"
+  ).mkString(";", ";", "")
+)
+addCommandAlias(
+  "buildGame",
+  List(
+    "roguelike/compile",
+    "roguelike/fastOptJS",
+    "roguelike/indigoBuild"
+  ).mkString(";", ";", "")
+)
+addCommandAlias(
+  "buildGameFull",
+  List(
+    "roguelike/compile",
+    "roguelike/fullOptJS",
+    "roguelike/indigoBuildFull"
+  ).mkString(";", ";", "")
+)
 
 addCommandAlias(
   "publishGame",

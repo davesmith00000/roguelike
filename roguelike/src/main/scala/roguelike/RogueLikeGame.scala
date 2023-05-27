@@ -8,7 +8,9 @@ import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
+import roguelike.model.GameAssetLoader
 import roguelike.model.Model
+import roguelike.model.SpriteAssetData
 import roguelike.screeneffects.InnerGlow
 import roguelike.shaders.Hover
 import roguelike.subsystems.FloatingMessage
@@ -90,7 +92,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   ): Outcome[Startup[Size]] =
     if GameAssets.loaded(assetCollection) && GameAssets.lazyAssetsLoaded(assetCollection) then
       val spriteAnimationLoader: (SpriteAssetData, Depth) => Outcome[SpriteAndAnimations] =
-        roguelike.AssetLoader.loadAnimation(assetCollection, dice)
+        GameAssetLoader.loadAnimation(assetCollection, dice)
 
       val spritesAndAnimations: Outcome[Batch[(AssetName, SpriteAndAnimations)]] =
         SpriteAssetData.spriteData.map { s =>

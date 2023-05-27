@@ -1,10 +1,10 @@
-package roguelike
+package roguelike.model
 
 import indigo.*
 import indigo.json.Json
 import roguelike.assets.GameAssets
 
-object AssetLoader:
+object GameAssetLoader:
 
   def loadAnimation(
       assetCollection: AssetCollection,
