@@ -8,15 +8,17 @@ import io.indigoengine.roguelike.starterkit.*
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 @JSExportTopLevel("IndigoGame")
-object DungeonViewer extends IndigoGame[Unit, Unit, Unit, Unit]:
+object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
+
+  val screenSize = Size(80, 50)
 
   val maxTileCount: Int = 4000
 
   def initialScene(bootData: Unit): Option[SceneName] =
-    Option(CloneTilesScene.name)
+    Option(ViewerScene.name)
 
-  def scenes(bootData: Unit): NonEmptyList[Scene[Unit, Unit, Unit]] =
-    NonEmptyList(CloneTilesScene)
+  def scenes(bootData: Unit): NonEmptyList[Scene[Unit, Model, ViewModel]] =
+    NonEmptyList(ViewerScene)
 
   val eventFilters: EventFilters =
     EventFilters.Permissive
@@ -26,8 +28,8 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Unit, Unit]:
       BootResult
         .noData(
           GameConfig.default
-            .withMagnification(2)
             .withFrameRateLimit(FPS.`60`)
+            .withViewport(screenSize * Size(10))
         )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
         .withAssets(Assets.assets)
@@ -35,31 +37,30 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Unit, Unit]:
           TerminalEntity.shader(maxTileCount),
           TerminalText.standardShader
         )
-        .withSubSystems(FPSCounter(Point(10, 350)))
     )
 
-  def initialModel(startupData: Unit): Outcome[Unit] =
-    Outcome(())
+  def initialModel(startupData: Unit): Outcome[Model] =
+    Outcome(Model.initial)
 
-  def initialViewModel(startupData: Unit, model: Unit): Outcome[Unit] =
-    Outcome(())
+  def initialViewModel(startupData: Unit, model: Model): Outcome[ViewModel] =
+    Outcome(ViewModel.initial)
 
   def setup(bootData: Unit, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[Unit]] =
     Outcome(Startup.Success(()))
 
-  def updateModel(context: FrameContext[Unit], model: Unit): GlobalEvent => Outcome[Unit] =
+  def updateModel(context: FrameContext[Unit], model: Model): GlobalEvent => Outcome[Model] =
     _ => Outcome(model)
 
   def updateViewModel(
       context: FrameContext[Unit],
-      model: Unit,
-      viewModel: Unit
-  ): GlobalEvent => Outcome[Unit] =
+      model: Model,
+      viewModel: ViewModel
+  ): GlobalEvent => Outcome[ViewModel] =
     _ => Outcome(viewModel)
 
   def present(
       context: FrameContext[Unit],
-      model: Unit,
-      viewModel: Unit
+      model: Model,
+      viewModel: ViewModel
   ): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment.empty)
