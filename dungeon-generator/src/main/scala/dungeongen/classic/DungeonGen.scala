@@ -1,4 +1,4 @@
-package dungeongen.dungeon
+package dungeongen.classic
 
 import indigo.*
 import roguelike.model.GameTile

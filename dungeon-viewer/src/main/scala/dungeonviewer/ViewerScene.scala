@@ -1,7 +1,7 @@
 package dungeonviewer
 
-import dungeongen.dungeon.DungeonGen
-import dungeongen.dungeon.DungeonRules
+import dungeongen.classic.DungeonGen
+import dungeongen.classic.DungeonRules
 import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
