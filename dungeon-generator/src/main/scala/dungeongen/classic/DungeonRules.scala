@@ -11,8 +11,8 @@ import scala.annotation.tailrec
 
 object DungeonRules:
 
-  val RoomMaxSize: Int = 12
-  val RoomMinSize: Int = 9
+  val RoomMaxSize: Int = 13
+  val RoomMinSize: Int = 7
   val MaxRooms: Int    = 30
 
   final case class Limit(floor: Int, amount: Int)

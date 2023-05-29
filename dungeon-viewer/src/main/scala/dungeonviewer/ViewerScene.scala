@@ -1,6 +1,5 @@
 package dungeonviewer
 
-import dungeongen.classic.DungeonGen
 import dungeongen.classic.DungeonRules
 import indigo.*
 import indigo.scenes.*
@@ -45,7 +44,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
   ): GlobalEvent => Outcome[ViewModel] =
     case KeyboardEvent.KeyUp(Key.SPACE) =>
       val dungeon: Dungeon =
-        DungeonGen.makeMap(
+        dungeongen.v2.DungeonGen.makeMap(
           context.dice,
           DungeonRules.MaxRooms,
           DungeonRules.RoomMinSize,
@@ -56,6 +55,17 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           0
         )
 
+        // dungeongen.classic.DungeonGen.makeMap(
+        //   context.dice,
+        //   DungeonRules.MaxRooms,
+        //   DungeonRules.RoomMinSize,
+        //   DungeonRules.RoomMaxSize,
+        //   Size(80, 50),
+        //   DungeonRules.maxMonstersPerRoom(0),
+        //   DungeonRules.maxCollectablesPerRoom(0),
+        //   0
+        // )
+
       val bg: Batch[(Point, MapTile)] =
         dungeon.positionedTiles.toBatch.map { p =>
           p.tile match
@@ -63,7 +73,10 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
               p.position -> MapTile(Tile.`▓`, RGBA.Crimson)
 
             case Ground(style) =>
-              p.position -> MapTile(Tile.`░`, RGBA.Red.mix(RGBA.Black, 0.5))
+              val c =
+                if style % 2 == 0 then RGBA.Red.mix(RGBA.Black, 0.4)
+                else RGBA.Red.mix(RGBA.Black, 0.75)
+              p.position -> MapTile(Tile.`░`, c)
 
             case DownStairs =>
               p.position -> MapTile(Tile.BLACK_UP_POINTING_TRIANGLE, RGBA.Yellow)
