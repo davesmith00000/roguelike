@@ -1,7 +1,6 @@
 package dungeongen.v2
 
 import indigo.*
-import indigoextras.geometry.BoundingBox
 
 import scala.annotation.tailrec
 

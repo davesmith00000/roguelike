@@ -1,7 +1,6 @@
 package dungeongen.v2
 
 import indigo.*
-import indigoextras.geometry.BoundingBox
 import roguelike.model.GameTile
 import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground

@@ -2,7 +2,6 @@ package roguelike.components.ui
 
 import indigo.*
 import indigo.shared.scenegraph.*
-import indigoextras.geometry.Vertex
 import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
