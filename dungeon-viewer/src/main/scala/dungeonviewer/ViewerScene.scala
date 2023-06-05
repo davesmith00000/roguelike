@@ -106,6 +106,9 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     case _ =>
       Outcome(viewModel)
 
+  def drawTriangle(t: Triangle): Shape.Polygon =
+    Shape.Polygon(t.closed.map(_.toPoint), Fill.None, Stroke(1, RGBA.Magenta))
+
   def present(
       context: SceneContext[Unit],
       model: Model,
@@ -117,15 +120,23 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           Graphic(10, 10, TerminalText(Assets.tileMap, fg, bg))
         }
 
+    val points: Batch[Shape.Circle] =
+      model.points.map { pt =>
+        Shape.Circle(
+          pt,
+          5,
+          Fill.Color(RGBA.Green)
+        )
+      }
+
+    val superTriangle = Batch(drawTriangle(model.superTriangle))
+
     Outcome(
-      SceneUpdateFragment(tiles.clones)
+      SceneUpdateFragment(
+        tiles.clones ++ points ++ superTriangle
+      )
         .addCloneBlanks(tiles.blanks)
     )
-
-final case class Model()
-object Model:
-  val initial: Model =
-    Model()
 
 final case class ViewModel(terminal: TerminalEmulator)
 object ViewModel:
@@ -136,3 +147,38 @@ object ViewModel:
         .putLine(Point(1, 1), "Hit the space key to generate / regenerate", RGBA.White, RGBA.Black)
 
     ViewModel(terminal)
+
+final case class Model(points: Batch[Point], superTriangle: Triangle)
+object Model:
+
+  def randomPoint(dice: Dice, offset: Point): Point =
+    Point(dice.rollFromZero(300), dice.rollFromZero(300)).moveBy(offset)
+
+  val initial: Model =
+    val dice          = Dice.fromSeed(1)
+    val offset        = Point(150, 200)
+    val points        = List.fill(5)(randomPoint(dice, offset)).toBatch
+    val superTriangle = Triangle.encompassing(points.map(_.toVertex))
+
+    Model(
+      points,
+      superTriangle
+    )
+
+final case class Triangle(a: Vertex, b: Vertex, c: Vertex):
+  val vertices: Batch[Vertex] = Batch(a, b, c)
+  val closed: Batch[Vertex]   = Batch(a, b, c, a)
+
+object Triangle:
+
+  // A triangle big enough to comfortably contain a point cloud
+  // Some fudged numbers here.
+  def encompassing(pointCloud: Batch[Vertex]): Triangle =
+    encompassing(BoundingBox.fromVertexCloud(pointCloud).expand(20))
+
+  def encompassing(b: BoundingBox): Triangle =
+    val t = Vertex(b.center.x, b.center.y - b.height)
+    val l = Vertex(b.center.x - b.width, b.bottom)
+    val r = Vertex(b.center.x + b.width, b.bottom)
+
+    Triangle(t, l, r)
