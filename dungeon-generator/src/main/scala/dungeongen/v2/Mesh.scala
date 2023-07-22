@@ -67,35 +67,32 @@ final case class Mesh(
     * other/connecting edges.
     */
   def removeEdgeAt(index: Int): Mesh =
-    edges.filterNot(e => e._1 == index)
     this.copy(
       edges = edges.filterNot(e => e._1 == index),
       tris = tris.filterNot(t => t._2.edgeA == index || t._2.edgeB == index || t._2.edgeC == index)
     )
 
-  // /** Adds a triangle using existing edges. Checks the edges are present, but does not ensure they
-  //   * are valid.
-  //   */
-  // def addTri(tri: Tri): Mesh =
-  //   if tri.edgeA >= 0 && tri.edgeA < edges.length &&
-  //     tri.edgeB >= 0 && tri.edgeB < edges.length &&
-  //     tri.edgeC >= 0 && tri.edgeC < edges.length
-  //   then this.copy(tris = tris :+ tri)
-  //   else this
+  /** Adds a triangle using existing edges. Checks the edges are present, but does not ensure they
+    * are valid.
+    */
+  def addTri(tri: Tri): Mesh =
+    if edges.exists(p => p._1 == tri.edgeA) &&
+      edges.exists(p => p._1 == tri.edgeB) &&
+      edges.exists(p => p._1 == tri.edgeC)
+    then
+      this.copy(
+        tris = tris :+ triNext -> tri,
+        triNext = triNext + 1
+      )
+    else this
 
-  // /** Removes any tris that match. */
-  // def removeTri(tri: Tri): Mesh =
-  //   this.copy(tris = tris.filterNot(_ == tri))
+  /** Removes any tris that match, leaves edges and vertices intact. */
+  def removeTri(tri: Tri): Mesh =
+    this.copy(tris = tris.filterNot(_._2 == tri))
 
-  // /** Removes the tri at the specified index. */
-  // def removeTriAt(index: Int): Mesh =
-  //   if index >= 0 && index < tris.length then
-  //     val (t1, t2) = tris.splitAt(index)
-
-  //     this.copy(
-  //       tris = t1.dropRight(1) ++ t2
-  //     )
-  //   else this
+  /** Removes the tri at the specified index, leaves edges and vertices intact. */
+  def removeTriAt(index: Int): Mesh =
+    this.copy(tris = tris.filterNot(_._1 == index))
 
   // // def addTriangle(triangle: Triangle): Triangulation =
   // //   val indexed = vertices.zipWithIndex
@@ -146,16 +143,29 @@ final case class Mesh(
   //     case _ => None
   //   }
 
-  // def |+|(other: Mesh): Mesh =
-  //   Mesh.combine(this, other)
+  /** Combines two meshes together, offsetting the indices of the second mesh by the first. Does not
+    * attempt to optimise the meshes in any way.
+    */
+  def |+|(other: Mesh): Mesh =
+    Mesh.combine(this, other)
 
-  // def prune: Mesh =
-  //   Mesh.prune(this)
+  /** Prune to remove any vertices and edges that are not part of a Tri. */
+  def prune: Mesh =
+    this
 
-  // def weld: Mesh =
-  //   Mesh.weld(this)
+  /** Weld matching Vertices and Edges, and remove the duplicates. */
+  def weld: Mesh =
+    this
 
-  // def transformVertex? // TODO
+  /** Weld matching Vertices and Edges, and then prune to remove any vertices and edges that are not
+    * part of a Tri.
+    */
+  def optimise: Mesh =
+    weld.prune
+
+  // TODO?
+  // def transformVertex? (translate / rotate / scale)
+  // def transformMesh? (translate / rotate / scale)
 
 object Mesh:
 
@@ -172,20 +182,36 @@ object Mesh:
   //     Batch(Tri(0, 1, 2))
   //   )
 
-  // def combine(a: Mesh, b: Mesh): Mesh =
-  //   // TODO: This is wrong, need to change the index offsets otherwise you get 0,1,2,0,1,2 instead of 0,1,2,3,4,5.
-  //   Mesh(
-  //     a.vertices ++ b.vertices,
-  //     a.edges ++ b.edges,
-  //     a.tris ++ b.tris
-  //   )
+  def offsetIndexesBy(vertexOffset: Int, edgeOffset: Int, triOffset: Int)(mesh: Mesh): Mesh =
+    Mesh(
+      vertices = mesh.vertices.map(p => (p._1 + vertexOffset, p._2)),
+      vertexNext = mesh.vertexNext + vertexOffset,
+      edges = mesh.edges.map { p =>
+        (p._1 + edgeOffset, Edge(p._2.vertexA + vertexOffset, p._2.vertexB + vertexOffset))
+      },
+      edgeNext = mesh.edgeNext + edgeOffset,
+      tris = mesh.tris.map { p =>
+        (
+          p._1 + triOffset,
+          Tri(p._2.edgeA + edgeOffset, p._2.edgeB + edgeOffset, p._2.edgeC + edgeOffset)
+        )
+      },
+      triNext = mesh.triNext + triOffset
+    )
 
-  // /** Removes edges and vertices that are not part of a Tri. */
-  // def prune(m: Mesh): Mesh =
-  //   m
-
-  // def weld(m: Mesh): Mesh =
-  //   m
+  /** Combines two meshes together, offsetting the indices of the second mesh by the first. Does not
+    * attempt to optimise the meshes in any way.
+    */
+  def combine(a: Mesh, b: Mesh): Mesh =
+    val bb = offsetIndexesBy(a.vertexNext, a.edgeNext, a.triNext)(b)
+    Mesh(
+      vertices = a.vertices ++ bb.vertices,
+      vertexNext = bb.vertexNext,
+      edges = a.edges ++ bb.edges,
+      edgeNext = bb.edgeNext,
+      tris = a.tris ++ bb.tris,
+      triNext = bb.triNext
+    )
 
 final case class Edge(vertexA: Int, vertexB: Int):
   def indices: Batch[Int] =
