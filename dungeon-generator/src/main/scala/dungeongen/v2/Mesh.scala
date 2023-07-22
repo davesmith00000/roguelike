@@ -3,7 +3,8 @@ package dungeongen.v2
 import indigo.*
 import indigo.syntax.*
 
-// TODO: Maybe it should be a class with ListBuffers?
+/** Naive implementation of a data structure for storing and modifying tri[angle]-based mesh data.
+  */
 final case class Mesh(
     vertices: Batch[(Int, Vertex)],
     vertexNext: Int,
@@ -20,7 +21,7 @@ final case class Mesh(
       vertexNext = vertexNext + 1
     )
 
-  // /** Removes any vertices that match, and any edges, and then any tris connected to them. */
+  /** Removes any vertices that match, and any edges, and then any tris connected to them. */
   def removeVertex(vertex: Vertex): Mesh =
     vertices.filter(_._2 ~== vertex).foldLeft(this) { case (acc, (i, _)) => acc.removeVertexAt(i) }
 
@@ -43,55 +44,34 @@ final case class Mesh(
       tris = t
     )
 
-    // if index >= 0 && index < vertices.length then
-    //   val (v1, v2) = vertices.splitAt(index)
-    //   val (badEdges, goodEdges) = edges.zipWithIndex.partition { case (e, _) =>
-    //     e.vertexA == index || e.vertexB == index
-    //   }
-    //   val badEdgeIndices = badEdges.map(_._2)
-    //   val t = tris.filterNot(t =>
-    //     badEdgeIndices.contains(t.edgeA) ||
-    //       badEdgeIndices.contains(t.edgeB) ||
-    //       badEdgeIndices.contains(t.edgeC)
-    //   )
+  /** Adds an edge using existing vertices. Checks the vertices are present, but does not ensure
+    * they are valid.
+    */
+  def addEdge(edge: Edge): Mesh =
+    if vertices.exists(p => p._1 == edge.vertexA) &&
+      vertices.exists(p => p._1 == edge.vertexB)
+    then
+      this.copy(
+        edges = edges :+ edgeNext -> edge,
+        edgeNext = edgeNext + 1
+      )
+    else this
 
-    //   this.copy(
-    //     vertices = v1 ++ v2.drop(1),
-    //     edges = goodEdges.map { case (e, _) =>
-    //       Edge(
-    //         if e.vertexA < index then e.vertexA else e.vertexA - 1,
-    //         if e.vertexB < index then e.vertexB else e.vertexB - 1
-    //       )
-    //     },
-    //     tris = t
-    //   )
-    // else this
+  /** Removes any edges that match, and any tris using them. Does not remove any other/connecting
+    * edges.
+    */
+  def removeEdge(edge: Edge): Mesh =
+    edges.filter(_._2 == edge).foldLeft(this) { case (acc, (i, _)) => acc.removeEdgeAt(i) }
 
-  // /** Adds an edge using existing vertices. Checks the vertices are present, but does not ensure
-  //   * they are valid.
-  //   */
-  // def addEdge(edge: Edge): Mesh =
-  //   if edge.vertexA >= 0 && edge.vertexA < vertices.length &&
-  //     edge.vertexB >= 0 && edge.vertexB < vertices.length
-  //   then this.copy(edges = edges :+ edge)
-  //   else this
-
-  // /** Removes any edges that match, and any tris connected to them. */
-  // def removeEdge(edge: Edge): Mesh =
-  //   val delete = edges.zipWithIndex.collect { case (e, i) if e == edge => i }
-  //   delete.foldLeft(this) { case (acc, i) => acc.removeEdgeAt(i) }
-
-  // /** Removes the edge at the specified index, and any tris attached to it. */
-  // def removeEdgeAt(index: Int): Mesh =
-  //   if index >= 0 && index < edges.length then
-  //     val (e1, e2) = edges.splitAt(index)
-  //     val t        = tris.filterNot(t => t.edgeA == index || t.edgeB == index || t.edgeC == index)
-
-  //     this.copy(
-  //       edges = e1.dropRight(1) ++ e2,
-  //       tris = t
-  //     )
-  //   else this
+  /** Removes the edge at the specified index, and any tris using it. Does not remove any
+    * other/connecting edges.
+    */
+  def removeEdgeAt(index: Int): Mesh =
+    edges.filterNot(e => e._1 == index)
+    this.copy(
+      edges = edges.filterNot(e => e._1 == index),
+      tris = tris.filterNot(t => t._2.edgeA == index || t._2.edgeB == index || t._2.edgeC == index)
+    )
 
   // /** Adds a triangle using existing edges. Checks the edges are present, but does not ensure they
   //   * are valid.
@@ -174,6 +154,8 @@ final case class Mesh(
 
   // def weld: Mesh =
   //   Mesh.weld(this)
+
+  // def transformVertex? // TODO
 
 object Mesh:
 
