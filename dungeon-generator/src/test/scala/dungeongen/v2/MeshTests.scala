@@ -14,9 +14,13 @@ class MeshTests extends munit.FunSuite {
    */
   val quadMesh =
     Mesh(
-      vertices = Batch(Vertex(0, 0), Vertex(0, 1), Vertex(1, 0), Vertex(1, 1)),
-      edges = Batch(Edge(0, 1), Edge(1, 2), Edge(2, 0), Edge(1, 3), Edge(3, 2)),
-      tris = Batch(Tri(0, 1, 2), Tri(4, 5, 1))
+      vertices = Batch(0 -> Vertex(0, 0), 1 -> Vertex(0, 1), 2 -> Vertex(1, 0), 3 -> Vertex(1, 1)),
+      vertexNext = 4,
+      edges =
+        Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0), 3 -> Edge(1, 3), 4 -> Edge(3, 2)),
+      edgeNext = 5,
+      tris = Batch(0 -> Tri(0, 1, 2), 1 -> Tri(4, 5, 1)),
+      triNext = 2
     )
 
   test("addVertex") {
@@ -24,55 +28,91 @@ class MeshTests extends munit.FunSuite {
       Mesh.empty.addVertex(Vertex(1, 0))
 
     val expected =
-      Mesh(
-        vertices = Batch(Vertex(1, 0)),
-        edges = Batch(),
-        tris = Batch()
+      Mesh.empty.copy(
+        vertices = Batch(0 -> Vertex(1, 0)),
+        vertexNext = 1
       )
 
     assertEquals(actual, expected)
   }
 
+  /*
+  0---2
+  |  /
+  | /
+  |/
+  1
+   */
   test("removeVertex") {
-    assert(1 == 2)
+    val actual =
+      quadMesh.removeVertex(Vertex(1, 1))
+
+    val expected =
+      Mesh(
+        vertices = Batch(0 -> Vertex(0, 0), 1 -> Vertex(0, 1), 2 -> Vertex(1, 0)),
+        vertexNext = 4,
+        edges = Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0)),
+        edgeNext = 5,
+        tris = Batch(0 -> Tri(0, 1, 2)),
+        triNext = 2
+      )
+
+    assertEquals(actual, expected)
   }
 
+  /*
+  0---2
+  |  /
+  | /
+  |/
+  1
+   */
   test("removeVertexAt (3)") {
     val actual =
       quadMesh.removeVertexAt(3)
 
     val expected =
       Mesh(
-        vertices = Batch(Vertex(0, 0), Vertex(0, 1), Vertex(1, 0)),
-        edges = Batch(Edge(0, 1), Edge(1, 2), Edge(2, 0)),
-        tris = Batch(Tri(0, 1, 2))
+        vertices = Batch(0 -> Vertex(0, 0), 1 -> Vertex(0, 1), 2 -> Vertex(1, 0)),
+        vertexNext = 4,
+        edges = Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0)),
+        edgeNext = 5,
+        tris = Batch(0 -> Tri(0, 1, 2)),
+        triNext = 2
       )
 
     assertEquals(actual, expected)
   }
 
-  /* New mesh
-      1
+  /*
+      2
      /|
     / |
    /  |
-  0---2
+  1---3
    */
-  test("removeVertexAt (0)".only) {
+  test("removeVertexAt (0)") {
     val actual =
       quadMesh.removeVertexAt(0)
 
     val expected =
       Mesh(
-        vertices = Batch(Vertex(0, 1), Vertex(1, 0), Vertex(1, 1)),
-        edges = Batch(Edge(0, 1), Edge(0, 2), Edge(2, 1)),
-        tris = Batch(Tri(0, 1, 2))
+        vertices = Batch(1 -> Vertex(0, 1), 2 -> Vertex(1, 0), 3 -> Vertex(1, 1)),
+        vertexNext = 4,
+        edges = Batch(1 -> Edge(1, 2), 3 -> Edge(1, 3), 4 -> Edge(3, 2)),
+        edgeNext = 5,
+        tris = Batch(1 -> Tri(4, 5, 1)),
+        triNext = 2
       )
 
     assertEquals(actual, expected)
   }
 
   test("addEdge") {
+    assert(1 == 2)
+  }
+
+  test("addEdge - fail - missing vertex") {
     assert(1 == 2)
   }
 
