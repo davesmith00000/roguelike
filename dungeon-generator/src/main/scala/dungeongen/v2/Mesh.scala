@@ -29,7 +29,7 @@ final case class Mesh(vertices: Batch[Vertex], edges: Batch[Edge], tris: Batch[T
       )
 
       this.copy(
-        vertices = v1.dropRight(1) ++ v2,
+        vertices = v1 ++ v2.drop(1),
         edges = goodEdges.map(_._1),
         tris = t
       )
@@ -133,6 +133,45 @@ final case class Mesh(vertices: Batch[Vertex], edges: Batch[Edge], tris: Batch[T
     catch {
       case _ => None
     }
+
+  def |+|(other: Mesh): Mesh =
+    Mesh.combine(this, other)
+
+  def prune: Mesh =
+    Mesh.prune(this)
+
+  def weld: Mesh =
+    Mesh.weld(this)
+
+object Mesh:
+
+  def empty: Mesh =
+    Mesh(Batch.empty, Batch.empty, Batch.empty)
+
+  def fromTriangles(triangles: Batch[Triangle]): Mesh =
+    triangles.map(fromTriangle).foldLeft(Mesh.empty)(_ |+| _)
+
+  def fromTriangle(triangle: Triangle): Mesh =
+    Mesh(
+      triangle.vertices,
+      Batch(Edge(0, 1), Edge(1, 2), Edge(2, 0)),
+      Batch(Tri(0, 1, 2))
+    )
+
+  def combine(a: Mesh, b: Mesh): Mesh =
+    // TODO: This is wrong, need to change the index offsets otherwise you get 0,1,2,0,1,2 instead of 0,1,2,3,4,5.
+    Mesh(
+      a.vertices ++ b.vertices,
+      a.edges ++ b.edges,
+      a.tris ++ b.tris
+    )
+
+  /** Removes edges and vertices that are not part of a Tri. */
+  def prune(m: Mesh): Mesh =  
+    m
+
+  def weld(m: Mesh): Mesh =  
+    m
 
 final case class Edge(vertexA: Int, vertexB: Int):
   def indices: Batch[Int] =
