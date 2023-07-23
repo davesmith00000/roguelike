@@ -63,7 +63,7 @@ final case class Mesh(
     * edges.
     */
   def removeEdge(edge: Edge): Mesh =
-    edges.filter(_._2 == edge).foldLeft(this) { case (acc, (i, _)) => acc.removeEdgeAt(i) }
+    edges.filter(_._2 ~== edge).foldLeft(this) { case (acc, (i, _)) => acc.removeEdgeAt(i) }
 
   /** Removes the edge at the specified index, and any tris using it. Does not remove any
     * other/connecting edges.
@@ -107,12 +107,7 @@ final case class Mesh(
     * results.
     */
   def toTriangles: Batch[Triangle] =
-    tris.flatMap { case (_, t) =>
-      val vSet = t.indices.map(i => edges(i)).flatMap(_._2.indices).toSet
-      if vSet.size == 3 then
-        Batch.fromOption(Triangle.fromVertices(vSet.toList.map(i => vertices(i)._2)))
-      else Batch.empty
-    }
+    tris.flatMap(t => Batch.fromOption(Mesh.toTriangle(t._2, this)))
 
   def toLineSegments: Batch[LineSegment] =
     edges.map { case (_, e) =>
@@ -293,6 +288,13 @@ object Mesh:
       triNext = bb.triNext
     )
 
+  def toTriangle(tri: Tri, mesh: Mesh): Option[Triangle] =
+    try
+      val vSet = tri.indices.map(i => mesh.edges(i)).flatMap(_._2.indices).toSet
+      if vSet.size == 3 then Triangle.fromVertices(vSet.toList.map(i => mesh.vertices(i)._2))
+      else None
+    catch case _ => None
+
 final case class Edge(vertexA: Int, vertexB: Int):
   def indices: Batch[Int] =
     Batch(vertexA, vertexB)
@@ -330,6 +332,11 @@ final case class Triangle(a: Vertex, b: Vertex, c: Vertex):
   val vertices: Batch[Vertex] = Batch(a, b, c)
   val closed: Batch[Vertex]   = Batch(a, b, c, a)
 
+  def withinCircumcirle(vertex: Vertex): Boolean =
+    BoundingCircle.fromThreeVertices(a, b, c) match
+      case None     => false
+      case Some(bc) => bc.contains(vertex)
+
   def toLineSegments: Batch[LineSegment] =
     Batch(
       LineSegment(a, b),
@@ -340,6 +347,10 @@ final case class Triangle(a: Vertex, b: Vertex, c: Vertex):
 object Triangle:
 
   def fromVertices(vertices: List[Vertex]): Option[Triangle] =
+    if vertices.length == 3 then Option(Triangle(vertices(0), vertices(1), vertices(2)))
+    else None
+
+  def fromVertices(vertices: Batch[Vertex]): Option[Triangle] =
     if vertices.length == 3 then Option(Triangle(vertices(0), vertices(1), vertices(2)))
     else None
 
