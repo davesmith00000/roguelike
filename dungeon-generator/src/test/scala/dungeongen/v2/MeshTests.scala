@@ -485,12 +485,112 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
+  test("weld - to edges with the same vertices but reversed are also welded") {
+    val actual =
+      Mesh.empty
+        .copy(
+          vertices = Batch(
+            0 -> Vertex(0, 0),
+            1 -> Vertex(1, 0)
+          ),
+          vertexNext = 6,
+          edges = Batch(
+            0 -> Edge(0, 1),
+            1 -> Edge(1, 0)
+          ),
+          edgeNext = 2
+        )
+        .weld
+
+    val expected =
+      Mesh.empty
+        .copy(
+          vertices = Batch(
+            0 -> Vertex(0, 0),
+            1 -> Vertex(1, 0)
+          ),
+          vertexNext = 6,
+          edges = Batch(
+            0 -> Edge(0, 1)
+          ),
+          edgeNext = 2
+        )
+
+    assertEquals(actual, expected)
+  }
+
   test("fromTriangle") {
-    assert(1 == 2)
+    val actual =
+      Mesh.fromTriangle(
+        Triangle(
+          Vertex(0, 0),
+          Vertex(0, 1),
+          Vertex(1, 0)
+        )
+      )
+
+    val expected =
+      Mesh(
+        vertices = Batch(0 -> Vertex(0, 0), 1 -> Vertex(0, 1), 2 -> Vertex(1, 0)),
+        vertexNext = 3,
+        edges = Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0)),
+        edgeNext = 3,
+        tris = Batch(0 -> Tri(0, 1, 2)),
+        triNext = 1
+      )
+
+    assertEquals(actual, expected)
   }
 
   test("fromTriangles") {
-    assert(1 == 2)
+    val actual =
+      Mesh.fromTriangles(
+        Batch(
+          Triangle(
+            Vertex(0, 0),
+            Vertex(0, 1),
+            Vertex(1, 0)
+          ),
+          Triangle(
+            Vertex(1, 1),
+            Vertex(1, 0),
+            Vertex(0, 1)
+          )
+        )
+      )
+
+    /*
+    0-2-2
+    |  /|
+    0 1 3
+    |/  |
+    1-5-3
+     */
+    val expected =
+      Mesh(
+        vertices = Batch(
+          (0, Vertex(0, 0)),
+          (1, Vertex(0, 1)),
+          (2, Vertex(1, 0)),
+          (3, Vertex(1, 1))
+        ),
+        vertexNext = 6,
+        edges = Batch(
+          (0, Edge(0, 1)),
+          (1, Edge(1, 2)),
+          (2, Edge(2, 0)),
+          (3, Edge(3, 2)),
+          (5, Edge(1, 3))
+        ),
+        edgeNext = 6,
+        tris = Batch(
+          (0, Tri(0, 1, 2)),
+          (1, Tri(3, 1, 5))
+        ),
+        triNext = 2
+      )
+
+    assertEquals(actual, expected)
   }
 
 }

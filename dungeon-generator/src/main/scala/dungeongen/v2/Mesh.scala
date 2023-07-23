@@ -229,7 +229,7 @@ final case class Mesh(
           (edgesAcc, trisAcc)
 
         case e ==: es =>
-          edgesAcc.find(_._2 == e._2) match
+          edgesAcc.find(_._2 ~== e._2) match
             case None =>
               // If the 'found so far' doesn't include this edge, add it and move on.
               weldEdges(es, trisAcc, edgesAcc :+ e)
@@ -278,15 +278,18 @@ object Mesh:
   def empty: Mesh =
     Mesh(Batch.empty, 0, Batch.empty, 0, Batch.empty, 0)
 
-  // def fromTriangles(triangles: Batch[Triangle]): Mesh =
-  //   triangles.map(fromTriangle).foldLeft(Mesh.empty)(_ |+| _)
+  def fromTriangles(triangles: Batch[Triangle]): Mesh =
+    triangles.map(fromTriangle).foldLeft(Mesh.empty)(_ |+| _).optimise
 
-  // def fromTriangle(triangle: Triangle): Mesh =
-  //   Mesh(
-  //     triangle.vertices,
-  //     Batch(Edge(0, 1), Edge(1, 2), Edge(2, 0)),
-  //     Batch(Tri(0, 1, 2))
-  //   )
+  def fromTriangle(triangle: Triangle): Mesh =
+    Mesh(
+      triangle.vertices.zipWithIndex.map(p => (p._2, p._1)),
+      3,
+      Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0)),
+      3,
+      Batch(0 -> Tri(0, 1, 2)),
+      1
+    )
 
   /** Shifts the indices of the stored data by the given offsets. */
   private[v2] def offsetIndexesBy(vertexOffset: Int, edgeOffset: Int, triOffset: Int)(
@@ -325,6 +328,13 @@ object Mesh:
 final case class Edge(vertexA: Int, vertexB: Int):
   def indices: Batch[Int] =
     Batch(vertexA, vertexB)
+
+  /** Approx. equals of an edge means that if you reverse one of the edges, they end up being the
+    * same.
+    */
+  def ~==(other: Edge): Boolean =
+    (this.vertexA == other.vertexA && this.vertexB == other.vertexB) ||
+      (this.vertexA == other.vertexB && this.vertexB == other.vertexA)
 
 object Edge:
 
