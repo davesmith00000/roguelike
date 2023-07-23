@@ -282,7 +282,58 @@ class MeshTests extends munit.FunSuite {
   }
 
   test("addTriangle") {
-    assert(1 == 2)
+    val actual =
+      Mesh
+        .fromTriangle(
+          Triangle(
+            Vertex(0, 0),
+            Vertex(0, 1),
+            Vertex(1, 0)
+          )
+        )
+        .addTriangle(
+          Triangle(
+            Vertex(1, 1),
+            Vertex(1, 0),
+            Vertex(0, 1)
+          )
+        )
+
+    /* Makes an unoptimised mesh of two distinct triangles
+    0-2-2 4
+    |  / /|
+    0 1 4 3
+    |/ /  |
+    1 5-5-3
+     */
+    val expected =
+      Mesh(
+        vertices = Batch(
+          (0, Vertex(0, 0)),
+          (1, Vertex(0, 1)),
+          (2, Vertex(1, 0)),
+          (3, Vertex(1, 1)),
+          (4, Vertex(1, 0)),
+          (5, Vertex(0, 1))
+        ),
+        vertexNext = 6,
+        edges = Batch(
+          (0, Edge(0, 1)),
+          (1, Edge(1, 2)),
+          (2, Edge(2, 0)),
+          (3, Edge(3, 4)),
+          (4, Edge(4, 5)),
+          (5, Edge(5, 3))
+        ),
+        edgeNext = 6,
+        tris = Batch(
+          (0, Tri(0, 1, 2)),
+          (1, Tri(3, 4, 5))
+        ),
+        triNext = 2
+      )
+
+    assertEquals(actual, expected)
   }
 
   test("toTriangles") {

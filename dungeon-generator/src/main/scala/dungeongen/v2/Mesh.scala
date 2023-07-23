@@ -96,43 +96,11 @@ final case class Mesh(
   def removeTriAt(index: Int): Mesh =
     this.copy(tris = tris.filterNot(_._1 == index))
 
-  // // def addTriangle(triangle: Triangle): Triangulation =
-  // //   val indexed = vertices.zipWithIndex
-
-  // //   val toUse =
-  // //     Batch(
-  // //       (triangle.a, indexed.find(p => p._1 ~== triangle.a)),
-  // //       (triangle.b, indexed.find(p => p._1 ~== triangle.b)),
-  // //       (triangle.c, indexed.find(p => p._1 ~== triangle.c))
-  // //     )
-
-  // //   @tailrec
-  // //   def rec(
-  // //       remaining: List[(Vertex, Option[(Vertex, Int)])],
-  // //       accV: List[Vertex],
-  // //       accI: List[Int]
-  // //   ): Option[(List[Vertex], Tri)] =
-  // //     remaining match
-  // //       case Nil =>
-  // //         Tri.fromIndices(accI).map(is => (accV, is))
-
-  // //       case (v, None) :: next =>
-  // //         rec(next, accV :+ v, accI :+ (vertices.length + accV.length + 1))
-
-  // //       case (v, Some((_, i))) :: next =>
-  // //         rec(next, accV, accI :+ i)
-
-  // //   val tri: Option[(List[Vertex], Tri)] = rec(toUse.toList, Nil, Nil)
-
-  // //   tri match
-  // //     case None =>
-  // //       this
-
-  // //     case Some((newVerts, tri)) =>
-  // //       this.copy(
-  // //         vertices = vertices ++ newVerts.toBatch,
-  // //         triangles = triangles :+ tri
-  // //       )
+  /** Adds a Triangle's data to this mesh. Does _not_ attempt to optimise the mesh, this can be done
+    * intentionally by calling the `weld`, `prune`, or `optimise` methods.
+    */
+  def addTriangle(triangle: Triangle): Mesh =
+    this |+| Mesh.fromTriangle(triangle)
 
   /** Returns the mesh as individual Triangles. The assumption is made that the edges do form a
     * valid trangle, no validation occurs. If the triangle is degenerate, you will get unexpected
