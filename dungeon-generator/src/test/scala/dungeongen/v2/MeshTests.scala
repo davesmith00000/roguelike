@@ -23,7 +23,7 @@ class MeshTests extends munit.FunSuite {
       triNext = 2
     )
 
-  test("addVertex".only) {
+  test("addVertex") {
     val actual =
       Mesh.empty.addVertex(Vertex(1, 0))
 
@@ -43,7 +43,7 @@ class MeshTests extends munit.FunSuite {
   |/
   1
    */
-  test("removeVertex".only) {
+  test("removeVertex") {
     val actual =
       quadMesh.removeVertex(Vertex(1, 1))
 
@@ -67,7 +67,7 @@ class MeshTests extends munit.FunSuite {
   |/
   1
    */
-  test("removeVertexAt (3)".only) {
+  test("removeVertexAt (3)") {
     val actual =
       quadMesh.removeVertexAt(3)
 
@@ -91,7 +91,7 @@ class MeshTests extends munit.FunSuite {
    /  |
   1---3
    */
-  test("removeVertexAt (0)".only) {
+  test("removeVertexAt (0)") {
     val actual =
       quadMesh.removeVertexAt(0)
 
@@ -108,7 +108,7 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
-  test("addEdge".only) {
+  test("addEdge") {
     val actual =
       Mesh.empty
         .addVertex(Vertex(0, 0))
@@ -126,7 +126,7 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
-  test("addEdge - fail - missing vertex".only) {
+  test("addEdge - fail - missing vertex") {
     val actual =
       Mesh.empty
         .addVertex(Vertex(0, 0))
@@ -151,7 +151,7 @@ class MeshTests extends munit.FunSuite {
   |/ x|
   1---3
    */
-  test("removeEdge".only) {
+  test("removeEdge") {
     val actual =
       quadMesh.removeEdge(Edge(3, 2))
 
@@ -176,7 +176,7 @@ class MeshTests extends munit.FunSuite {
   |/ x|
   1---3
    */
-  test("removeEdgeAt".only) {
+  test("removeEdgeAt") {
     val actual =
       quadMesh.removeEdgeAt(4)
 
@@ -194,7 +194,7 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
-  test("addTri".only) {
+  test("addTri") {
     val actual =
       Mesh.empty
         .addVertex(Vertex(0, 0))
@@ -256,7 +256,7 @@ class MeshTests extends munit.FunSuite {
   |/ 1|
   1-3-3
    */
-  test("removeTriAt".only) {
+  test("removeTriAt") {
     val actual =
       quadMesh.removeTriAt(0)
 
@@ -288,7 +288,7 @@ class MeshTests extends munit.FunSuite {
     assert(1 == 2)
   }
 
-  test("offsetBy".only) {
+  test("offsetBy") {
     val actual =
       Mesh.offsetIndexesBy(10, 20, 30)(
         Mesh.empty
@@ -314,7 +314,7 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
-  test("combine / |+|".only) {
+  test("combine / |+|") {
     val actual =
       Mesh.combine(
         Mesh.empty
@@ -365,12 +365,90 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
+  /*
+  0-2-2
+  |  /|
+  0 1 x <-- edge 4
+  |/ x|
+  1-3-3 <-- dangling v 3, e 3, to be pruned
+   */
   test("prune") {
-    assert(1 == 2)
+    val actual =
+      quadMesh
+        .removeEdgeAt(4) // leaves edge 3 and vertex 3 not associated with a Tri
+        .prune
+
+    val expected =
+      Mesh(
+        vertices = Batch(0 -> Vertex(0, 0), 1 -> Vertex(0, 1), 2 -> Vertex(1, 0)),
+        vertexNext = 4,
+        edges = Batch(0 -> Edge(0, 1), 1 -> Edge(1, 2), 2 -> Edge(2, 0)),
+        edgeNext = 5,
+        tris = Batch(0 -> Tri(0, 1, 2)),
+        triNext = 2
+      )
+
+    assertEquals(actual, expected)
   }
 
   test("weld") {
-    assert(1 == 2)
+    val actual =
+      Mesh.empty
+        .copy(
+          vertices = Batch(
+            0 -> Vertex(0, 0),
+            1 -> Vertex(1, 0),
+            2 -> Vertex(0, 1),
+            3 -> Vertex(1, 0),
+            4 -> Vertex(0, 1),
+            5 -> Vertex(1, 1)
+          ),
+          vertexNext = 6,
+          edges = Batch(
+            0 -> Edge(0, 1),
+            1 -> Edge(1, 2),
+            2 -> Edge(2, 0),
+            3 -> Edge(3, 4),
+            4 -> Edge(4, 5),
+            5 -> Edge(5, 3)
+          ),
+          edgeNext = 6,
+          tris = Batch(
+            0 -> Tri(0, 1, 2),
+            1 -> Tri(3, 4, 5)
+          ),
+          triNext = 2
+        )
+        .weld
+
+    val expected =
+      Mesh.empty.copy(
+        vertices = Batch(
+          0 -> Vertex(0, 0),
+          1 -> Vertex(1, 0),
+          2 -> Vertex(0, 1),
+          // 3 -> Vertex(1, 0), // copy of 1
+          // 4 -> Vertex(0, 1), // copy of 2
+          5 -> Vertex(1, 1)
+        ),
+        vertexNext = 6, // unchanged, running count, not the length
+        edges = Batch(
+          0 -> Edge(0, 1),
+          1 -> Edge(1, 2),
+          2 -> Edge(2, 0),
+          // 3 -> Edge(3, 4), // copy of 1
+          4 -> Edge(2, 5),
+          5 -> Edge(5, 1)
+        ),
+        edgeNext = 6,
+        tris = Batch(
+          0 -> Tri(0, 1, 2),
+          1 -> Tri(1, 4, 5)
+        ),
+        triNext = 2
+      )
+
+    assertEquals(actual, expected)
   }
 
   test("fromTriangle") {

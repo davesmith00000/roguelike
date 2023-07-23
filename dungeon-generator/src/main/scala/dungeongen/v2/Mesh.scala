@@ -3,6 +3,8 @@ package dungeongen.v2
 import indigo.*
 import indigo.syntax.*
 
+import scala.annotation.tailrec
+
 /** Naive implementation of a data structure for storing and modifying tri[angle]-based mesh data.
   */
 final case class Mesh(
@@ -151,11 +153,108 @@ final case class Mesh(
 
   /** Prune to remove any vertices and edges that are not part of a Tri. */
   def prune: Mesh =
-    this
+    // First remove any edges not associate with a tri
+    val es = edges.filter(e =>
+      tris.exists(t => t._2.edgeA == e._1 || t._2.edgeB == e._1 || t._2.edgeC == e._1)
+    )
+
+    // Then remove any vertices not associated with an edge
+    val vs = vertices.filter(v => es.exists(e => e._2.vertexA == v._1 || e._2.vertexB == v._1))
+
+    this.copy(
+      vertices = vs,
+      edges = es
+    )
 
   /** Weld matching Vertices and Edges, and remove the duplicates. */
   def weld: Mesh =
-    this
+    import Batch.==:
+
+    // First weld the vertices, and update the edges as you go.
+    @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
+    @tailrec
+    def weldVerts(
+        remaining: Batch[(Int, Vertex)],
+        edgesAcc: Batch[(Int, Edge)],
+        vertsAcc: Batch[(Int, Vertex)]
+    ): (Batch[(Int, Vertex)], Batch[(Int, Edge)]) =
+      remaining match
+        case Batch() =>
+          (vertsAcc, edgesAcc)
+
+        case v ==: vs =>
+          vertsAcc.find(_._2 ~== v._2) match
+            case None =>
+              // If the 'found so far' doesn't include this vertex, add it and move on.
+              weldVerts(vs, edgesAcc, vertsAcc :+ v)
+
+            case Some((replacementIndex, _)) =>
+              // This vertex needs to be welded with one of the ones accumulated already.
+              // This is the same as forgetting the vertex, and pointing the matching one.
+
+              val updatedEdges =
+                edgesAcc.map { case (idx, e @ Edge(a, b)) =>
+                  idx -> Edge(
+                    if a == v._1 then replacementIndex else a,
+                    if b == v._1 then replacementIndex else b
+                  )
+                }
+
+              weldVerts(vs, updatedEdges, vertsAcc)
+
+        case _ =>
+          // Not a real case, Batch pattern matching isn't great.
+          throw new Exception(
+            "Batch pattern matching failed unexpectedly during Mesh.weld of vertices. Shouldn't have got here."
+          )
+
+    val (vs, es) = weldVerts(vertices, edges, Batch.empty)
+
+    // Then weld the edges, and update the tris as you go
+    @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
+    @tailrec
+    def weldEdges(
+        remaining: Batch[(Int, Edge)],
+        trisAcc: Batch[(Int, Tri)],
+        edgesAcc: Batch[(Int, Edge)]
+    ): (Batch[(Int, Edge)], Batch[(Int, Tri)]) =
+      remaining match
+        case Batch() =>
+          (edgesAcc, trisAcc)
+
+        case e ==: es =>
+          edgesAcc.find(_._2 == e._2) match
+            case None =>
+              // If the 'found so far' doesn't include this edge, add it and move on.
+              weldEdges(es, trisAcc, edgesAcc :+ e)
+
+            case Some((replacementIndex, _)) =>
+              // This edge needs to be welded with one of the ones accumulated already.
+              // This is the same as forgetting the edge, and pointing the matching one.
+              val updatedTries =
+                trisAcc.map { case (idx, t @ Tri(a, b, c)) =>
+                  idx -> Tri(
+                    if a == e._1 then replacementIndex else a,
+                    if b == e._1 then replacementIndex else b,
+                    if c == e._1 then replacementIndex else c
+                  )
+                }
+
+              weldEdges(es, updatedTries, edgesAcc)
+
+        case _ =>
+          // Not a real case, Batch pattern matching isn't great.
+          throw new Exception(
+            "Batch pattern matching failed unexpectedly during Mesh.weld of edges. Shouldn't have got here."
+          )
+
+    val (es2, ts) = weldEdges(es, tris, Batch.empty)
+
+    this.copy(
+      vertices = vs,
+      edges = es2,
+      tris = ts
+    )
 
   /** Weld matching Vertices and Edges, and then prune to remove any vertices and edges that are not
     * part of a Tri.
@@ -169,6 +268,7 @@ final case class Mesh(
 
 object Mesh:
 
+  /** Provides an empty Mesh */
   def empty: Mesh =
     Mesh(Batch.empty, 0, Batch.empty, 0, Batch.empty, 0)
 
@@ -182,7 +282,10 @@ object Mesh:
   //     Batch(Tri(0, 1, 2))
   //   )
 
-  def offsetIndexesBy(vertexOffset: Int, edgeOffset: Int, triOffset: Int)(mesh: Mesh): Mesh =
+  /** Shifts the indices of the stored data by the given offsets. */
+  private[v2] def offsetIndexesBy(vertexOffset: Int, edgeOffset: Int, triOffset: Int)(
+      mesh: Mesh
+  ): Mesh =
     Mesh(
       vertices = mesh.vertices.map(p => (p._1 + vertexOffset, p._2)),
       vertexNext = mesh.vertexNext + vertexOffset,
