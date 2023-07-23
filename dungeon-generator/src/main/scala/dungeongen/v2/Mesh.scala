@@ -330,6 +330,13 @@ final case class Triangle(a: Vertex, b: Vertex, c: Vertex):
   val vertices: Batch[Vertex] = Batch(a, b, c)
   val closed: Batch[Vertex]   = Batch(a, b, c, a)
 
+  def toLineSegments: Batch[LineSegment] =
+    Batch(
+      LineSegment(a, b),
+      LineSegment(b, c),
+      LineSegment(c, a)
+    )
+
 object Triangle:
 
   def fromVertices(vertices: List[Vertex]): Option[Triangle] =
