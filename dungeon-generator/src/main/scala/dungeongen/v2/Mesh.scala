@@ -134,16 +134,22 @@ final case class Mesh(
   // //         triangles = triangles :+ tri
   // //       )
 
-  // def toTriangles: Option[Batch[Triangle]] =
-  //   try
-  //     tris.map { t =>
-  //       val vSet = t.indices.map(i => edges(i)).flatMap(_.indices).toSet
-  //       if vSet.size == 3 then Triangle.fromVertices(vSet.toList.map(i => vertices(i)))
-  //       else None
-  //     }.sequence
-  //   catch {
-  //     case _ => None
-  //   }
+  /** Returns the mesh as individual Triangles. The assumption is made that the edges do form a
+    * valid trangle, no validation occurs. If the triangle is degenerate, you will get unexpected
+    * results.
+    */
+  def toTriangles: Batch[Triangle] =
+    tris.flatMap { case (_, t) =>
+      val vSet = t.indices.map(i => edges(i)).flatMap(_._2.indices).toSet
+      if vSet.size == 3 then
+        Batch.fromOption(Triangle.fromVertices(vSet.toList.map(i => vertices(i)._2)))
+      else Batch.empty
+    }
+
+  def toLineSegments: Batch[LineSegment] =
+    edges.map { case (_, e) =>
+      LineSegment(vertices(e.vertexA)._2, vertices(e.vertexB)._2)
+    }
 
   /** Combines two meshes together, offsetting the indices of the second mesh by the first. Does not
     * attempt to optimise the meshes in any way.

@@ -2,6 +2,7 @@ package dungeongen.v2
 
 import indigo.Batch
 import indigo.Vertex
+import indigo.shared.geometry.LineSegment
 
 class MeshTests extends munit.FunSuite {
 
@@ -285,7 +286,40 @@ class MeshTests extends munit.FunSuite {
   }
 
   test("toTriangles") {
-    assert(1 == 2)
+    val actual =
+      quadMesh.toTriangles
+
+    val expected =
+      Batch(
+        Triangle(
+          Vertex(0, 0),
+          Vertex(0, 1),
+          Vertex(1, 0)
+        ),
+        Triangle(
+          Vertex(1, 1),
+          Vertex(1, 0),
+          Vertex(0, 1)
+        )
+      )
+
+    assertEquals(actual, expected)
+  }
+
+  test("toLineSegments") {
+    val actual =
+      quadMesh.toLineSegments
+
+    val expected =
+      Batch(
+        LineSegment(Vertex(0, 0), Vertex(0, 1)),
+        LineSegment(Vertex(0, 1), Vertex(1, 0)),
+        LineSegment(Vertex(1, 0), Vertex(0, 0)),
+        LineSegment(Vertex(0, 1), Vertex(1, 1)),
+        LineSegment(Vertex(1, 1), Vertex(1, 0))
+      )
+
+    assertEquals(actual, expected)
   }
 
   test("offsetBy") {
