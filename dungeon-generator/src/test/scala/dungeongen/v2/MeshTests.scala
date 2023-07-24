@@ -357,6 +357,34 @@ class MeshTests extends munit.FunSuite {
     assertEquals(actual, expected)
   }
 
+  test("toTriangles - real case") {
+    val actual =
+      Mesh(
+        Batch((0, Vertex(0, 10)), (1, Vertex(10, 10)), (2, Vertex(5, 0)), (3, Vertex(5, 5))),
+        12,
+        Batch(
+          (0, Edge(0, 1)),
+          (1, Edge(1, 2)),
+          (2, Edge(2, 0)),
+          (3, Edge(3, 0)),
+          (5, Edge(1, 3)),
+          (8, Edge(2, 3))
+        ),
+        12,
+        Batch((1, Tri(3, 0, 5)), (2, Tri(5, 1, 8)), (3, Tri(3, 2, 8))),
+        4
+      ).toTriangles
+
+    val expected =
+      Batch(
+        Triangle(Vertex(5, 5), Vertex(0, 10), Vertex(10, 10)),
+        Triangle(Vertex(10, 10), Vertex(5, 5), Vertex(5, 0)),
+        Triangle(Vertex(5, 5), Vertex(0, 10), Vertex(5, 0))
+      )
+
+    assertEquals(actual, expected)
+  }
+
   test("toLineSegments") {
     val actual =
       quadMesh.toLineSegments

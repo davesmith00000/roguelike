@@ -1,6 +1,9 @@
 package dungeonviewer
 
 import dungeongen.classic.DungeonRules
+import dungeongen.v2.BowyerWatson
+import dungeongen.v2.Mesh
+import dungeongen.v2.Triangle
 import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
@@ -106,9 +109,6 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     case _ =>
       Outcome(viewModel)
 
-  def drawTriangle(t: Triangle): Shape.Polygon =
-    Shape.Polygon(t.closed.map(_.toPoint), Fill.None, Stroke(1, RGBA.Magenta))
-
   def present(
       context: SceneContext[Unit],
       model: Model,
@@ -129,11 +129,17 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         )
       }
 
-    val superTriangle = Batch(drawTriangle(model.superTriangle))
+    val superTriangle = model.superTriangle.toLineSegments.map { ls =>
+      Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Magenta))
+    }
+
+    val meshLines = model.mesh.toLineSegments.map { ls =>
+      Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Cyan))
+    }
 
     Outcome(
       SceneUpdateFragment(
-        tiles.clones ++ points ++ superTriangle
+        tiles.clones ++ points ++ superTriangle ++ meshLines
       )
         .addCloneBlanks(tiles.blanks)
     )
@@ -148,7 +154,7 @@ object ViewModel:
 
     ViewModel(terminal)
 
-final case class Model(points: Batch[Point], superTriangle: Triangle)
+final case class Model(points: Batch[Point], superTriangle: Triangle, mesh: Mesh)
 object Model:
 
   def randomPoint(dice: Dice, offset: Point): Point =
@@ -157,28 +163,12 @@ object Model:
   val initial: Model =
     val dice          = Dice.fromSeed(1)
     val offset        = Point(150, 200)
-    val points        = List.fill(5)(randomPoint(dice, offset)).toBatch
+    val points        = List.fill(10)(randomPoint(dice, offset)).toBatch
     val superTriangle = Triangle.encompassing(points.map(_.toVertex))
+    val mesh          = BowyerWatson.triangulation(points.map(_.toVertex), superTriangle)
 
     Model(
       points,
-      superTriangle
+      superTriangle,
+      mesh
     )
-
-final case class Triangle(a: Vertex, b: Vertex, c: Vertex):
-  val vertices: Batch[Vertex] = Batch(a, b, c)
-  val closed: Batch[Vertex]   = Batch(a, b, c, a)
-
-object Triangle:
-
-  // A triangle big enough to comfortably contain a point cloud
-  // Some fudged numbers here.
-  def encompassing(pointCloud: Batch[Vertex]): Triangle =
-    encompassing(BoundingBox.fromVertexCloud(pointCloud).expand(20))
-
-  def encompassing(b: BoundingBox): Triangle =
-    val t = Vertex(b.center.x, b.center.y - b.height)
-    val l = Vertex(b.center.x - b.width, b.bottom)
-    val r = Vertex(b.center.x + b.width, b.bottom)
-
-    Triangle(t, l, r)

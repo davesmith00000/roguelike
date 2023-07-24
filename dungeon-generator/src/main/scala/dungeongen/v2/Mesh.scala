@@ -110,8 +110,14 @@ final case class Mesh(
     tris.flatMap(t => Batch.fromOption(Mesh.toTriangle(t._2, this)))
 
   def toLineSegments: Batch[LineSegment] =
-    edges.map { case (_, e) =>
-      LineSegment(vertices(e.vertexA)._2, vertices(e.vertexB)._2)
+    edges.flatMap { case (_, e) =>
+      Batch.fromOption(
+        vertices.find(_._1 == e.vertexA).flatMap { a =>
+          vertices.find(_._1 == e.vertexB).map { b =>
+            LineSegment(a._2, b._2)
+          }
+        }
+      )
     }
 
   /** Combines two meshes together, offsetting the indices of the second mesh by the first. Does not
@@ -289,11 +295,17 @@ object Mesh:
     )
 
   def toTriangle(tri: Tri, mesh: Mesh): Option[Triangle] =
-    try
-      val vSet = tri.indices.map(i => mesh.edges(i)).flatMap(_._2.indices).toSet
-      if vSet.size == 3 then Triangle.fromVertices(vSet.toList.map(i => mesh.vertices(i)._2))
-      else None
-    catch case _ => None
+    val vSet = tri.indices
+      .flatMap { i =>
+        Batch.fromOption(mesh.edges.find(_._1 == i))
+      }
+      .flatMap(_._2.indices)
+      .toSet
+    if vSet.size == 3 then
+      Triangle.fromVertices(
+        vSet.toList.flatMap(i => mesh.vertices.find(_._1 == i).toList).map(_._2)
+      )
+    else None
 
 final case class Edge(vertexA: Int, vertexB: Int):
   def indices: Batch[Int] =

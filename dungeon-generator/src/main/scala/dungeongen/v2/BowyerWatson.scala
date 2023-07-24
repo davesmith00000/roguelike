@@ -10,7 +10,9 @@ object BowyerWatson:
 
   def triangulation(pointList: Batch[Vertex]): Mesh =
     val superTriangle = Triangle.encompassing(pointList)
+    triangulation(pointList, superTriangle)
 
+  def triangulation(pointList: Batch[Vertex], superTriangle: Triangle): Mesh =
     val initialMesh = Mesh.empty
       .addTriangle(superTriangle)
 
@@ -32,6 +34,9 @@ object BowyerWatson:
 
           // remove them from the data structure
           val meshWithHole = internalEdges.foldLeft(acc) { case (a, e) => a.removeEdge(e) }
+          val meshWithoutInvalidTries = badTris.foldLeft(meshWithHole) { case (a, t) =>
+            a.removeTri(t)
+          }
 
           // re-triangulate the polygonal hole
           val nextMesh =
@@ -39,27 +44,42 @@ object BowyerWatson:
               .flatMap { e =>
                 edgeToTriangle(e, acc, p)
               }
-              .foldLeft(meshWithHole) { case (m, t) => m.addTriangle(t) }
-              .optimise
+              .foldLeft(meshWithoutInvalidTries) { case (m, t) => m.addTriangle(t) }
+              .weld
 
           rec(ps, nextMesh)
 
     val meshWithSuperTri = rec(pointList.toList, initialMesh)
 
-    // if triangle contains a vertex from original super-triangle remove triangle from triangulation
+    // if there are 3 or more vertices (+ 3 from the super, so 6), then if a
+    // triangle contains a vertex from original super-triangle remove triangle from triangulation
+    // otherwise leave the super in place.
     val result =
-      superTriEdges
-        .map(_._1)
-        .foldLeft(meshWithSuperTri) { case (acc, i) =>
-          acc.removeEdgeAt(i)
-        }
+      if meshWithSuperTri.vertices.length >= 6 then
+        val withoutSuperEdges =
+          superTriEdges
+            .map(_._1)
+            .foldLeft(meshWithSuperTri) { case (acc, i) =>
+              acc.removeEdgeAt(i)
+            }
+
+        superTriangle.vertices
+          .foldLeft(withoutSuperEdges) { case (acc, i) =>
+            acc.removeVertex(i)
+          }
+      else meshWithSuperTri
 
     result
 
   // Left is 'bad' i.e. triangles inside the circle. Right is 'good', triangles we can leave in place.
   def findInvalidTris(point: Vertex, mesh: Mesh): (Batch[Tri], Batch[Tri]) =
     mesh.tris.map(_._2).partition { t =>
-      Mesh.toTriangle(t, mesh).map(t => t.withinCircumcirle(point)).getOrElse(false)
+      Mesh
+        .toTriangle(t, mesh)
+        .map { t =>
+          t.withinCircumcirle(point)
+        }
+        .getOrElse(false)
     }
 
   // Left is 'bad' i.e. edges shared between the given triangles (occurs more than once).
@@ -67,7 +87,7 @@ object BowyerWatson:
   def findBoundaryEdges(triangles: Batch[Tri], mesh: Mesh): (Batch[Edge], Batch[Edge]) =
     val allEdges =
       triangles.flatMap { t =>
-        mesh.edges.map(_._2).filter(e => t.indices.contains(e))
+        mesh.edges.filter(e => t.indices.contains(e._1)).map(_._2)
       }
 
     allEdges.partition { e =>
