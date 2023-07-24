@@ -247,6 +247,19 @@ object Mesh:
   def empty: Mesh =
     Mesh(Batch.empty, 0, Batch.empty, 0, Batch.empty, 0)
 
+  /** Produces a mesh from the given vertices. */
+  def fromVertices(vertices: Batch[Vertex]): Mesh =
+    BowyerWatson.triangulation(vertices)
+
+  /** Produces a mesh from the given vertices and supplied super triangle.
+    *
+    * The super triangle is an implementation detail most users won't care about. It must be large
+    * enough to comfortably encompass the point cloud. By default this is done by finding the
+    * bounding box around the vertices, expanding it, and creating a triangle around it.
+    */
+  def fromVertices(vertices: Batch[Vertex], superTriangle: Triangle): Mesh =
+    BowyerWatson.triangulation(vertices, superTriangle)
+
   def fromTriangles(triangles: Batch[Triangle]): Mesh =
     triangles.map(fromTriangle).foldLeft(Mesh.empty)(_ |+| _).optimise
 
@@ -369,14 +382,29 @@ object Triangle:
   def fromVertices(vertices: Vertex*): Option[Triangle] =
     fromVertices(vertices.toList)
 
-  // A triangle big enough to comfortably contain a point cloud
-  // Some fudged numbers here.
+  /** Make a triangle big enough to comfortably contain a point cloud by calculating a suitable
+    * padding value.
+    */
   def encompassing(pointCloud: Batch[Vertex]): Triangle =
-    encompassing(BoundingBox.fromVertexCloud(pointCloud).expand(20))
+    val bb      = BoundingBox.fromVertexCloud(pointCloud)
+    val half    = bb.halfSize
+    val padding = Math.max(half.x, half.y)
+    encompassing(bb, padding)
 
+  /** Make a triangle to encompass a point cloud, with a given amount of padding. */
+  def encompassing(pointCloud: Batch[Vertex], padding: Double): Triangle =
+    encompassing(BoundingBox.fromVertexCloud(pointCloud).expand(padding))
+
+  /** Make a triangle big enough to exactly contain a BoundingBox. */
   def encompassing(b: BoundingBox): Triangle =
-    val t = Vertex(b.center.x, b.center.y - b.height)
-    val l = Vertex(b.center.x - b.width, b.bottom)
-    val r = Vertex(b.center.x + b.width, b.bottom)
+    encompassing(b, 0)
+
+  /** Make a triangle big enough to contain a BoundingBox, with a given amount of padding.
+    */
+  def encompassing(b: BoundingBox, padding: Double): Triangle =
+    val bb = b.expand(padding)
+    val t  = Vertex(bb.center.x, bb.center.y - bb.height)
+    val l  = Vertex(bb.center.x - bb.width, bb.bottom)
+    val r  = Vertex(bb.center.x + bb.width, bb.bottom)
 
     Triangle(t, l, r)

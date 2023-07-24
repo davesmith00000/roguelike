@@ -9,5 +9,8 @@ final case class Dungeon(
     positionedTiles: List[PositionedTile],
     hostiles: List[Hostile],
     collectables: List[Collectable],
-    currentFloor: Int
+    currentFloor: Int,
+    meta: DungeonMetadata
 )
+
+final case class DungeonMetadata(roomCenters: List[Point])

@@ -6,6 +6,7 @@ import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.DungeonMetadata
 import roguelike.model.dungeon.PositionedTile
 import roguelike.model.dungeon.WallCode
 import roguelike.model.entity.*
@@ -46,7 +47,8 @@ object DungeonGen:
       positionedTiles = rooms.flatMap(_.toPositionedTiles(dice)),
       hostiles = Nil,
       collectables = Nil,
-      currentFloor = 0
+      currentFloor = 0,
+      meta = DungeonMetadata(rooms.map(_.bounds.center))
     )
 
 final case class Room(bounds: Rectangle):

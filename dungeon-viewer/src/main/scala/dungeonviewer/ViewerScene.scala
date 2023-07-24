@@ -1,7 +1,6 @@
 package dungeonviewer
 
 import dungeongen.classic.DungeonRules
-import dungeongen.v2.BowyerWatson
 import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
 import indigo.*
@@ -37,6 +36,16 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     Set()
 
   def updateModel(context: SceneContext[Unit], model: Model): GlobalEvent => Outcome[Model] =
+    case KeyboardEvent.KeyUp(Key.SPACE) =>
+      // Fudge. When we switch to the dungeon, clear the test mesh.
+      Outcome(
+        model.copy(
+          points = Batch.empty,
+          mesh = Mesh.empty,
+          superTriangle = Triangle(Vertex(-1), Vertex(-1), Vertex(-1))
+        )
+      )
+
     case _ =>
       Outcome(model)
 
@@ -104,7 +113,18 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         TerminalEmulator(Size(80, 50))
           .put(tiles)
 
-      Outcome(viewModel.copy(terminal = terminal))
+      val roomPoints    = dungeon.meta.roomCenters.toBatch.map(_ * Point(10))
+      val vertices      = roomPoints.map(_.toVertex)
+      val superTriangle = Triangle.encompassing(vertices)
+
+      Outcome(
+        viewModel.copy(
+          terminal = terminal,
+          roomPoints = roomPoints,
+          roomSuperTriangle = superTriangle,
+          dungeonMesh = Mesh.fromVertices(vertices, superTriangle)
+        )
+      )
 
     case _ =>
       Outcome(viewModel)
@@ -120,8 +140,18 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           Graphic(10, 10, TerminalText(Assets.tileMap, fg, bg))
         }
 
-    val points: Batch[Shape.Circle] =
-      model.points.map { pt =>
+    Outcome(
+      SceneUpdateFragment(
+        tiles.clones ++
+          drawMesh(model.points, model.superTriangle, model.mesh) ++
+          drawMesh(viewModel.roomPoints, viewModel.roomSuperTriangle, viewModel.dungeonMesh)
+      )
+        .addCloneBlanks(tiles.blanks)
+    )
+
+  def drawMesh(points: Batch[Point], superTriangle: Triangle, mesh: Mesh): Batch[SceneNode] =
+    val pts: Batch[Shape.Circle] =
+      points.map { pt =>
         Shape.Circle(
           pt,
           5,
@@ -129,22 +159,22 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         )
       }
 
-    val superTriangle = model.superTriangle.toLineSegments.map { ls =>
+    val st = superTriangle.toLineSegments.map { ls =>
       Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Magenta))
     }
 
-    val meshLines = model.mesh.toLineSegments.map { ls =>
+    val ml = mesh.toLineSegments.map { ls =>
       Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Cyan))
     }
 
-    Outcome(
-      SceneUpdateFragment(
-        tiles.clones ++ points ++ superTriangle ++ meshLines
-      )
-        .addCloneBlanks(tiles.blanks)
-    )
+    pts ++ st ++ ml
 
-final case class ViewModel(terminal: TerminalEmulator)
+final case class ViewModel(
+    terminal: TerminalEmulator,
+    dungeonMesh: Mesh,
+    roomPoints: Batch[Point],
+    roomSuperTriangle: Triangle
+)
 object ViewModel:
   val initial: ViewModel =
 
@@ -152,7 +182,7 @@ object ViewModel:
       TerminalEmulator(Size(80, 50))
         .putLine(Point(1, 1), "Hit the space key to generate / regenerate", RGBA.White, RGBA.Black)
 
-    ViewModel(terminal)
+    ViewModel(terminal, Mesh.empty, Batch.empty, Triangle(Vertex(-1), Vertex(-1), Vertex(-1)))
 
 final case class Model(points: Batch[Point], superTriangle: Triangle, mesh: Mesh)
 object Model:
@@ -164,8 +194,8 @@ object Model:
     val dice          = Dice.fromSeed(1)
     val offset        = Point(150, 200)
     val points        = List.fill(10)(randomPoint(dice, offset)).toBatch
-    val superTriangle = Triangle.encompassing(points.map(_.toVertex))
-    val mesh          = BowyerWatson.triangulation(points.map(_.toVertex), superTriangle)
+    val superTriangle = Triangle.encompassing(points.map(_.toVertex), 10)
+    val mesh          = Mesh.fromVertices(points.map(_.toVertex), superTriangle)
 
     Model(
       points,

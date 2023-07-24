@@ -1,6 +1,7 @@
 package dungeongen.js
 
 import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.DungeonMetadata
 import roguelike.model.dungeon.PositionedTile
 
 import scala.scalajs.js
@@ -14,6 +15,7 @@ trait JsDungeon extends js.Object:
   val hostiles: js.Array[JsHostile]
   val collectables: js.Array[JsCollectable]
   val currentFloor: Int
+  val meta: js.Array[JsPoint]
 
 object JsDungeon:
   def fromDungeon(d: Dungeon) =
@@ -28,6 +30,7 @@ object JsDungeon:
         JsCollectable.fromCollectable(_)
       }.toJSArray
       val currentFloor: Int = d.currentFloor
+      val meta: js.Array[JsPoint] = d.meta.roomCenters.map(JsPoint.fromPoint).toJSArray
     }
 
   def toDungeon(d: JsDungeon) =
@@ -41,5 +44,6 @@ object JsDungeon:
       d.collectables.map {
         JsCollectable.toCollectable(_)
       }.toList,
-      d.currentFloor
+      d.currentFloor,
+      DungeonMetadata(d.meta.toList.map(JsPoint.toPoint))
     )

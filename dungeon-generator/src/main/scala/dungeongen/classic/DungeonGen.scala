@@ -6,6 +6,7 @@ import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
+import roguelike.model.dungeon.DungeonMetadata
 import roguelike.model.dungeon.PositionedTile
 import roguelike.model.entity.*
 import roguelike.model.gamedata.Armour
@@ -52,7 +53,8 @@ object DungeonGen:
               tiles,
               hostiles,
               collectables,
-              currentFloor
+              currentFloor,
+              DungeonMetadata(Nil)
             )
 
           case Some(center) =>
@@ -67,7 +69,8 @@ object DungeonGen:
               tiles,
               hostiles,
               collectables,
-              currentFloor
+              currentFloor,
+              DungeonMetadata(Nil)
             )
       else
         val w = dice.rollFromZero(roomMaxSize - roomMinSize) + roomMinSize
