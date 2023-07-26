@@ -5,6 +5,7 @@ import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
 import indigo.*
 import indigo.scenes.*
+import indigo.shared.geometry.LineSegment
 import indigo.syntax.*
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.model.GameTile.DownStairs
@@ -113,16 +114,37 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         TerminalEmulator(Size(80, 50))
           .put(tiles)
 
-      val roomPoints    = dungeon.meta.rooms.toBatch.map(r => r.center * Point(10))
+      // TODO: This is all being done in the wrong place, should be part of the map builder, just noodling.
+
+      val roomsAsBounds = dungeon.meta.rooms.toBatch.map(_.toBoundingBox)
+
+      val roomPoints    = dungeon.meta.rooms.toBatch.map(r => r.center)
       val vertices      = roomPoints.map(_.toVertex)
       val superTriangle = Triangle.encompassing(vertices)
+
+      val mesh = Mesh.fromVertices(vertices, superTriangle)
+
+      val lines = mesh.toLineSegments.filter {
+        case ls @ LineSegment(start, end)
+            if roomsAsBounds
+              .exists(bb => !bb.contains(start) && !bb.contains(end) && bb.lineIntersects(ls)) =>
+          false
+
+        case _ =>
+          true
+      }
 
       Outcome(
         viewModel.copy(
           terminal = terminal,
-          roomPoints = roomPoints,
-          roomSuperTriangle = superTriangle,
-          dungeonMesh = Mesh.fromVertices(vertices, superTriangle)
+          roomPoints = roomPoints.map(_ * Point(10)),
+          roomSuperTriangle = Triangle(
+            superTriangle.a * Vertex(10),
+            superTriangle.b * Vertex(10),
+            superTriangle.c * Vertex(10)
+          ),
+          dungeonMesh =
+            lines.map(ls => ls.moveStartTo(ls.start * Vertex(10)).moveEndTo(ls.end * Vertex(10)))
         )
       )
 
@@ -143,13 +165,17 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     Outcome(
       SceneUpdateFragment(
         tiles.clones ++
-          drawMesh(model.points, model.superTriangle, model.mesh) ++
+          drawMesh(model.points, model.superTriangle, model.mesh.toLineSegments) ++
           drawMesh(viewModel.roomPoints, viewModel.roomSuperTriangle, viewModel.dungeonMesh)
       )
         .addCloneBlanks(tiles.blanks)
     )
 
-  def drawMesh(points: Batch[Point], superTriangle: Triangle, mesh: Mesh): Batch[SceneNode] =
+  def drawMesh(
+      points: Batch[Point],
+      superTriangle: Triangle,
+      lines: Batch[LineSegment]
+  ): Batch[SceneNode] =
     val pts: Batch[Shape.Circle] =
       points.map { pt =>
         Shape.Circle(
@@ -163,7 +189,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
       Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Magenta))
     }
 
-    val ml = mesh.toLineSegments.map { ls =>
+    val ml = lines.map { ls =>
       Shape.Line(ls.start.toPoint, ls.end.toPoint, Stroke(1, RGBA.Cyan))
     }
 
@@ -171,7 +197,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
 
 final case class ViewModel(
     terminal: TerminalEmulator,
-    dungeonMesh: Mesh,
+    dungeonMesh: Batch[LineSegment],
     roomPoints: Batch[Point],
     roomSuperTriangle: Triangle
 )
@@ -182,7 +208,7 @@ object ViewModel:
       TerminalEmulator(Size(80, 50))
         .putLine(Point(1, 1), "Hit the space key to generate / regenerate", RGBA.White, RGBA.Black)
 
-    ViewModel(terminal, Mesh.empty, Batch.empty, Triangle(Vertex(-1), Vertex(-1), Vertex(-1)))
+    ViewModel(terminal, Batch.empty, Batch.empty, Triangle(Vertex(-1), Vertex(-1), Vertex(-1)))
 
 final case class Model(points: Batch[Point], superTriangle: Triangle, mesh: Mesh)
 object Model:
