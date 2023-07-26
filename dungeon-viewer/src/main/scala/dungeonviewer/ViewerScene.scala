@@ -16,6 +16,8 @@ import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 
+import scala.annotation.tailrec
+
 object ViewerScene extends Scene[Unit, Model, ViewModel]:
 
   type SceneModel     = Model
@@ -124,7 +126,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
 
       val mesh = Mesh.fromVertices(vertices, superTriangle)
 
-      val lines = mesh.toLineSegments.filter {
+      val goodLines = mesh.toLineSegments.filter {
         case ls @ LineSegment(start, end)
             if roomsAsBounds
               .exists(bb => !bb.contains(start) && !bb.contains(end) && bb.lineIntersects(ls)) =>
@@ -133,6 +135,46 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         case _ =>
           true
       }
+
+      @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
+      @tailrec
+      def rec(
+          remainingRooms: Batch[BoundingBox],
+          remainingLines: Batch[LineSegment],
+          acc: Batch[LineSegment]
+      ): Batch[LineSegment] =
+        remainingRooms match
+          case Batch() =>
+            acc
+
+          case _ if remainingLines.isEmpty =>
+            acc
+
+          case r ==: rs =>
+            val (connected, notConnected) =
+              remainingLines.partition(ls => r.contains(ls.start) || r.contains(ls.end))
+
+            val res1 =
+              connected
+                .filter(ls => rs.exists(_.contains(ls.start)) || rs.exists(_.contains(ls.end)))
+                .sortBy(_.length)
+                .splitAt(context.dice.roll(2))._1
+
+            val res2 = res1.headOption match
+              case None =>
+                Batch.empty
+
+              case Some(shortest) =>
+                val l = shortest.length
+                res1.filter(_.length <= l * 1.25)
+            
+
+            rec(rs, notConnected, res2 ++ acc)
+
+          case _ =>
+            throw new Exception("Pattern matching error on Batch of room bounds.")
+
+      val connections = rec(roomsAsBounds, goodLines, Batch.empty)
 
       Outcome(
         viewModel.copy(
@@ -143,8 +185,9 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
             superTriangle.b * Vertex(10),
             superTriangle.c * Vertex(10)
           ),
-          dungeonMesh =
-            lines.map(ls => ls.moveStartTo(ls.start * Vertex(10)).moveEndTo(ls.end * Vertex(10)))
+          dungeonMesh = connections.map(ls =>
+            ls.moveStartTo(ls.start * Vertex(10)).moveEndTo(ls.end * Vertex(10))
+          )
         )
       )
 
