@@ -15,7 +15,7 @@ trait JsDungeon extends js.Object:
   val hostiles: js.Array[JsHostile]
   val collectables: js.Array[JsCollectable]
   val currentFloor: Int
-  val meta: js.Array[JsPoint]
+  val meta: js.Array[JsRectangle]
 
 object JsDungeon:
   def fromDungeon(d: Dungeon) =
@@ -29,8 +29,8 @@ object JsDungeon:
       val collectables: js.Array[JsCollectable] = d.collectables.map {
         JsCollectable.fromCollectable(_)
       }.toJSArray
-      val currentFloor: Int = d.currentFloor
-      val meta: js.Array[JsPoint] = d.meta.roomCenters.map(JsPoint.fromPoint).toJSArray
+      val currentFloor: Int       = d.currentFloor
+      val meta: js.Array[JsRectangle] = d.meta.rooms.map(JsRectangle.fromRectangle).toJSArray
     }
 
   def toDungeon(d: JsDungeon) =
@@ -45,5 +45,5 @@ object JsDungeon:
         JsCollectable.toCollectable(_)
       }.toList,
       d.currentFloor,
-      DungeonMetadata(d.meta.toList.map(JsPoint.toPoint))
+      DungeonMetadata(d.meta.toList.map(JsRectangle.toRectangle))
     )

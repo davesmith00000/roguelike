@@ -13,4 +13,4 @@ final case class Dungeon(
     meta: DungeonMetadata
 )
 
-final case class DungeonMetadata(roomCenters: List[Point])
+final case class DungeonMetadata(rooms: List[Rectangle])

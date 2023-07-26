@@ -113,7 +113,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
         TerminalEmulator(Size(80, 50))
           .put(tiles)
 
-      val roomPoints    = dungeon.meta.roomCenters.toBatch.map(_ * Point(10))
+      val roomPoints    = dungeon.meta.rooms.toBatch.map(r => r.center * Point(10))
       val vertices      = roomPoints.map(_.toVertex)
       val superTriangle = Triangle.encompassing(vertices)
 

@@ -48,7 +48,7 @@ object DungeonGen:
       hostiles = Nil,
       collectables = Nil,
       currentFloor = 0,
-      meta = DungeonMetadata(rooms.map(_.bounds.center))
+      meta = DungeonMetadata(rooms.map(_.bounds))
     )
 
 final case class Room(bounds: Rectangle):
