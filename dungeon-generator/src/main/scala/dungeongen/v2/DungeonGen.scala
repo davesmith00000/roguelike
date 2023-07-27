@@ -87,7 +87,7 @@ object DungeonGen:
     }
 
   def findCorridorConnections(rooms: List[Rectangle], dice: Dice): Batch[LineSegment] =
-    val roomsAsBounds = rooms.toBatch.map(_.toBoundingBox)
+    val roomsAsBounds = rooms.toBatch.map(_.contract(1).toBoundingBox)
 
     val roomPoints    = rooms.toBatch.map(r => r.center)
     val vertices      = roomPoints.map(_.toVertex)

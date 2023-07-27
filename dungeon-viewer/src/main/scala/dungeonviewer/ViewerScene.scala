@@ -52,6 +52,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     case _ =>
       Outcome(model)
 
+  @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
   def updateViewModel(
       context: SceneContext[Unit],
       model: Model,
@@ -136,7 +137,6 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           true
       }
 
-      @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
       @tailrec
       def rec(
           remainingRooms: Batch[BoundingBox],
@@ -158,7 +158,8 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
               connected
                 .filter(ls => rs.exists(_.contains(ls.start)) || rs.exists(_.contains(ls.end)))
                 .sortBy(_.length)
-                .splitAt(context.dice.roll(2))._1
+                .splitAt(context.dice.roll(2))
+                ._1
 
             val res2 = res1.headOption match
               case None =>
@@ -167,7 +168,6 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
               case Some(shortest) =>
                 val l = shortest.length
                 res1.filter(_.length <= l * 1.25)
-            
 
             rec(rs, notConnected, res2 ++ acc)
 
@@ -175,6 +175,30 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
             throw new Exception("Pattern matching error on Batch of room bounds.")
 
       val connections = rec(roomsAsBounds, goodLines, Batch.empty)
+
+      val roomsActualSize = roomsAsBounds.map(_.contract(2.0))
+
+      // Workout the doorway lines.
+      def makeRoomLine(
+          roomA: BoundingBox,
+          roomB: BoundingBox,
+          start: Vertex,
+          end: Vertex
+      ): LineSegment =
+        // TODO: We want to adjust the start and end here. What are the rules?
+        LineSegment(start, end)
+
+      val doorwayLines = connections.flatMap { ls =>
+        val res =
+          for {
+            roomA <- roomsActualSize.find(bb => bb.contains(ls.start))
+            roomB <- roomsActualSize.find(bb => bb.contains(ls.end))
+            start <- roomA.lineIntersectsAt(ls)
+            end   <- roomB.lineIntersectsAt(ls)
+          } yield makeRoomLine(roomA, roomB, start, end)
+
+        res.toBatch
+      }
 
       Outcome(
         viewModel.copy(
@@ -187,7 +211,8 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           ),
           dungeonMesh = connections.map(ls =>
             ls.moveStartTo(ls.start * Vertex(10)).moveEndTo(ls.end * Vertex(10))
-          )
+          ),
+          doorwayLines = doorwayLines
         )
       )
 
@@ -209,7 +234,25 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
       SceneUpdateFragment(
         tiles.clones ++
           drawMesh(model.points, model.superTriangle, model.mesh.toLineSegments) ++
-          drawMesh(viewModel.roomPoints, viewModel.roomSuperTriangle, viewModel.dungeonMesh)
+          drawMesh(viewModel.roomPoints, viewModel.roomSuperTriangle, viewModel.dungeonMesh) ++
+          viewModel.doorwayLines.flatMap { ls =>
+            val start = (ls.start * Vertex(10)).toPoint
+            val end   = (ls.end * Vertex(10)).toPoint
+
+            Batch(
+              Shape.Line(start, end, Stroke(1, RGBA.Yellow)),
+              Shape.Circle(
+                start,
+                3,
+                Fill.Color(RGBA.Yellow)
+              ),
+              Shape.Circle(
+                end,
+                3,
+                Fill.Color(RGBA.Yellow)
+              )
+            )
+          }
       )
         .addCloneBlanks(tiles.blanks)
     )
@@ -241,6 +284,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
 final case class ViewModel(
     terminal: TerminalEmulator,
     dungeonMesh: Batch[LineSegment],
+    doorwayLines: Batch[LineSegment],
     roomPoints: Batch[Point],
     roomSuperTriangle: Triangle
 )
@@ -251,7 +295,13 @@ object ViewModel:
       TerminalEmulator(Size(80, 50))
         .putLine(Point(1, 1), "Hit the space key to generate / regenerate", RGBA.White, RGBA.Black)
 
-    ViewModel(terminal, Batch.empty, Batch.empty, Triangle(Vertex(-1), Vertex(-1), Vertex(-1)))
+    ViewModel(
+      terminal,
+      Batch.empty,
+      Batch.empty,
+      Batch.empty,
+      Triangle(Vertex(-1), Vertex(-1), Vertex(-1))
+    )
 
 final case class Model(points: Batch[Point], superTriangle: Triangle, mesh: Mesh)
 object Model:
