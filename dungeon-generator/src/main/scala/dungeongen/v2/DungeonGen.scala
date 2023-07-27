@@ -48,10 +48,25 @@ object DungeonGen:
     val roomTiles =
       rooms.flatMap(_.toPositionedTiles(dice))
 
-    val corridorConnections = findCorridorConnections(rooms.map(_.bounds), dice)
+    val corridorConnections =
+      findCorridorConnections(rooms.map(_.bounds), dice)
+
+    val roomsActualSize = rooms.map(_.bounds.toBoundingBox.contract(2.0))
+
+    val doorwayLines = corridorConnections.flatMap { ls =>
+      val res =
+        for {
+          roomA <- roomsActualSize.find(bb => bb.contains(ls.start))
+          roomB <- roomsActualSize.find(bb => bb.contains(ls.end))
+          start <- roomA.lineIntersectsAt(ls)
+          end   <- roomB.lineIntersectsAt(ls)
+        } yield adjustConnections(dice, roomA, roomB, start, end, ls)
+
+      res.toBatch
+    }
 
     val newTunnelTiles: List[List[PositionedTile]] =
-      corridorConnections.toList
+      doorwayLines.toList
         .map { ls =>
           buildTunnel(dice, ls.start.toPoint, ls.end.toPoint)
         }
@@ -146,6 +161,64 @@ object DungeonGen:
     val connections = rec(roomsAsBounds, goodLines, Batch.empty)
 
     connections
+
+  // Workout the doorway lines.
+  def adjustConnections(
+      dice: Dice,
+      roomA: BoundingBox,
+      roomB: BoundingBox,
+      start: Vertex,
+      end: Vertex,
+      originalLine: LineSegment
+  ): LineSegment =
+    // TODO: We want to adjust the start and end here. What are the rules? Always from A to B.
+
+    // Can we make a perfectly straight line vertical line within bounds?
+    def verticalHit =
+      dice
+        .shuffle((0 to (roomA.width.toInt - 1)).toList)
+        .map { i =>
+          val line = LineSegment(
+            Vertex(roomA.position.x + i, roomA.center.y),
+            Vertex(roomA.position.x + i, roomB.center.y)
+          )
+          roomB.lineIntersectsAt(line)
+        }
+        .collectFirst { case Some(doorwayPosition) => doorwayPosition }
+
+    // Can we make a perfectly straight line horizontal line within bounds?
+    def horizontalHit =
+      dice
+        .shuffle((0 to (roomA.height.toInt - 1)).toList)
+        .map { i =>
+          val line = LineSegment(
+            Vertex(roomA.center.x, roomA.position.y + i),
+            Vertex(roomB.center.x, roomA.position.y + i)
+          )
+          roomB.lineIntersectsAt(line)
+        }
+        .collectFirst { case Some(doorwayPosition) => doorwayPosition }
+
+    // If we had context... could we reuse doorways already created?
+
+    verticalHit match
+      case None =>
+        horizontalHit match
+          case None =>
+            // standard placement is an ok fall back plan
+            LineSegment(originalLine.start, originalLine.end)
+
+          case Some(doorwayPosition) =>
+            LineSegment(
+              Vertex(roomA.center.x, doorwayPosition.y),
+              Vertex(roomB.center.x, doorwayPosition.y)
+            )
+
+      case Some(doorwayPosition) =>
+        LineSegment(
+          Vertex(doorwayPosition.x, roomA.center.y),
+          Vertex(doorwayPosition.x, roomB.center.y)
+        )
 
   def buildTunnel(dice: Dice, from: Point, to: Point): List[PositionedTile] =
     if dice.roll(2) == 1 then

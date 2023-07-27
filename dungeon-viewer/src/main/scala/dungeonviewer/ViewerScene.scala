@@ -178,16 +178,6 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
 
       val roomsActualSize = roomsAsBounds.map(_.contract(2.0))
 
-      // Workout the doorway lines.
-      def makeRoomLine(
-          roomA: BoundingBox,
-          roomB: BoundingBox,
-          start: Vertex,
-          end: Vertex
-      ): LineSegment =
-        // TODO: We want to adjust the start and end here. What are the rules?
-        LineSegment(start, end)
-
       val doorwayLines = connections.flatMap { ls =>
         val res =
           for {
@@ -195,7 +185,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
             roomB <- roomsActualSize.find(bb => bb.contains(ls.end))
             start <- roomA.lineIntersectsAt(ls)
             end   <- roomB.lineIntersectsAt(ls)
-          } yield makeRoomLine(roomA, roomB, start, end)
+          } yield makeRoomLine(context.dice, roomA, roomB, start, end)
 
         res.toBatch
       }
@@ -280,6 +270,63 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     }
 
     pts ++ st ++ ml
+
+  // Workout the doorway lines.
+  def makeRoomLine(
+      dice: Dice,
+      roomA: BoundingBox,
+      roomB: BoundingBox,
+      start: Vertex,
+      end: Vertex
+  ): LineSegment =
+    // TODO: We want to adjust the start and end here. What are the rules? Always from A to B.
+
+    // Can we make a perfectly straight line vertical line within bounds?
+    def verticalHit =
+      dice
+        .shuffle((0 to (roomA.width.toInt)).toList)
+        .map { i =>
+          val line = LineSegment(
+            Vertex(roomA.position.x + i, roomA.center.y),
+            Vertex(roomA.position.x + i, roomB.center.y)
+          )
+          roomB.lineIntersectsAt(line)
+        }
+        .collectFirst { case Some(doorwayPosition) => doorwayPosition }
+
+    // Can we make a perfectly straight line horizontal line within bounds?
+    def horizontalHit =
+      dice
+        .shuffle((0 to (roomA.height.toInt)).toList)
+        .map { i =>
+          val line = LineSegment(
+            Vertex(roomA.center.x, roomA.position.y + i),
+            Vertex(roomB.center.x, roomA.position.y + i)
+          )
+          roomB.lineIntersectsAt(line)
+        }
+        .collectFirst { case Some(doorwayPosition) => doorwayPosition }
+
+    // If we had context... could we reuse doorways already created?
+
+    verticalHit match
+      case None =>
+        horizontalHit match
+          case None =>
+            // standard placement is an ok fall back plan
+            LineSegment(start, end)
+
+          case Some(doorwayPosition) =>
+            LineSegment(
+              Vertex(roomA.center.x, doorwayPosition.y),
+              Vertex(roomB.center.x, doorwayPosition.y)
+            )
+
+      case Some(doorwayPosition) =>
+        LineSegment(
+          Vertex(doorwayPosition.x, roomA.center.y),
+          Vertex(doorwayPosition.x, roomB.center.y)
+        )
 
 final case class ViewModel(
     terminal: TerminalEmulator,
