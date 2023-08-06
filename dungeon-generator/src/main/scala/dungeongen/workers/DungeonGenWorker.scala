@@ -1,6 +1,5 @@
 package dungeongen.workers
 
-import dungeongen.classic.DungeonGen
 import dungeongen.classic.DungeonRules
 import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
@@ -53,19 +52,35 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
 object DungeonGenWorker extends IndigoWorker[DungeonGenConfig, JsDungeonGameMapTuple] {
   val name: WorkerName = WorkerName("assets/dungeon-gen-worker")
 
+  val useDungeonGenV2: Boolean = true
+
   def process(config: DungeonGenConfig) = {
     val dice = Dice.fromSeed(config.seed.toLong)
     val dungeonModel =
-      DungeonGen.makeMap(
-        dice,
-        DungeonRules.MaxRooms,
-        DungeonRules.RoomMinSize,
-        DungeonRules.RoomMaxSize,
-        Size(50, 30),
-        DungeonRules.maxMonstersPerRoom(0),
-        DungeonRules.maxCollectablesPerRoom(0),
-        config.currentLevel
-      )
+      if useDungeonGenV2 then
+        dungeongen.v2.DungeonGen
+          .makeMap(
+            dice,
+            DungeonRules.MaxRooms,
+            DungeonRules.RoomMinSize,
+            DungeonRules.RoomMaxSize,
+            Size(50, 30),
+            DungeonRules.maxMonstersPerRoom(0),
+            DungeonRules.maxCollectablesPerRoom(0),
+            config.currentLevel
+          )
+      else
+        dungeongen.classic.DungeonGen
+          .makeMap(
+            dice,
+            DungeonRules.MaxRooms,
+            DungeonRules.RoomMinSize,
+            DungeonRules.RoomMaxSize,
+            Size(50, 30),
+            DungeonRules.maxMonstersPerRoom(0),
+            DungeonRules.maxCollectablesPerRoom(0),
+            config.currentLevel
+          )
 
     val gameMapModel =
       GameMap
