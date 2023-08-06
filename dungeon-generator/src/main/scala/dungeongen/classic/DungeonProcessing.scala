@@ -19,6 +19,69 @@ object DungeonProcessing:
     _.map {
 
       /*
+      gw.
+      g_.
+      gw.
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Ground(_)),
+              None,
+              None,
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.VerticalWallTop))
+
+      /*
+      .wg
+      ._g
+      .wg
+       */
+      case (
+            t,
+            List(
+              None,
+              Some(Wall(_)),
+              Some(Ground(_)),
+              None,
+              None,
+              Some(Ground(_)),
+              None,
+              Some(Wall(_)),
+              Some(Ground(_))
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.VerticalWallTop))
+
+      /*
+      ...
+      w_w
+      ggg
+       */
+      case (
+            t,
+            List(
+              None,
+              None,
+              None,
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Ground(_))
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.HorizontalWallMiddle))
+
+      /*
       wgg
       w_w
       ...

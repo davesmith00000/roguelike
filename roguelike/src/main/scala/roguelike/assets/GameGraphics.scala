@@ -51,6 +51,9 @@ object GameGraphics:
       case WallCode.VerticalWallToCeilingTop =>
         CloneTileData(position.x, position.y, 96, 64, 32, 32)
 
+      case WallCode.HorizontalWallMiddle =>
+        CloneTileData(position.x, position.y, 32, 86, 32, 32)
+
   def floorTile(style: Int, position: Point): CloneTileData =
     val startX = 384
     val startY = 0
