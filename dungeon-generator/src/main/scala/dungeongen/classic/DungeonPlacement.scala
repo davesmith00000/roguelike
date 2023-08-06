@@ -27,16 +27,20 @@ object DungeonPlacement:
       .zipWithIndex
       .flatMap {
         case (Orc.name, i) =>
-          val x = dice.rollFromZero(room.width - 4) + room.left + 2
-          val y = dice.rollFromZero(room.height - 4) + room.top + 2
+          val x   = dice.rollFromZero(room.width - 4) + room.left + 2
+          val y   = dice.rollFromZero(room.height - 4) + room.top + 2
+          val pos = Point(x, y)
 
-          List(Orc.spawn(entityCount + i, Point(x, y)))
+          if pos == room.center then Nil
+          else List(Orc.spawn(entityCount + i, pos))
 
         case (Troll.name, i) =>
-          val x = dice.rollFromZero(room.width - 4) + room.left + 2
-          val y = dice.rollFromZero(room.height - 4) + room.top + 2
+          val x   = dice.rollFromZero(room.width - 4) + room.left + 2
+          val y   = dice.rollFromZero(room.height - 4) + room.top + 2
+          val pos = Point(x, y)
 
-          List(Troll.spawn(entityCount + i, Point(x, y)))
+          if pos == room.center then Nil
+          else List(Troll.spawn(entityCount + i, pos))
 
         case _ =>
           Nil
@@ -49,15 +53,14 @@ object DungeonPlacement:
       dice: Dice,
       room: Rectangle,
       maxCollectablesPerRoom: Int,
-      hostiles: List[Hostile],
-      roomCenter: Point
+      hostiles: List[Hostile]
   ): List[Collectable] =
     def spawn(item: Item): List[Collectable] =
       val x   = dice.rollFromZero(room.width - 4) + room.left + 2
       val y   = dice.rollFromZero(room.height - 4) + room.top + 2
       val pos = Point(x, y)
 
-      if hostiles.contains(pos) || pos == roomCenter then Nil
+      if hostiles.contains(pos) || pos == room.center then Nil
       else List(Collectable(pos, item))
 
     DungeonRules

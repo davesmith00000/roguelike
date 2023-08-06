@@ -10,9 +10,14 @@ import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
+import roguelike.model.entity.Collectable
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
+import roguelike.model.gamedata.Armour
+import roguelike.model.gamedata.Consumables
+import roguelike.model.gamedata.Melee
+import roguelike.model.gamedata.Ranged
 
 import scala.annotation.tailrec
 
@@ -86,11 +91,41 @@ object ViewModel:
           h.position -> MapTile(Tile.`☺`, RGBA.Olive)
       }
 
+    val collectables: Batch[(Point, MapTile)] =
+      dungeon.collectables.toBatch.map {
+        case c @ Collectable(_, _: Consumables.HealthPotion.type) =>
+          c.position -> MapTile(Tile.h, RGBA.Red)
+
+        case c @ Collectable(_, _: Ranged.FireballScroll.type) =>
+          c.position -> MapTile(Tile.f, RGBA.Orange)
+
+        case c @ Collectable(_, _: Ranged.ConfusionScroll.type) =>
+          c.position -> MapTile(Tile.c, RGBA.Cyan)
+
+        case c @ Collectable(_, _: Ranged.LightningScroll.type) =>
+          c.position -> MapTile(Tile.l, RGBA.Blue)
+
+        case c @ Collectable(_, _: Melee.Dagger.type) =>
+          c.position -> MapTile(Tile.d, RGBA.Silver)
+
+        case c @ Collectable(_, _: Melee.Sword.type) =>
+          c.position -> MapTile(Tile.s, RGBA.Silver)
+
+        case c @ Collectable(_, _: Armour.LeatherArmor.type) =>
+          c.position -> MapTile(Tile.a, RGBA.SlateGray)
+
+        case c @ Collectable(_, _: Armour.ChainMail.type) =>
+          c.position -> MapTile(Tile.A, RGBA.SlateGray)
+
+        case c =>
+          c.position -> MapTile(Tile.X, RGBA.Indigo)
+      }
+
     val player: Batch[(Point, MapTile)] =
       Batch(dungeon.playerStart -> MapTile(Tile.`@`, RGBA.White))
 
     val tiles: Batch[(Point, MapTile)] =
-      bg ++ hostiles ++ player
+      bg ++ collectables ++ hostiles ++ player
 
     val terminal: TerminalEmulator =
       addInstructions(

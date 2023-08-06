@@ -114,8 +114,7 @@ object DungeonGen:
                 dice,
                 newRoom.contract(1),
                 maxCollectablesPerRoom,
-                roomHostiles,
-                roomCenter
+                roomHostiles
               )
 
           val newTunnelTiles: List[PositionedTile] =

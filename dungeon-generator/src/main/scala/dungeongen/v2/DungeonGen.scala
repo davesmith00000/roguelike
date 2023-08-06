@@ -1,6 +1,8 @@
 package dungeongen.v2
 
 import dungeongen.classic.DungeonCreation
+import dungeongen.classic.DungeonPlacement
+import dungeongen.classic.DungeonProcessing
 import indigo.*
 import indigo.syntax.*
 import roguelike.model.GameTile
@@ -71,13 +73,50 @@ object DungeonGen:
           buildTunnel(dice, ls.start.toPoint, ls.end.toPoint)
         }
 
+    val downstairs =
+      rooms.headOption match
+        case None => Nil
+        case Some(room) =>
+          List(PositionedTile(room.bounds.center, GameTile.DownStairs))
+
+    val hostiles =
+      roomsActualSize.dropRight(1).map(_.toRectangle).foldLeft(List.empty[Hostile]) { case (hostiles, room) =>
+        hostiles ++
+          DungeonPlacement.placeEntities(
+            currentFloor,
+            hostiles.length,
+            dice,
+            room,
+            maxMonstersPerRoom
+          )
+      }
+
+    val collectables =
+      roomsActualSize.dropRight(1).map(_.toRectangle).foldLeft(List.empty[Collectable]) {
+        case (collectables, room) =>
+          collectables ++
+            DungeonPlacement.placeCollectables(
+              currentFloor,
+              collectables.length,
+              dice,
+              room,
+              maxCollectablesPerRoom,
+              hostiles
+            )
+      }
+
+    val processedTiles =
+      DungeonProcessing.processTiles(
+        mergeTileSets(roomTiles :: newTunnelTiles) ++ downstairs
+      )
+
     Dungeon(
       playerStart = firstRoom.bounds.center,
-      stairsPosition = Point(1),
-      positionedTiles = mergeTileSets(roomTiles :: newTunnelTiles),
-      hostiles = Nil,
-      collectables = Nil,
-      currentFloor = 0,
+      stairsPosition = downstairs.headOption.map(_.position).getOrElse(Point.zero),
+      positionedTiles = processedTiles,
+      hostiles = hostiles,
+      collectables = collectables,
+      currentFloor = currentFloor,
       meta = DungeonMetadata(rooms.map(_.bounds))
     )
 
