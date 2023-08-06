@@ -12,12 +12,184 @@ import scala.annotation.tailrec
 
 object DungeonProcessing:
 
-  val processTiles =
-    finaliseTiles andThen
-      convertWallsToDropOffs andThen
-      placeWallTops andThen
-      placeWallToCeilingTops andThen
-      placeCaps
+  val processTiles: List[PositionedTile] => List[PositionedTile] =
+    finaliseTiles andThen groupWithSurrounding andThen chooseTile
+
+  def chooseTile: List[(PositionedTile, List[Option[GameTile]])] => List[PositionedTile] =
+    _.map {
+
+      /*
+      wgg
+      w_w
+      ...
+       */
+      case (
+            t,
+            List(
+              Some(Wall(_)),
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOffFadeLeft))
+
+      /*
+      ggw
+      w_w
+      ...
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Wall(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOffFadeRight))
+
+      /*
+      gw.
+      w_.
+      ...
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              None,
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOff))
+
+      /*
+      .wg
+      ._w
+      ...
+       */
+      case (
+            t,
+            List(
+              None,
+              Some(Wall(_)),
+              Some(Ground(_)),
+              None,
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOff))
+
+      /*
+      ggg
+      w_w
+      ..w
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              Some(Wall(_))
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOffMiddle))
+
+      /*
+      ggg
+      w_w
+      w..
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              Some(Wall(_)),
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOffMiddle))
+
+      /*
+      ggg
+      w_w
+      ...
+       */
+      case (
+            t,
+            List(
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Ground(_)),
+              Some(Wall(_)),
+              None,
+              Some(Wall(_)),
+              None,
+              None,
+              None
+            )
+          ) =>
+        t.copy(tile = Wall(WallCode.DropOffMiddle))
+
+      case (t, List(_, _, _, _, None, _, _, _, _)) =>
+        t
+
+      case (t, _) =>
+        t
+    }
+
+  def groupWithSurrounding: List[PositionedTile] => List[(PositionedTile, List[Option[GameTile]])] =
+    tiles =>
+      def extractAt(pos: Point): Option[GameTile] =
+        tiles.find(_.position == pos).map(_.tile)
+
+      tiles.map { t =>
+        t -> List(
+          extractAt(t.position + Point(-1, -1)), // tl
+          extractAt(t.position + Point(0, -1)),  // tm
+          extractAt(t.position + Point(1, -1)),  // tr
+          extractAt(t.position + Point(-1, 0)),  // l
+          None,                                  // c
+          extractAt(t.position + Point(1, 0)),   // r
+          extractAt(t.position + Point(-1, 1)),  // bl
+          extractAt(t.position + Point(0, 1)),   // bm
+          extractAt(t.position + Point(1, 1))    // br
+        )
+      }
 
   def finaliseTiles(tiles: List[PositionedTile]): List[PositionedTile] =
     @tailrec
@@ -53,164 +225,5 @@ object DungeonProcessing:
 
         case _ :: ts =>
           rec(ts, accepted)
-
-    rec(tiles, Nil)
-
-  def convertWallsToDropOffs(
-      tiles: List[PositionedTile]
-  ): List[PositionedTile] =
-    @tailrec
-    def rec(
-        remaining: List[PositionedTile],
-        acc: List[PositionedTile]
-    ): List[PositionedTile] =
-      remaining match
-        case Nil =>
-          acc
-
-        case head :: next =>
-          val others = next ++ acc
-          val bm     = others.find(_.position == head.position + Point(0, 1))
-
-          val newWall =
-            head.tile match
-              case Wall(WallCode.Wall) =>
-                val code =
-                  if bm.isEmpty then WallCode.DropOff else WallCode.Wall
-
-                PositionedTile(head.position, Wall(code))
-
-              case _ =>
-                head
-
-          rec(
-            next,
-            newWall :: acc
-          )
-
-    rec(tiles, Nil)
-
-  def placeCaps(
-      tiles: List[PositionedTile]
-  ): List[PositionedTile] =
-    @tailrec
-    def rec(
-        remaining: List[PositionedTile],
-        acc: List[PositionedTile]
-    ): List[PositionedTile] =
-      remaining match
-        case Nil =>
-          acc
-
-        case head :: next =>
-          val others = next ++ acc
-          val surrounding =
-            List(
-              others.find(_.position == head.position + Point(-1, -1)).toList,
-              others.find(_.position == head.position + Point(0, -1)).toList,
-              others.find(_.position == head.position + Point(1, -1)).toList,
-              others.find(_.position == head.position + Point(-1, 0)).toList,
-              others.find(_.position == head.position + Point(1, 0)).toList
-            ).flatten
-
-          val alone = surrounding.map(_.tile).forall {
-            case GameTile.Wall(WallCode.DropOff) => true
-            case GameTile.Wall(_)                => false
-            case _                               => true
-          }
-
-          val newWall =
-            head.tile match
-              case Wall(WallCode.Wall) =>
-                val code =
-                  if alone then WallCode.Cap else WallCode.Wall
-
-                PositionedTile(head.position, Wall(code))
-
-              case _ =>
-                head
-
-          rec(
-            next,
-            newWall :: acc
-          )
-
-    rec(tiles, Nil)
-
-  def placeWallTops(
-      tiles: List[PositionedTile]
-  ): List[PositionedTile] =
-    @tailrec
-    def rec(
-        remaining: List[PositionedTile],
-        acc: List[PositionedTile]
-    ): List[PositionedTile] =
-      remaining match
-        case Nil =>
-          acc
-
-        case head :: next =>
-          val others = next ++ acc
-          val bm     = others.find(_.position == head.position + Point(0, 1)).map(_.tile)
-
-          val newWall =
-            head.tile match
-              case Wall(WallCode.Wall) =>
-                val code =
-                  bm match
-                    case Some(GameTile.Wall(WallCode.Wall)) =>
-                      WallCode.VerticalWallTop
-
-                    case _ =>
-                      WallCode.Wall
-
-                PositionedTile(head.position, Wall(code))
-
-              case _ =>
-                head
-
-          rec(
-            next,
-            newWall :: acc
-          )
-
-    rec(tiles, Nil)
-
-  def placeWallToCeilingTops(
-      tiles: List[PositionedTile]
-  ): List[PositionedTile] =
-    @tailrec
-    def rec(
-        remaining: List[PositionedTile],
-        acc: List[PositionedTile]
-    ): List[PositionedTile] =
-      remaining match
-        case Nil =>
-          acc
-
-        case head :: next =>
-          val others = next ++ acc
-          val bm     = others.find(_.position == head.position + Point(0, 1)).map(_.tile)
-
-          val newWall =
-            head.tile match
-              case Wall(WallCode.VerticalWallTop) =>
-                val code =
-                  bm match
-                    case Some(GameTile.Wall(WallCode.Wall)) =>
-                      WallCode.VerticalWallToCeilingTop
-
-                    case _ =>
-                      WallCode.VerticalWallTop
-
-                PositionedTile(head.position, Wall(code))
-
-              case _ =>
-                head
-
-          rec(
-            next,
-            newWall :: acc
-          )
 
     rec(tiles, Nil)

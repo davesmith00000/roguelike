@@ -30,6 +30,15 @@ object GameGraphics:
       case WallCode.DropOff =>
         CloneTileData(position.x, position.y, 160, 256, 32, 32)
 
+      case WallCode.DropOffFadeLeft =>
+        CloneTileData(position.x, position.y, 160 + 32, 256, 32, 32)
+
+      case WallCode.DropOffMiddle =>
+        CloneTileData(position.x, position.y, 160 + 32 + 32, 256, 32, 32)
+
+      case WallCode.DropOffFadeRight =>
+        CloneTileData(position.x, position.y, 160 + 32 + 32 + 32, 256, 32, 32)
+
       case WallCode.Wall =>
         CloneTileData(position.x, position.y, 0, 96, 32, 32)
 

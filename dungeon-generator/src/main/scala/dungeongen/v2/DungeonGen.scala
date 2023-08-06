@@ -80,15 +80,16 @@ object DungeonGen:
           List(PositionedTile(room.bounds.center, GameTile.DownStairs))
 
     val hostiles =
-      roomsActualSize.dropRight(1).map(_.toRectangle).foldLeft(List.empty[Hostile]) { case (hostiles, room) =>
-        hostiles ++
-          DungeonPlacement.placeEntities(
-            currentFloor,
-            hostiles.length,
-            dice,
-            room,
-            maxMonstersPerRoom
-          )
+      roomsActualSize.dropRight(1).map(_.toRectangle).foldLeft(List.empty[Hostile]) {
+        case (hostiles, room) =>
+          hostiles ++
+            DungeonPlacement.placeEntities(
+              currentFloor,
+              hostiles.length,
+              dice,
+              room,
+              maxMonstersPerRoom
+            )
       }
 
     val collectables =
