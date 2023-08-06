@@ -166,7 +166,7 @@ lazy val roguelike =
       windowStartHeight     := 720,
       disableFrameRateLimit := false,
       electronInstall       := indigoplugin.ElectronInstall.Latest,
-      backgroundColor       := "black"
+      backgroundColor       := "#21293f"
     )
     .settings(indigoDeps)
     .enablePlugins(GhpagesPlugin) // Website stuff
