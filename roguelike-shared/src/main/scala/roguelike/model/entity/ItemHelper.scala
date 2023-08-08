@@ -24,14 +24,16 @@ object ItemHelper:
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
   def findMeleeByNameOrError(name: String): Melee =
-    Melee.values.find(_.name == name)
+    Melee.values
+      .find(_.name == name)
       .getOrElse {
         throw new Exception(s"Error, unknown Melee '$name'.")
       }
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.throw"))
   def findArmourByNameOrError(name: String): Armour =
-    Armour.values.find(_.name == name)
+    Armour.values
+      .find(_.name == name)
       .getOrElse {
         throw new Exception(s"Error, unknown Armour '$name'.")
       }

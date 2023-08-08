@@ -29,7 +29,7 @@ object JsDungeon:
       val collectables: js.Array[JsCollectable] = d.collectables.map {
         JsCollectable.fromCollectable(_)
       }.toJSArray
-      val currentFloor: Int       = d.currentFloor
+      val currentFloor: Int           = d.currentFloor
       val meta: js.Array[JsRectangle] = d.meta.rooms.map(JsRectangle.fromRectangle).toJSArray
     }
 
