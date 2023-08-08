@@ -7,7 +7,6 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.model.SharedCodecs
 import roguelike.model.items.Item
-// import roguelike.model.entity.Weapon
 
 final case class Collectable(position: Point, item: Item) extends Entity:
   val blocksMovement: Boolean = false
@@ -22,16 +21,15 @@ object Collectable:
 
   given Encoder[Collectable] = new Encoder[Collectable] {
     final def apply(data: Collectable): Json = Json.obj(
-      // ("position", data.position.asJson),
-      // ("item", data.item.asJson)
+      ("position", data.position.asJson),
+      ("item", data.item.name.asJson)
     )
   }
 
   given Decoder[Collectable] = new Decoder[Collectable] {
     final def apply(c: HCursor): Decoder.Result[Collectable] =
-      ???
-    // for {
-    //   position   <- c.downField("position").as[Point]
-    //   item <- c.downField("item").as[Item]
-    // } yield Collectable(position, item)
+      for {
+        position <- c.downField("position").as[Point]
+        item     <- c.downField("item").as[String]
+      } yield Collectable(position, ItemHelper.findByNameOrError(item))
   }

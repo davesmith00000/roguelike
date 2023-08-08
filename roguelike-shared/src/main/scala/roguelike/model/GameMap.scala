@@ -87,35 +87,33 @@ object GameMap:
 
   given Encoder[GameMap] = new Encoder[GameMap] {
     final def apply(data: GameMap): Json =
-      ???
-    // Json.obj(
-    //   ("size", data.size.asJson),
-    //   ("tiles", data.tileMap.toListWithPosition.asJson),
-    //   ("visible", data.visible.asJson),
-    //   ("explored", data.explored.asJson),
-    //   ("hostiles", data.hostiles.asJson),
-    //   ("collectables", data.collectables.asJson)
-    // )
+      Json.obj(
+        ("size", data.size.asJson),
+        ("tiles", data.tileMap.toList.asJson),
+        ("visible", data.visible.toList.asJson),
+        ("explored", data.explored.asJson)
+        // ("hostiles", data.hostiles.asJson),
+        // ("collectables", data.collectables.asJson)
+      )
   }
 
   given Decoder[GameMap] = new Decoder[GameMap] {
     final def apply(c: HCursor): Decoder.Result[GameMap] =
-      ???
-    // for {
-    //   size         <- c.downField("size").as[Size]
-    //   tiles        <- c.downField("tiles").as[List[(Point, GameTile)]]
-    //   visible      <- c.downField("visible").as[List[Point]]
-    //   explored     <- c.downField("explored").as[Set[Point]]
-    //   hostiles     <- c.downField("hostiles").as[List[Hostile]]
-    //   collectables <- c.downField("collectables").as[List[Collectable]]
-    // } yield GameMap(
-    //   size,
-    //   QuadTree.empty(size.width, size.height),
-    //   visible,
-    //   explored,
-    //   hostiles,
-    //   collectables
-    // ).insert(tiles)
+      for {
+        size     <- c.downField("size").as[Size]
+        tiles    <- c.downField("tiles").as[List[Option[GameTile]]]
+        visible  <- c.downField("visible").as[List[Point]]
+        explored <- c.downField("explored").as[Set[Point]]
+        // hostiles     <- c.downField("hostiles").as[List[Hostile]]
+        // collectables <- c.downField("collectables").as[List[Collectable]]
+      } yield GameMap(
+        size,
+        tiles.toBatch,
+        visible.toBatch,
+        explored // ,
+        // hostiles,
+        // collectables
+      ) // .insert(tiles)
   }
 
   def initial(size: Size): GameMap =

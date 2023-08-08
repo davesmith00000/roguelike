@@ -160,6 +160,21 @@ object Inventory:
   val initial: Inventory =
     Inventory(Backpack.initial, Equipment.initial)
 
+  given Encoder[Inventory] = new Encoder[Inventory] {
+    final def apply(data: Inventory): Json = Json.obj(
+      ("backpack", data.backpack.asJson),
+      ("equipment", data.equipment.asJson)
+    )
+  }
+
+  given Decoder[Inventory] = new Decoder[Inventory] {
+    final def apply(c: HCursor): Decoder.Result[Inventory] =
+      for {
+        backpack  <- c.downField("backpack").as[Backpack]
+        equipment <- c.downField("equipment").as[Equipment]
+      } yield Inventory(backpack, equipment)
+  }
+
 final case class Backpack(capacity: Int, items: Batch[Item]):
 
   lazy val count: Int =
@@ -200,18 +215,17 @@ object Backpack:
 
   given Encoder[Backpack] = new Encoder[Backpack] {
     final def apply(data: Backpack): Json = Json.obj(
-      // ("capacity", Json.fromInt(data.capacity)),
-      // ("items", data.items.asJson)
+      ("capacity", Json.fromInt(data.capacity)),
+      ("items", data.items.map(_.name).toList.asJson)
     )
   }
 
   given Decoder[Backpack] = new Decoder[Backpack] {
     final def apply(c: HCursor): Decoder.Result[Backpack] =
-      ???
-    // for {
-    //   capacity <- c.downField("capacity").as[Int]
-    //   items    <- c.downField("items").as[List[Item]]
-    // } yield Backpack(capacity, items)
+      for {
+        capacity <- c.downField("capacity").as[Int]
+        items    <- c.downField("items").as[List[String]]
+      } yield Backpack(capacity, items.toBatch.map(ItemHelper.findByNameOrError))
   }
 
 final case class Equipment(weapon: Option[Melee], armour: Option[Armour]):
@@ -329,16 +343,18 @@ object Equipment:
 
   given Encoder[Equipment] = new Encoder[Equipment] {
     final def apply(data: Equipment): Json = Json.obj(
-      // ("weapon", data.weapon.asJson),
-      // ("armour", data.armour.asJson)
+      ("weapon", data.weapon.map(_.name).asJson),
+      ("armour", data.armour.map(_.name).asJson)
     )
   }
 
   given Decoder[Equipment] = new Decoder[Equipment] {
     final def apply(c: HCursor): Decoder.Result[Equipment] =
-      ???
-    // for {
-    //   // weapon <- c.downField("weapon").as[Option[Melee]]
-    //   // armour <- c.downField("armour").as[Option[Armour]]
-    // } yield Equipment(weapon, armour)
+      for {
+        weapon <- c.downField("weapon").as[Option[String]]
+        armour <- c.downField("armour").as[Option[String]]
+      } yield Equipment(
+        weapon.map(ItemHelper.findMeleeByNameOrError),
+        armour.map(ItemHelper.findArmourByNameOrError)
+      )
   }

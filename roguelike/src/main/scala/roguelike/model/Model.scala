@@ -2,6 +2,7 @@ package roguelike.model
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.GenerateLevel
@@ -436,7 +437,9 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       stairsPosition,
       gameMap,
       messageLog,
-      currentFloor
+      currentFloor,
+      collectables.toList,
+      hostiles.hostiles.toList
     )
 
 object Model:
@@ -472,7 +475,10 @@ object Model:
       gameMap = saveData.gameMap,
       messageLog = saveData.messageLog,
       loadInfo = model.loadInfo.withSaveData(saveData),
-      currentFloor = saveData.currentFloor
+      currentFloor = saveData.currentFloor,
+      gameState = GameState.UpdatingPlayer,
+      collectables = saveData.collectables.toBatch,
+      hostiles = HostilesPool(saveData.hostiles.toBatch)
     )
 
   def assignDungeon(

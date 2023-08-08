@@ -14,7 +14,9 @@ final case class ModelSaveData(
     stairsPosition: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
-    currentFloor: Int
+    currentFloor: Int,
+    collectables: List[Collectable],
+    hostiles: List[Hostile]
 ):
   def toJsonString: String =
     this.asJson.noSpaces
@@ -39,7 +41,9 @@ object ModelSaveData:
       ("stairsPosition", data.stairsPosition.asJson),
       ("gameMap", data.gameMap.asJson),
       ("messageLog", data.messageLog.asJson),
-      ("currentFloor", data.currentFloor.asJson)
+      ("currentFloor", data.currentFloor.asJson),
+      ("collectables", data.collectables.asJson),
+      ("hostiles", data.hostiles.asJson)
     )
   }
 
@@ -51,11 +55,15 @@ object ModelSaveData:
         gameMap        <- c.downField("gameMap").as[GameMap]
         messageLog     <- c.downField("messageLog").as[MessageLog]
         currentFloor   <- c.downField("currentFloor").as[Int]
+        collectables   <- c.downField("collectables").as[List[Collectable]]
+        hostiles       <- c.downField("hostiles").as[List[Hostile]]
       } yield ModelSaveData(
         player,
         stairsPosition,
         gameMap,
         messageLog,
-        currentFloor
+        currentFloor,
+        collectables,
+        hostiles
       )
   }

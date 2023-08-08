@@ -190,36 +190,31 @@ object Player:
 
   given Encoder[Player] = new Encoder[Player] {
     final def apply(data: Player): Json =
-      ???
-    // Json.obj(
-    //   ("position", data.position.asJson),
-    //   ("isAlive", Json.fromBoolean(data.isAlive)),
-    //   ("fighter", data.fighter.asJson),
-    //   ("inventory", data.inventory.asJson),
-    //   ("level", data.level.asJson),
-    //   ("xp", data.xp.asJson) // ,
-    //   // ("equipment", data.equipment.asJson)
-    // )
+      Json.obj(
+        ("position", data.position.asJson),
+        ("isAlive", Json.fromBoolean(data.isAlive)),
+        ("fighter", data.fighter.asJson),
+        ("inventory", data.inventory.asJson),
+        ("level", data.level.asJson),
+        ("xp", data.xp.asJson)
+      )
   }
 
   given Decoder[Player] = new Decoder[Player] {
     final def apply(c: HCursor): Decoder.Result[Player] =
-      // for {
-      //   position  <- c.downField("position").as[Point]
-      //   isAlive   <- c.downField("isAlive").as[Boolean]
-      //   fighter   <- c.downField("fighter").as[Fighter]
-      //   inventory <- c.downField("inventory").as[Inventory]
-      //   level     <- c.downField("level").as[Int]
-      //   xp        <- c.downField("xp").as[Int]
-      //   equipment <- c.downField("equipment").as[Equipment]
-      // } yield Player(
-      //   position,
-      //   isAlive,
-      //   fighter,
-      //   inventory,
-      //   level,
-      //   xp,
-      //   equipment
-      // )
-      ???
+      for {
+        position  <- c.downField("position").as[Point]
+        isAlive   <- c.downField("isAlive").as[Boolean]
+        fighter   <- c.downField("fighter").as[Fighter]
+        inventory <- c.downField("inventory").as[Inventory]
+        level     <- c.downField("level").as[Int]
+        xp        <- c.downField("xp").as[Int]
+      } yield Player(
+        position,
+        isAlive,
+        fighter,
+        inventory,
+        level,
+        xp
+      )
   }
