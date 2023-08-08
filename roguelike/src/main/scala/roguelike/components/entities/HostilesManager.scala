@@ -2,6 +2,7 @@ package roguelike.components.entities
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -38,7 +39,9 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
         HostilesVM(
           viewModel.tilePositions,
           viewModel.squareSize,
-          viewModel.hostilePositions
+          viewModel.hostilePositions,
+          viewModel.sprites.map(_.orc),
+          viewModel.sprites.map(_.troll)
         ),
       (viewModel, hvm) => viewModel.copy(hostilePositions = hvm.hostilePositions)
     )
@@ -214,7 +217,12 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
         context,
         hostile,
         HostileComponent
-          .HostileVM(viewModel.squareSize, viewModel.hostilePositions)
+          .HostileVM(
+            viewModel.squareSize,
+            viewModel.hostilePositions,
+            viewModel.orcSprite,
+            viewModel.trollSprite
+          )
       )
 
     model.pool.hostiles
@@ -243,5 +251,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
   final case class HostilesVM(
       tilePositions: Batch[Point],
       squareSize: Point,
-      hostilePositions: Map[Int, ActorPosition]
+      hostilePositions: Map[Int, ActorPosition],
+      orcSprite: Option[Sprite[Bitmap]],
+      trollSprite: Option[Sprite[Bitmap]]
   )

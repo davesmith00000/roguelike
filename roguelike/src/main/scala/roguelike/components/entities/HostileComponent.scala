@@ -2,6 +2,7 @@ package roguelike.components.entities
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
@@ -24,7 +25,13 @@ object HostileComponent extends Component[Size, Hostile, HostilesManager.Hostile
 
   def viewModelLens: Lens[HostilesManager.HostilesVM, HostileVM] =
     Lens(
-      viewModel => HostileVM(viewModel.squareSize, viewModel.hostilePositions),
+      viewModel =>
+        HostileVM(
+          viewModel.squareSize,
+          viewModel.hostilePositions,
+          viewModel.orcSprite,
+          viewModel.trollSprite
+        ),
       (viewModel, hvm) => viewModel.copy(hostilePositions = hvm.hostilePositions)
     )
 
@@ -186,14 +193,42 @@ object HostileComponent extends Component[Size, Hostile, HostilesManager.Hostile
           )
         )
 
-    Outcome(
-      Shape.Circle(
-        position,
-        size,
-        Fill.Color(color),
-        Stroke(2, color.mix(RGBA.Black, 0.5))
-      ) :: healthbar
-    )
+    val hostileSprite =
+      hostile match
+        case _: Orc =>
+          viewModel.orcSprite match
+            case None =>
+              Outcome.raiseError(new Exception("Orc sprite missing."))
+
+            case Some(sp) =>
+              Outcome(sp)
+
+        case _: Troll =>
+          viewModel.trollSprite match
+            case None =>
+              Outcome.raiseError(new Exception("Troll sprite missing."))
+
+            case Some(sp) =>
+              Outcome(sp)
+
+    if hostile.isAlive then
+      hostileSprite.map(
+        _.withRef(Point(16, 18))
+          .moveTo(position)
+          .changeCycle(HostileVM.IdleCycle)
+          .play() :: healthbar
+      )
+    else
+      Outcome(
+        Batch(
+          Shape.Circle(
+            position,
+            size,
+            Fill.Color(color),
+            Stroke(2, color.mix(RGBA.Black, 0.5))
+          )
+        )
+      )
 
   enum Cmds:
     case ConfuseFor(numberOfTurns: Int)
@@ -208,5 +243,12 @@ object HostileComponent extends Component[Size, Hostile, HostilesManager.Hostile
 
   final case class HostileVM(
       squareSize: Point,
-      hostilePositions: Map[Int, ActorPosition]
+      hostilePositions: Map[Int, ActorPosition],
+      orcSprite: Option[Sprite[Bitmap]],
+      trollSprite: Option[Sprite[Bitmap]]
   )
+
+  object HostileVM:
+    val IdleCycle: CycleLabel   = CycleLabel("iddle")
+    val WalkCycle: CycleLabel   = CycleLabel("walk")
+    val AttackCycle: CycleLabel = CycleLabel("attack")

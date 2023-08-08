@@ -325,5 +325,4 @@ object CachedTerminals:
   def initial: CachedTerminals =
     CachedTerminals(TerminalClones.empty, TerminalClones.empty)
 
-//sprites: Batch[(AssetName, Sprite[Bitmap])]
-final case class GameSprites(player: Sprite[Bitmap])
+final case class GameSprites(player: Sprite[Bitmap], orc: Sprite[Bitmap], troll: Sprite[Bitmap])

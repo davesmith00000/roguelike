@@ -98,13 +98,15 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   ): GlobalEvent => Outcome[GameViewModel] =
     case LoadEvent.SpritesLoaded(sprites) =>
       val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
+      val orc    = sprites.find(_._1 == GameAssets.Enemy1).map(_._2)
+      val troll  = sprites.find(_._1 == GameAssets.Enemy2).map(_._2)
 
       val gameSprite: Option[GameSprites] =
-        player.map { plr =>
-          GameSprites(
-            player = plr.withRef(13, 28)
-          )
-        }
+        for {
+          p <- player
+          o <- orc
+          t <- troll
+        } yield GameSprites(p, o, t)
 
       Outcome(
         viewModel.copy(
