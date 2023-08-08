@@ -40,19 +40,7 @@ object GameGraphics:
         CloneTileData(position.x, position.y, 160 + 32 + 32 + 32, 256, 32, 32)
 
       case WallCode.Wall =>
-        CloneTileData(position.x, position.y, 0, 96, 32, 32)
-
-      case WallCode.Cap =>
-        CloneTileData(position.x, position.y, 96, 160, 32, 32)
-
-      case WallCode.VerticalWallTop =>
-        CloneTileData(position.x, position.y, 96, 32, 32, 32)
-
-      case WallCode.VerticalWallToCeilingTop =>
-        CloneTileData(position.x, position.y, 96, 64, 32, 32)
-
-      case WallCode.HorizontalWallMiddle =>
-        CloneTileData(position.x, position.y, 32, 86, 32, 32)
+        CloneTileData(position.x, position.y - 32, 96, 224, 32, 64)
 
   def floorTile(style: Int, position: Point): CloneTileData =
     val startX = 384

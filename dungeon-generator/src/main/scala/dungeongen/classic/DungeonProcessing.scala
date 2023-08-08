@@ -19,69 +19,6 @@ object DungeonProcessing:
     _.map {
 
       /*
-      gw.
-      g_.
-      gw.
-       */
-      case (
-            t,
-            List(
-              Some(Ground(_)),
-              Some(Wall(_)),
-              None,
-              Some(Ground(_)),
-              None,
-              None,
-              Some(Ground(_)),
-              Some(Wall(_)),
-              None
-            )
-          ) =>
-        t.copy(tile = Wall(WallCode.VerticalWallTop))
-
-      /*
-      .wg
-      ._g
-      .wg
-       */
-      case (
-            t,
-            List(
-              None,
-              Some(Wall(_)),
-              Some(Ground(_)),
-              None,
-              None,
-              Some(Ground(_)),
-              None,
-              Some(Wall(_)),
-              Some(Ground(_))
-            )
-          ) =>
-        t.copy(tile = Wall(WallCode.VerticalWallTop))
-
-      /*
-      ...
-      w_w
-      ggg
-       */
-      case (
-            t,
-            List(
-              None,
-              None,
-              None,
-              Some(Wall(_)),
-              None,
-              Some(Wall(_)),
-              Some(Ground(_)),
-              Some(Ground(_)),
-              Some(Ground(_))
-            )
-          ) =>
-        t.copy(tile = Wall(WallCode.HorizontalWallMiddle))
-
-      /*
       wgg
       w_w
       ...
@@ -227,6 +164,24 @@ object DungeonProcessing:
             )
           ) =>
         t.copy(tile = Wall(WallCode.DropOffMiddle))
+
+      // Catch all: If there is ground above you, fall back to a drop off so
+      // that we don't obscure the path.
+      case (
+            t,
+            List(
+              _,
+              Some(Ground(_)),
+              _,
+              _,
+              None,
+              _,
+              _,
+              _,
+              _
+            )
+          ) if t.tile.isWall =>
+        t.copy(tile = Wall(WallCode.DropOff))
 
       case (t, List(_, _, _, _, None, _, _, _, _)) =>
         t
