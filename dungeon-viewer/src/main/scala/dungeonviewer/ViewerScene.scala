@@ -3,6 +3,7 @@ package dungeonviewer
 import dungeongen.classic.DungeonRules
 import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
+import dungeonviewer.generated.Assets
 import indigo.*
 import indigo.scenes.*
 import indigo.shared.geometry.LineSegment
@@ -95,7 +96,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     val tiles =
       viewModel.terminal
         .toCloneTiles(Point.zero, RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-          Graphic(10, 10, TerminalText(Assets.tileMap, fg, bg))
+          Graphic(10, 10, TerminalText(Assets.assets.AnikkiSquare10x10, fg, bg))
         }
 
     val mesh: Batch[SceneNode] =
