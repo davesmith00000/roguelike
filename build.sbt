@@ -10,7 +10,7 @@ ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports"
 lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   version      := "0.0.1",
   organization := "purplekingdomgames",
-  scalaVersion := "3.3.0",
+  scalaVersion := "3.3.1",
   libraryDependencies ++= Seq(
     "org.scalameta" %%% "munit" % "0.7.29" % Test
   ),
