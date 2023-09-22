@@ -2,6 +2,7 @@ import scala.sys.process._
 import scala.language.postfixOps
 
 import sbtwelcome._
+import indigoplugin.IndigoOptions
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -21,7 +22,7 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.15.0-RC3"
+val indigoVersion              = "0.15.0-RC4"
 val roguelikeStarterKitVersion = "0.3.0-RC3"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
@@ -129,6 +130,13 @@ lazy val dungeonGenerator =
     .settings(indigoDeps)
     .dependsOn(roguelikeShared)
 
+lazy val dungeonViewerOptions: IndigoOptions =
+  IndigoOptions.defaults
+    .withTitle("Dungeon Viewer")
+    .withAssetDirectory("dungeon-viewer/assets")
+    .withWindowSize(800, 500)
+    .withBackgroundColor("black")
+
 lazy val dungeonViewer =
   (project in file("dungeon-viewer"))
     .enablePlugins(ScalaJSPlugin, SbtIndigo)
@@ -138,17 +146,16 @@ lazy val dungeonViewer =
       Test / scalaJSLinkerConfig ~= {
         _.withModuleKind(ModuleKind.CommonJSModule)
       },
-      showCursor            := true,
-      title                 := "Dungeon Viewer",
-      gameAssetsDirectory   := "./assets",
-      windowStartWidth      := 800,
-      windowStartHeight     := 500,
-      disableFrameRateLimit := false,
-      electronInstall       := indigoplugin.ElectronInstall.Latest,
-      backgroundColor       := "black"
+      indigoOptions := dungeonViewerOptions
     )
     .settings(indigoDeps)
     .dependsOn(dungeonGenerator)
+
+lazy val roguelikeOptions: IndigoOptions =
+  IndigoOptions.defaults
+    .withTitle("My Generic Roguelike")
+    .withWindowSize(1280, 720)
+    .withBackgroundColor("#21293f")
 
 lazy val roguelike =
   project
@@ -159,14 +166,7 @@ lazy val roguelike =
       Test / scalaJSLinkerConfig ~= {
         _.withModuleKind(ModuleKind.CommonJSModule)
       },
-      showCursor            := true,
-      title                 := "My Generic Roguelike",
-      gameAssetsDirectory   := "../assets",
-      windowStartWidth      := 1280,
-      windowStartHeight     := 720,
-      disableFrameRateLimit := false,
-      electronInstall       := indigoplugin.ElectronInstall.Latest,
-      backgroundColor       := "#21293f"
+      indigoOptions := roguelikeOptions
     )
     .settings(indigoDeps)
     .enablePlugins(GhpagesPlugin) // Website stuff
