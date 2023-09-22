@@ -2,7 +2,7 @@ import scala.sys.process._
 import scala.language.postfixOps
 
 import sbtwelcome._
-import indigoplugin.IndigoOptions
+import indigoplugin._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -146,7 +146,14 @@ lazy val dungeonViewer =
       Test / scalaJSLinkerConfig ~= {
         _.withModuleKind(ModuleKind.CommonJSModule)
       },
-      indigoOptions := dungeonViewerOptions
+      indigoOptions := dungeonViewerOptions,
+      Compile / sourceGenerators += Def.task {
+        IndigoGenerators
+          .sbt((Compile / sourceManaged).value, "dungeonviewer.generated")
+          .listAssets("Assets", dungeonViewerOptions.assets)
+          .generateConfig("Config", dungeonViewerOptions)
+          .toSourceFiles
+      }
     )
     .settings(indigoDeps)
     .dependsOn(dungeonGenerator)
@@ -166,7 +173,14 @@ lazy val roguelike =
       Test / scalaJSLinkerConfig ~= {
         _.withModuleKind(ModuleKind.CommonJSModule)
       },
-      indigoOptions := roguelikeOptions
+      indigoOptions := roguelikeOptions,
+      Compile / sourceGenerators += Def.task {
+        IndigoGenerators
+          .sbt((Compile / sourceManaged).value, "roguelike.generated")
+          .listAssets("Assets", roguelikeOptions.assets)
+          .generateConfig("Config", roguelikeOptions)
+          .toSourceFiles
+      }
     )
     .settings(indigoDeps)
     .enablePlugins(GhpagesPlugin) // Website stuff

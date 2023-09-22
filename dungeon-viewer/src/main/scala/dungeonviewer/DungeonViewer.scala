@@ -1,5 +1,7 @@
 package dungeonviewer
 
+import dungeonviewer.generated.Assets
+import dungeonviewer.generated.Config
 import indigo.*
 import indigo.scenes.*
 import indigoextras.subsystems.FPSCounter
@@ -26,13 +28,9 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
   def boot(flags: Map[String, String]): Outcome[BootResult[Unit]] =
     Outcome(
       BootResult
-        .noData(
-          GameConfig.default
-            .withFrameRateLimit(FPS.`60`)
-            .withViewport(screenSize * Size(10))
-        )
+        .noData(Config.config)
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
-        .withAssets(Assets.assets)
+        .withAssets(Assets.assets.assets("./"))
         .withShaders(
           TerminalEntity.shader(maxTileCount),
           TerminalText.standardShader
