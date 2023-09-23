@@ -4,6 +4,7 @@ import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
 import roguelike.assets.GameAssets
+import roguelike.assets.ShaderInnerGlow
 
 final case class InnerGlow(
     screenSize: Size,
@@ -27,7 +28,7 @@ final case class InnerGlow(
 object InnerGlow:
   val shaderId: ShaderId = ShaderId("inner glow blend material")
 
-  val shader: BlendShader.External =
+  val shader: BlendShader.Source =
     BlendShader
-      .External(shaderId)
-      .withFragmentProgram(GameAssets.InnerGlow)
+      .Source(shaderId)
+      .withFragmentProgram(ShaderInnerGlow.InnerglowFragment)
