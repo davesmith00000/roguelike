@@ -22,7 +22,7 @@ object GameAssetLoader:
     val res =
       spriteData.aseprite
         .toSpriteAndAnimations(dice, spriteData.imageData)
-        .map(s => s.copy(sprite = s.sprite.withDepth(depth)))
+        .map(_.modifySprite(_.withDepth(depth)))
 
     res match
       case Some(spriteAndAnimations) =>
