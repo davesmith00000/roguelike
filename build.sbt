@@ -80,6 +80,44 @@ lazy val roguelikeGenerated =
     .settings(indigoDeps)
     .settings(
       Compile / sourceGenerators += Def.task {
+        IndigoGenerators
+          .sbt((Compile / sourceManaged).value, "roguelike.assets")
+          .listAssets("GeneratedAssets", roguelikeOptions.assets)
+          .embedAseprite("AsepriteDeath", os.pwd / "assets" / "sprites" / "death.json")
+          .embedAseprite("AsepriteEnemy1", os.pwd / "assets" / "sprites" / "enemy1.json")
+          .embedAseprite("AsepriteEnemy2", os.pwd / "assets" / "sprites" / "ENEMY2.json")
+          .embedAseprite("AsepriteEnemy3", os.pwd / "assets" / "sprites" / "ENEMY3.json")
+          .embedAseprite(
+            "AsepriteKeyAnimation",
+            os.pwd / "assets" / "sprites" / "Key_animation.json"
+          )
+          .embedAseprite("AsepritePlayer", os.pwd / "assets" / "sprites" / "Player.json")
+          .embedAseprite(
+            "AsepritePotionAnimation",
+            os.pwd / "assets" / "sprites" / "Potion_animation.json"
+          )
+          .embedAseprite("AsepriteShadows", os.pwd / "assets" / "sprites" / "shadows.json")
+          .embedAseprite(
+            "AsepriteTorchAnimation",
+            os.pwd / "assets" / "sprites" / "torch_animation.json"
+          )
+          .embedGLSLShaders(
+            "ShaderInnerGlow",
+            os.pwd / "assets" / "shaders" / "noop.vert",
+            os.pwd / "assets" / "shaders" / "innerglow.frag",
+            false
+          )
+          .embedGLSLShaders(
+            "ShaderText",
+            os.pwd / "assets" / "shaders" / "noop.vert",
+            os.pwd / "assets" / "shaders" / "text.frag",
+            false
+          )
+          .toSourceFiles
+      }
+    )
+    .settings(
+      Compile / sourceGenerators += Def.task {
         val cachedFun = FileFunction.cached(
           streams.value.cacheDirectory / "gamedata"
         ) { (gameData: Set[File]) =>
@@ -104,7 +142,7 @@ lazy val roguelikeGenerated =
                 gameData,
                 outDir
               ) ++
-            AssetsGen
+            AssetsGen // TODO: Remove
               .gen(
                 "GameAssets",
                 "roguelike.assets",
@@ -163,6 +201,10 @@ lazy val roguelikeOptions: IndigoOptions =
     .withTitle("My Generic Roguelike")
     .withWindowSize(1280, 720)
     .withBackgroundColor("#21293f")
+    .excludeAssetPaths {
+      case p if p.endsWith(".json")     => true
+      case p if p.startsWith("shaders") => true
+    }
 
 lazy val roguelike =
   project
@@ -176,8 +218,7 @@ lazy val roguelike =
       indigoOptions := roguelikeOptions,
       Compile / sourceGenerators += Def.task {
         IndigoGenerators
-          .sbt((Compile / sourceManaged).value, "roguelike.generated")
-          .listAssets("Assets", roguelikeOptions.assets)
+          .sbt((Compile / sourceManaged).value, "roguelike.config")
           .generateConfig("Config", roguelikeOptions)
           .toSourceFiles
       }

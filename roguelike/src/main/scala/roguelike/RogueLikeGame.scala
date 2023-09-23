@@ -7,6 +7,7 @@ import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
+import roguelike.config.Config
 import roguelike.game.GameScene
 import roguelike.model.GameAssetLoader
 import roguelike.model.Model
@@ -57,11 +58,12 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
 
     Outcome(
       BootResult(
-        GameConfig.default
-          .withMagnification(1)
-          .withViewport(gameViewport)
-          .withFrameRateLimit(FPS.`60`)
-          .withClearColor(RGBA.fromHexString("#21293f")),
+        Config.config,
+        // GameConfig.default
+        //   .withMagnification(1)
+        //   .withViewport(gameViewport)
+        //   .withFrameRateLimit(FPS.`60`)
+        //   .withClearColor(RGBA.fromHexString("#21293f")),
         gameViewport.size
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
@@ -91,7 +93,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       assetCollection: AssetCollection,
       dice: Dice
   ): Outcome[Startup[Size]] =
-    if GameAssets.loaded(assetCollection) && GameAssets.lazyAssetsLoaded(assetCollection) then
+    if GameAssets.loaded(assetCollection) then
       val spriteAnimationLoader: (SpriteAssetData, Depth) => Outcome[SpriteAndAnimations] =
         GameAssetLoader.loadAnimation(assetCollection, dice)
 

@@ -1,7 +1,5 @@
 Name|type|phase|path
 ---|---|---|---
-TextFragShader|text|init|assets/shaders/text.frag
-InnerGlow|text|init|assets/shaders/innerglow.frag
 TileMap|image|init|assets/Anikki_square_10x10.png
 indigoLogo|image|init|assets/indigoLogo.png
 purpleKingdomLogo|image|init|assets/pkLogo.png
