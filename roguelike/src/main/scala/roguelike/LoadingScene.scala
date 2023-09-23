@@ -47,7 +47,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
         .addGlobalEvents(
           AssetBundleLoaderEvent.Load(
             loadBindingKey,
-            GameAssets.lazyAssets
+            GameAssets.assets.game.assets("./")
           ),
           StorageEvent.Load(ModelSaveData.saveKey)
         )
@@ -97,9 +97,9 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
     case LoadEvent.SpritesLoaded(sprites) =>
-      val player = sprites.find(_._1 == GameAssets.Player).map(_._2)
-      val orc    = sprites.find(_._1 == GameAssets.Enemy1).map(_._2)
-      val troll  = sprites.find(_._1 == GameAssets.Enemy2).map(_._2)
+      val player = sprites.find(_._1 == GameAssets.assets.game.Player).map(_._2)
+      val orc    = sprites.find(_._1 == GameAssets.assets.game.enemy1).map(_._2)
+      val troll  = sprites.find(_._1 == GameAssets.assets.game.ENEMY2).map(_._2)
 
       val gameSprite: Option[GameSprites] =
         for {

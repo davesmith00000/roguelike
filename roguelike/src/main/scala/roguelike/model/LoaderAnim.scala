@@ -4,7 +4,6 @@ import indigo.*
 import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 
 object LoaderAnim:
 
@@ -16,7 +15,7 @@ object LoaderAnim:
       Text(
         textCopy,
         RoguelikeTiles.Size10x10.Fonts.fontKey,
-        TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+        TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
       )
 
     val textBounds: Rectangle =
@@ -30,7 +29,7 @@ object LoaderAnim:
         Point(0),
         Size(32),
         ClipSheet(4, Seconds(0.25)),
-        GameAssetsNew.assets.init.loadingMaterial
+        GameAssets.assets.init.loadingMaterial
       )
 
     val midX       = textBounds.width * 0.5

@@ -2,6 +2,11 @@ package roguelike.model
 
 import indigo.*
 import indigo.json.Json
+import roguelike.assets.AsepriteDeath
+import roguelike.assets.AsepriteEnemy1
+import roguelike.assets.AsepriteEnemy2
+import roguelike.assets.AsepriteEnemy3
+import roguelike.assets.AsepritePlayer
 import roguelike.assets.GameAssets
 
 object GameAssetLoader:
@@ -14,11 +19,10 @@ object GameAssetLoader:
       depth: Depth
   ): Outcome[SpriteAndAnimations] = {
 
-    val res = for {
-      json                <- assetCollection.findTextDataByName(spriteData.jsonData)
-      aseprite            <- Json.asepriteFromJson(json)
-      spriteAndAnimations <- aseprite.toSpriteAndAnimations(dice, spriteData.imageData)
-    } yield spriteAndAnimations.copy(sprite = spriteAndAnimations.sprite.withDepth(depth))
+    val res =
+      spriteData.aseprite
+        .toSpriteAndAnimations(dice, spriteData.imageData)
+        .map(s => s.copy(sprite = s.sprite.withDepth(depth)))
 
     res match
       case Some(spriteAndAnimations) =>
@@ -30,14 +34,29 @@ object GameAssetLoader:
 
 final case class SpriteAssetData(
     imageData: AssetName,
-    jsonData: AssetName
+    aseprite: Aseprite
 )
 object SpriteAssetData:
 
   val spriteData = Batch(
-    SpriteAssetData(GameAssets.Player, GameAssets.PlayerData),
-    SpriteAssetData(GameAssets.Death, GameAssets.DeathData),
-    SpriteAssetData(GameAssets.Enemy1, GameAssets.EnemyData1),
-    SpriteAssetData(GameAssets.Enemy2, GameAssets.EnemyData2),
-    SpriteAssetData(GameAssets.Enemy3, GameAssets.EnemyData3)
+    SpriteAssetData(
+      GameAssets.assets.game.Player,
+      AsepritePlayer.aseprite
+    ),
+    SpriteAssetData(
+      GameAssets.assets.game.death,
+      AsepriteDeath.aseprite
+    ),
+    SpriteAssetData(
+      GameAssets.assets.game.enemy1,
+      AsepriteEnemy1.aseprite
+    ),
+    SpriteAssetData(
+      GameAssets.assets.game.ENEMY2,
+      AsepriteEnemy2.aseprite
+    ),
+    SpriteAssetData(
+      GameAssets.assets.game.ENEMY3,
+      AsepriteEnemy3.aseprite
+    )
   )

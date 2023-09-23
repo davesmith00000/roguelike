@@ -6,7 +6,6 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 import roguelike.model.Equipment
 import roguelike.model.GameState
 import roguelike.model.Inventory
@@ -32,7 +31,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -40,7 +39,7 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
     )
       .moveTo(1, 2)
 
@@ -48,19 +47,19 @@ object UIElements:
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA(0.3, 0.3, 0.3, 1.0))
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA(0.3, 0.3, 0.3, 1.0))
     )
   val toolTipAlive: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Blue)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Blue)
     )
   val toolTipDead: Text[TerminalText] =
     Text(
       "",
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Red)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Red)
     )
 
   val letters: Batch[String]            = ('a' to 'z').toBatch.map(_.toString)
@@ -179,7 +178,7 @@ object UIElements:
     Text(
       text,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
     )
       .moveTo(5, 5)
 
@@ -190,7 +189,7 @@ object UIElements:
     Text(
       helpControlsText,
       RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
 
