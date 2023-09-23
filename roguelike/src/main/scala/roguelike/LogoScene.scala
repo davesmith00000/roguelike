@@ -8,6 +8,7 @@ import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
+import roguelike.assets.GameAssetsNew
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
@@ -125,8 +126,7 @@ object Logos:
 
     Graphic(
       size,
-      Material
-        .Bitmap(GameAssets.PurpleKingdomLogo)
+      GameAssetsNew.assets.init.pkLogoMaterial
         .stretch
         .toImageEffects
     ).withRef(size.toPoint / 2)
@@ -137,8 +137,7 @@ object Logos:
 
     Graphic(
       size,
-      Material
-        .Bitmap(GameAssets.IndigoLogo)
+      GameAssetsNew.assets.init.indigoLogoMaterial
         .stretch
         .toImageEffects
     ).withRef(size.toPoint / 2)

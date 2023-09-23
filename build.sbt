@@ -83,23 +83,23 @@ lazy val roguelikeGenerated =
         IndigoGenerators
           .sbt((Compile / sourceManaged).value, "roguelike.assets")
           .listAssets("GeneratedAssets", roguelikeOptions.assets)
-          .embedAseprite("AsepriteDeath", os.pwd / "assets" / "sprites" / "death.json")
-          .embedAseprite("AsepriteEnemy1", os.pwd / "assets" / "sprites" / "enemy1.json")
-          .embedAseprite("AsepriteEnemy2", os.pwd / "assets" / "sprites" / "ENEMY2.json")
-          .embedAseprite("AsepriteEnemy3", os.pwd / "assets" / "sprites" / "ENEMY3.json")
+          .embedAseprite("AsepriteDeath", os.pwd / "assets" / "game" / "death.json")
+          .embedAseprite("AsepriteEnemy1", os.pwd / "assets" / "game" / "enemy1.json")
+          .embedAseprite("AsepriteEnemy2", os.pwd / "assets" / "game" / "ENEMY2.json")
+          .embedAseprite("AsepriteEnemy3", os.pwd / "assets" / "game" / "ENEMY3.json")
           .embedAseprite(
             "AsepriteKeyAnimation",
-            os.pwd / "assets" / "sprites" / "Key_animation.json"
+            os.pwd / "assets" / "game" / "Key_animation.json"
           )
-          .embedAseprite("AsepritePlayer", os.pwd / "assets" / "sprites" / "Player.json")
+          .embedAseprite("AsepritePlayer", os.pwd / "assets" / "game" / "Player.json")
           .embedAseprite(
             "AsepritePotionAnimation",
-            os.pwd / "assets" / "sprites" / "Potion_animation.json"
+            os.pwd / "assets" / "game" / "Potion_animation.json"
           )
-          .embedAseprite("AsepriteShadows", os.pwd / "assets" / "sprites" / "shadows.json")
+          .embedAseprite("AsepriteShadows", os.pwd / "assets" / "game" / "shadows.json")
           .embedAseprite(
             "AsepriteTorchAnimation",
-            os.pwd / "assets" / "sprites" / "torch_animation.json"
+            os.pwd / "assets" / "game" / "torch_animation.json"
           )
           .embedGLSLShaders(
             "ShaderInnerGlow",

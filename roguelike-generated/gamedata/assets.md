@@ -1,12 +1,5 @@
 Name|type|phase|path
 ---|---|---|---
-TileMap|image|init|assets/Anikki_square_10x10.png
-indigoLogo|image|init|assets/indigoLogo.png
-purpleKingdomLogo|image|init|assets/pkLogo.png
-Loader|image|init|assets/loading.png
-MenuBg|image|init|assets/menuBg.png
-UI|image|init|assets/ui/ui.png
-MenuBackgroundAudio|audio|init|assets/audio/Retro Mystic.mp3
 Icons|image|lazy|assets/simple-sprites-24x24.png
 DoorStone|image|lazy|assets/bg/door_stone.png
 Objects|image|lazy|assets/bg/objects.png

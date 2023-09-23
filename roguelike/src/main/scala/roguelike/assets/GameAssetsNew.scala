@@ -6,8 +6,10 @@ import roguelike.assets.GeneratedAssets
 
 object GameAssetsNew:
 
+  export GeneratedAssets.*
+
   def initialAssets: Set[AssetType] =
-    Set()
+    GeneratedAssets.assets.init.assets("./")
   
   def loaded(assetCollection: AssetCollection): Boolean =
     audiosLoaded(assetCollection) &&

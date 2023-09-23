@@ -7,6 +7,7 @@ import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
+import roguelike.assets.GameAssetsNew
 import roguelike.config.Config
 import roguelike.game.GameScene
 import roguelike.model.GameAssetLoader
@@ -59,15 +60,10 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     Outcome(
       BootResult(
         Config.config,
-        // GameConfig.default
-        //   .withMagnification(1)
-        //   .withViewport(gameViewport)
-        //   .withFrameRateLimit(FPS.`60`)
-        //   .withClearColor(RGBA.fromHexString("#21293f")),
         gameViewport.size
       )
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
-        .withAssets(GameAssets.initialAssets)
+        .withAssets(GameAssetsNew.initialAssets)
         .withShaders(
           TerminalText.standardShader,
           InnerGlow.shader,

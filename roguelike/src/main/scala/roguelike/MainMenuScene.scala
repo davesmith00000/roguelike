@@ -10,6 +10,7 @@ import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
+import roguelike.assets.GameAssetsNew
 import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
@@ -126,8 +127,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 object MainMenuBackground:
   val graphic = Graphic(
     Size(100),
-    Material
-      .Bitmap(GameAssets.MenuBg)
+    GameAssetsNew.assets.init.menuBgMaterial
       .tile
       .toImageEffects
   )
@@ -155,7 +155,7 @@ object MainMenuTitle:
   val titleText = Text(
     "My Generic Roguelite",
     RoguelikeTiles.Size10x10.Fonts.fontKey,
-    TerminalText(GameAssets.TileMap, RGBA.Yellow, RGBA.Zero)
+    TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.Yellow, RGBA.Zero)
   )
 
   val group =
@@ -218,7 +218,7 @@ object MainMenuItems:
       .toBatch
 
 object MainMenuAudio:
-  val track = Track(GameAssets.MenuBackgroundAudio)
+  val track = Track(GameAssetsNew.assets.init.RetroMystic)
 
   val changeVolume: Track => SignalFunction[Double, Track] = t =>
     SignalFunction { d =>
@@ -235,7 +235,7 @@ object MainMenuAudio:
   def present(time: Seconds): SceneAudio =
     SceneAudio(
       SceneAudioSource(
-        BindingKey(GameAssets.MenuBackgroundAudio.toString),
+        BindingKey(GameAssetsNew.assets.init.RetroMystic.toString),
         PlaybackPattern.SingleTrackLoop(
           soundTimeline.atOrElse(time)(track)
         )
