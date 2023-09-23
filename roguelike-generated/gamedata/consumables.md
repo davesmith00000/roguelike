@@ -1,3 +1,3 @@
-Name|Amount
----|---
-Health Potion|4
+| Key           | Name          | Amount |
+| ------------- | ------------- | ------ |
+| Health Potion | Health Potion | 4      |

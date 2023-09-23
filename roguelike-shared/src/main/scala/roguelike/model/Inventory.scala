@@ -234,7 +234,7 @@ final case class Equipment(weapon: Option[Melee], armour: Option[Armour]):
     armour.map(_.defenseBonus).getOrElse(0)
 
   def powerBonus: Int =
-    weapon.map(_.power).getOrElse(0)
+    weapon.map(_.powerBonus).getOrElse(0)
 
   def equip(equipment: Melee | Armour): Outcome[(Option[Item], Equipment)] =
     equipment match

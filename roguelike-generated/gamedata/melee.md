@@ -1,4 +1,4 @@
-Name|Power Bonus
----|---
-Dagger|2
-Sword |4
+| Key    | Name   | Power Bonus |
+| ------ | ------ | ----------- |
+| Dagger | Dagger | 2           |
+| Sword  | Sword  | 4           |
