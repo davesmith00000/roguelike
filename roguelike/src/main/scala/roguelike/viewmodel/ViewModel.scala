@@ -9,7 +9,6 @@ import roguelike.InventoryEvent
 import roguelike.NewGame
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
@@ -133,14 +132,14 @@ final case class GameViewModel(
         model.messageLog
           .toTerminal(Size(50, 30), false, 0, true)
           .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, fg, bg))
+            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
           }
 
       val shortLog =
         model.messageLog
           .toTerminal(Size(50, 5), false, 0, false)
           .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, fg, bg))
+            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
           }
 
       Outcome(

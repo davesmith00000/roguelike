@@ -6,7 +6,6 @@ import indigoextras.ui.HitArea
 import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 
 final case class ButtonComponent(
     text: String,
@@ -49,7 +48,7 @@ final case class ButtonComponent(
         Text(
           text,
           RoguelikeTiles.Size10x10.Fonts.fontKey,
-          TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, textColor, RGBA.Zero, shadowColor)
+          TerminalText(GameAssets.assets.init.AnikkiSquare10x10, textColor, RGBA.Zero, shadowColor)
         ).alignCenter
           .moveTo(Point((width * 0.5).toInt, 4))
       ).moveTo(position)

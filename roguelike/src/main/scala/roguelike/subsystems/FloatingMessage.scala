@@ -6,7 +6,6 @@ import io.indigoengine.roguelike.starterkit.terminal.TerminalText
 import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 
 object FloatingMessage:
 
@@ -22,7 +21,7 @@ object FloatingMessage:
           Text(
             "",
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+            TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
           ).alignCenter
         ),
         Seconds(1.5d)

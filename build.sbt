@@ -141,13 +141,6 @@ lazy val roguelikeGenerated =
                 "roguelike.model.gamedata",
                 gameData,
                 outDir
-              ) ++
-            AssetsGen // TODO: Remove
-              .gen(
-                "GameAssets",
-                "roguelike.assets",
-                gameData,
-                outDir
               )
         }
         cachedFun(IO.listFiles(baseDirectory.value / "gamedata").toSet).toSeq

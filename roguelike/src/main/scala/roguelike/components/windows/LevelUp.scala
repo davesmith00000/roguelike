@@ -6,7 +6,6 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.assets.GameAssetsNew
 import roguelike.components.Component
 import roguelike.model.Message
 import roguelike.model.Model
@@ -96,7 +95,7 @@ object LevelUp extends Component[Size, Model, GameViewModel]:
           Text(
             text,
             RoguelikeTiles.Size10x10.Fonts.fontKey,
-            TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
+            TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
           )
             .moveTo(5, 5)
         ).moveTo(((viewportSize - windowSize) / 2).toPoint)
