@@ -5,6 +5,7 @@ import indigo.scenes.SceneContext
 import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
+import roguelike.assets.GameAssetsNew
 import roguelike.components.Component
 import roguelike.game.UIElements
 import roguelike.model.Inventory
@@ -77,7 +78,7 @@ object InventoryMenu extends Component[Size, Model, GameViewModel]:
             Text(
               text,
               RoguelikeTiles.Size10x10.Fonts.fontKey,
-              TerminalText(GameAssets.TileMap, RGBA.White, RGBA.Zero)
+              TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
             )
               .moveTo(5, 5)
           ).moveTo(((viewportSize - windowSize) / 2).toPoint)
@@ -101,7 +102,7 @@ object InventoryMenu extends Component[Size, Model, GameViewModel]:
             Text(
               text,
               RoguelikeTiles.Size10x10.Fonts.fontKey,
-              TerminalText(GameAssets.TileMap, RGBA.White, RGBA.Zero)
+              TerminalText(GameAssetsNew.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
             )
               .moveTo(5, 5)
           ).moveTo(((viewportSize - windowSize) / 2).toPoint)

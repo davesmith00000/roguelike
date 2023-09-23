@@ -9,6 +9,7 @@ import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
+import roguelike.assets.GameAssetsNew
 
 final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
 
@@ -121,7 +122,7 @@ object MessageLog:
   ): TerminalEntity =
     logToTerminal(size, messages, reversed, startOffset, true)
       .draw(
-        GameAssets.TileMap,
+        GameAssetsNew.assets.init.AnikkiSquare10x10,
         RogueLikeGame.charSize,
         MapTile(Tile.SPACE),
         4000
