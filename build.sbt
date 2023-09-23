@@ -114,6 +114,23 @@ lazy val roguelikeGenerated =
             false
           )
           .toSourceFiles
+      },
+      Compile / sourceGenerators += Def.task {
+        IndigoGenerators
+          .sbt((Compile / sourceManaged).value, "roguelike.model.gamedata")
+          .embedMarkdownTable
+          .asEnum("Armour", os.pwd / "roguelike-generated" / "gamedata" / "armour.md", "roguelike.model.items.Item")
+          .embedMarkdownTable
+          .asEnum("Consumables", os.pwd / "roguelike-generated" / "gamedata" / "consumables.md", "roguelike.model.items.Item")
+          .embedMarkdownTable
+          .asEnum("Hostiles", os.pwd / "roguelike-generated" / "gamedata" / "hostiles.md")
+          // .embedMarkdownTable
+          // .asEnum("KeyMapping", os.pwd / "roguelike-generated" / "gamedata" / "key-mappings.md")
+          .embedMarkdownTable
+          .asEnum("Melee", os.pwd / "roguelike-generated" / "gamedata" / "melee.md", "roguelike.model.items.Item")
+          .embedMarkdownTable
+          .asEnum("Ranged", os.pwd / "roguelike-generated" / "gamedata" / "ranged.md", "roguelike.model.items.Item")
+          .toSourceFiles
       }
     )
     .settings(
@@ -122,19 +139,6 @@ lazy val roguelikeGenerated =
           streams.value.cacheDirectory / "gamedata"
         ) { (gameData: Set[File]) =>
           val outDir = (Compile / sourceManaged).value
-          MeleeGen.gen("Melee", "roguelike.model.gamedata", gameData, outDir) ++
-            ArmourGen
-              .gen("Armour", "roguelike.model.gamedata", gameData, outDir) ++
-            ConsumablesGen.gen(
-              "Consumables",
-              "roguelike.model.gamedata",
-              gameData,
-              outDir
-            ) ++
-            RangedGen
-              .gen("Ranged", "roguelike.model.gamedata", gameData, outDir) ++
-            HostilesGen
-              .gen("Hostiles", "roguelike.model.gamedata", gameData, outDir) ++
             KeyMappingsGen
               .gen(
                 "KeyMapping",
