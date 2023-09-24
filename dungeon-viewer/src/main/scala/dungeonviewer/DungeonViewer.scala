@@ -30,7 +30,7 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
       BootResult
         .noData(Config.config)
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
-        .withAssets(Assets.assets.assets("./"))
+        .withAssets(Assets.assets.assetSet)
         .withShaders(
           TerminalEntity.shader(maxTileCount),
           TerminalText.standardShader

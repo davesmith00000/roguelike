@@ -47,7 +47,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
         .addGlobalEvents(
           AssetBundleLoaderEvent.Load(
             loadBindingKey,
-            GameAssets.assets.game.assets("./")
+            GameAssets.assets.game.assetSet
           ),
           StorageEvent.Load(ModelSaveData.saveKey)
         )

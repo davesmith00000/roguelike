@@ -119,36 +119,37 @@ lazy val roguelikeGenerated =
         IndigoGenerators
           .sbt((Compile / sourceManaged).value, "roguelike.model.gamedata")
           .embedMarkdownTable
-          .asEnum("Armour", os.pwd / "roguelike-generated" / "gamedata" / "armour.md", "roguelike.model.items.Item")
+          .asEnum(
+            "Armour",
+            os.pwd / "roguelike-generated" / "gamedata" / "armour.md",
+            "roguelike.model.items.Item"
+          )
           .embedMarkdownTable
-          .asEnum("Consumables", os.pwd / "roguelike-generated" / "gamedata" / "consumables.md", "roguelike.model.items.Item")
+          .asEnum(
+            "Consumables",
+            os.pwd / "roguelike-generated" / "gamedata" / "consumables.md",
+            "roguelike.model.items.Item"
+          )
           .embedMarkdownTable
           .asEnum("Hostiles", os.pwd / "roguelike-generated" / "gamedata" / "hostiles.md")
-          // .embedMarkdownTable
-          // .asEnum("KeyMapping", os.pwd / "roguelike-generated" / "gamedata" / "key-mappings.md")
           .embedMarkdownTable
-          .asEnum("Melee", os.pwd / "roguelike-generated" / "gamedata" / "melee.md", "roguelike.model.items.Item")
+          .asEnum(
+            "Melee",
+            os.pwd / "roguelike-generated" / "gamedata" / "melee.md",
+            "roguelike.model.items.Item"
+          )
           .embedMarkdownTable
-          .asEnum("Ranged", os.pwd / "roguelike-generated" / "gamedata" / "ranged.md", "roguelike.model.items.Item")
+          .asEnum(
+            "Ranged",
+            os.pwd / "roguelike-generated" / "gamedata" / "ranged.md",
+            "roguelike.model.items.Item"
+          )
+          .embedMarkdownTable
+          .asCustom("KeyMapping", os.pwd / "roguelike-generated" / "gamedata" / "key-mappings.md")(
+            KeyMappingsGen.present("KeyMapping")
+          )
           .toSourceFiles
       }
-    )
-    .settings(
-      Compile / sourceGenerators += Def.task {
-        val cachedFun = FileFunction.cached(
-          streams.value.cacheDirectory / "gamedata"
-        ) { (gameData: Set[File]) =>
-          val outDir = (Compile / sourceManaged).value
-            KeyMappingsGen
-              .gen(
-                "KeyMapping",
-                "roguelike.model.gamedata",
-                gameData,
-                outDir
-              )
-        }
-        cachedFun(IO.listFiles(baseDirectory.value / "gamedata").toSet).toSeq
-      }.taskValue
     )
 
 lazy val roguelikeShared =
