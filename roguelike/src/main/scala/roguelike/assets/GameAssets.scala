@@ -9,10 +9,10 @@ object GameAssets:
   export GeneratedAssets.*
 
   def initialAssets: Set[AssetType] =
-    GeneratedAssets.assets.init.assets("./")
+    GeneratedAssets.assets.init.assetSet
 
   def loaded(assetCollection: AssetCollection): Boolean =
-    GeneratedAssets.assets.game.assets("./").forall {
+    GeneratedAssets.assets.game.assetSet.forall {
       case t: AssetType.Text =>
         assetCollection.findTextDataByName(t.name).isDefined
 

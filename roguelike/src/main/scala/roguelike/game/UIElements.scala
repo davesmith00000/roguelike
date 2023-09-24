@@ -16,7 +16,6 @@ import roguelike.model.entity.Fighter
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.KeyMapping
 import roguelike.model.gamedata.Melee
 
 import scala.scalajs.js
