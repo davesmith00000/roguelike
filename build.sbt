@@ -22,8 +22,8 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.15.0-RC4"
-val roguelikeStarterKitVersion = "0.3.0-RC3"
+val indigoVersion              = "0.15.0"
+val roguelikeStarterKitVersion = "0.3.0"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(
