@@ -125,9 +125,7 @@ object Logos:
 
     Graphic(
       size,
-      GameAssets.assets.init.pkLogoMaterial
-        .stretch
-        .toImageEffects
+      GameAssets.assets.init.pkLogoMaterial.stretch.toImageEffects
     ).withRef(size.toPoint / 2)
       .modifyMaterial(_.withAlpha(0.0))
 
@@ -136,8 +134,6 @@ object Logos:
 
     Graphic(
       size,
-      GameAssets.assets.init.indigoLogoMaterial
-        .stretch
-        .toImageEffects
+      GameAssets.assets.init.indigoLogoMaterial.stretch.toImageEffects
     ).withRef(size.toPoint / 2)
       .modifyMaterial(_.withAlpha(0.0))

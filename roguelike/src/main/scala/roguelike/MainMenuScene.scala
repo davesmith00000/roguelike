@@ -126,9 +126,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 object MainMenuBackground:
   val graphic = Graphic(
     Size(100),
-    GameAssets.assets.init.menuBgMaterial
-      .tile
-      .toImageEffects
+    GameAssets.assets.init.menuBgMaterial.tile.toImageEffects
   )
 
   def present(time: Seconds, viewportSize: Size): Batch[Graphic[Material.ImageEffects]] =
