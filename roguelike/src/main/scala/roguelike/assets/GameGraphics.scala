@@ -17,8 +17,7 @@ object GameGraphics:
       Graphic(
         32,
         32,
-        GameAssets.assets.game.tilesetMaterial
-          .toImageEffects
+        GameAssets.assets.game.tilesetMaterial.toImageEffects
           .withOverlay(Fill.Color(RGBA.Black.withAmount(0.7)))
       )
     )
