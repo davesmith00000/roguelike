@@ -3,7 +3,6 @@ package roguelike.components.windows
 import indigo.*
 import indigo.scenes.SceneContext
 import indigo.scenes.SceneEvent
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.MainMenuScene
 import roguelike.assets.GameAssets
 import roguelike.components.Component
@@ -12,6 +11,7 @@ import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameViewModel
+import roguelikestarterkit.*
 
 object QuitMenu extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput

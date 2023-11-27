@@ -22,8 +22,8 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.15.0"
-val roguelikeStarterKitVersion = "0.3.0"
+val indigoVersion              = "0.15.2"
+val roguelikeStarterKitVersion = "0.4.0"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(
@@ -80,8 +80,7 @@ lazy val roguelikeGenerated =
     .settings(indigoDeps)
     .settings(
       Compile / sourceGenerators += Def.task {
-        IndigoGenerators
-          .sbt((Compile / sourceManaged).value, "roguelike.assets")
+        IndigoGenerators("roguelike.assets")
           .listAssets("GeneratedAssets", roguelikeOptions.assets)
           .embedAseprite("AsepriteDeath", os.pwd / "assets" / "game" / "death.json")
           .embedAseprite("AsepriteEnemy1", os.pwd / "assets" / "game" / "enemy1.json")
@@ -113,11 +112,10 @@ lazy val roguelikeGenerated =
             os.pwd / "assets" / "shaders" / "text.frag",
             false
           )
-          .toSourceFiles
+          .toSourceFiles((Compile / sourceManaged).value)
       },
       Compile / sourceGenerators += Def.task {
-        IndigoGenerators
-          .sbt((Compile / sourceManaged).value, "roguelike.model.gamedata")
+        IndigoGenerators("roguelike.model.gamedata")
           .embedMarkdownTable
           .asEnum(
             "Armour",
@@ -148,7 +146,7 @@ lazy val roguelikeGenerated =
           .asCustom("KeyMapping", os.pwd / "roguelike-generated" / "gamedata" / "key-mappings.md")(
             KeyMappingsGen.present("KeyMapping")
           )
-          .toSourceFiles
+          .toSourceFiles((Compile / sourceManaged).value)
       }
     )
 
@@ -184,11 +182,10 @@ lazy val dungeonViewer =
       },
       indigoOptions := dungeonViewerOptions,
       Compile / sourceGenerators += Def.task {
-        IndigoGenerators
-          .sbt((Compile / sourceManaged).value, "dungeonviewer.generated")
+        IndigoGenerators("dungeonviewer.generated")
           .listAssets("Assets", dungeonViewerOptions.assets)
           .generateConfig("Config", dungeonViewerOptions)
-          .toSourceFiles
+          .toSourceFiles((Compile / sourceManaged).value)
       }
     )
     .settings(indigoDeps)
@@ -215,10 +212,9 @@ lazy val roguelike =
       },
       indigoOptions := roguelikeOptions,
       Compile / sourceGenerators += Def.task {
-        IndigoGenerators
-          .sbt((Compile / sourceManaged).value, "roguelike.config")
+        IndigoGenerators("roguelike.config")
           .generateConfig("Config", roguelikeOptions)
-          .toSourceFiles
+          .toSourceFiles((Compile / sourceManaged).value)
       }
     )
     .settings(indigoDeps)

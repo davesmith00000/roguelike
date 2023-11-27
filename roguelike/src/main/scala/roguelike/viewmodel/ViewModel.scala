@@ -3,7 +3,6 @@ package roguelike.viewmodel
 import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.NewGame
@@ -21,6 +20,7 @@ import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ui.*
+import roguelikestarterkit.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -131,15 +131,17 @@ final case class GameViewModel(
       val history =
         model.messageLog
           .toTerminal(Size(50, 30), false, 0, true)
-          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+          .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
+            (fg, bg) =>
+              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
           }
 
       val shortLog =
         model.messageLog
           .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(Point(3, 4), RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+          .toCloneTiles(CloneId("short_log_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
+            (fg, bg) =>
+              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
           }
 
       Outcome(

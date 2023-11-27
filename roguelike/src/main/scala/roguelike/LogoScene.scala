@@ -6,13 +6,13 @@ import indigo.syntax.*
 import indigo.syntax.animations.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoadingState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.*
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 

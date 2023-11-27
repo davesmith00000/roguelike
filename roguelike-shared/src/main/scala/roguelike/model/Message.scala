@@ -5,8 +5,8 @@ import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
 import io.circe.*
 import io.circe.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
+import roguelikestarterkit.*
 
 final case class Message(
     text: String,

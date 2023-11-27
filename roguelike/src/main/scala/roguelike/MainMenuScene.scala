@@ -7,7 +7,6 @@ import indigo.syntax.*
 import indigo.syntax.animations.*
 import indigoextras.ui.Button
 import indigoextras.ui.HitArea
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
@@ -16,6 +15,7 @@ import roguelike.model.Model
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.MainMenuUi
+import roguelikestarterkit.*
 
 object MainMenuScene extends Scene[Size, Model, ViewModel]:
 

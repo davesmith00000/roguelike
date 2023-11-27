@@ -1,14 +1,13 @@
 package roguelike.model
 
-import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGBA
-import indigo.shared.datatypes.Size
+import indigo.*
 import io.circe.*
 import io.circe.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
+import roguelikestarterkit.*
+import roguelikestarterkit.*
 
 final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
 
@@ -50,7 +49,7 @@ final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
       size: Size,
       reversed: Boolean,
       startOffset: Int
-  ): TerminalEntity =
+  ): TerminalClones =
     MessageLog.renderMessages(
       position * RogueLikeGame.charSize.toPoint,
       size * RogueLikeGame.charSize,
@@ -118,12 +117,15 @@ object MessageLog:
       messages: List[Message],
       reversed: Boolean,
       startOffset: Int
-  ): TerminalEntity =
+  ): TerminalClones =
     logToTerminal(size, messages, reversed, startOffset, true)
-      .draw(
-        GameAssets.assets.init.AnikkiSquare10x10,
-        RogueLikeGame.charSize,
-        MapTile(Tile.SPACE),
-        4000
-      )
-      .moveTo(position)
+      .toCloneTiles(CloneId("messages"), position, RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
+        Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+      }
+    // .draw(
+    //   GameAssets.assets.init.AnikkiSquare10x10,
+    //   RogueLikeGame.charSize,
+    //   MapTile(Tile.SPACE),
+    //   4000
+    // )
+    // .moveTo(position)

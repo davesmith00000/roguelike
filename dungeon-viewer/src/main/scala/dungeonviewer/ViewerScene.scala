@@ -8,8 +8,8 @@ import indigo.*
 import indigo.scenes.*
 import indigo.shared.geometry.LineSegment
 import indigo.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.model.dungeon.Dungeon
+import roguelikestarterkit.*
 
 import scala.annotation.tailrec
 
@@ -95,8 +95,9 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     val tiles =
       viewModel.terminal
-        .toCloneTiles(Point.zero, RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
-          Graphic(10, 10, TerminalText(Assets.assets.AnikkiSquare10x10, fg, bg))
+        .toCloneTiles(CloneId("tiles"), Point.zero, RoguelikeTiles.Size10x10.charCrops) {
+          (fg, bg) =>
+            Graphic(10, 10, TerminalText(Assets.assets.AnikkiSquare10x10, fg, bg))
         }
 
     val mesh: Batch[SceneNode] =

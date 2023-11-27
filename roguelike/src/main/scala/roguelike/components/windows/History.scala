@@ -3,10 +3,10 @@ package roguelike.components.windows
 import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.scenegraph.CloneTiles
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.components.Component
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
+import roguelikestarterkit.*
 
 object History extends Component[Size, Model, GameViewModel]:
   type Command            = Unit

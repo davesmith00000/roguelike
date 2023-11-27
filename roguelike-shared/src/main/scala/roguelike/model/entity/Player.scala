@@ -3,7 +3,6 @@ package roguelike.model.entity
 import indigo.*
 import io.circe.*
 import io.circe.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent
@@ -16,6 +15,7 @@ import roguelike.model.SharedCodecs
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Melee
 import roguelike.model.items.Item
+import roguelikestarterkit.*
 
 final case class Player(
     position: Point,

@@ -4,8 +4,6 @@ import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
 import indigo.*
 import indigo.syntax.*
-import io.indigoengine.roguelike.starterkit.*
-import io.indigoengine.roguelike.starterkit.terminal.MapTile
 import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
@@ -18,6 +16,8 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelikestarterkit.*
+import roguelikestarterkit.terminal.MapTile
 
 import scala.annotation.tailrec
 

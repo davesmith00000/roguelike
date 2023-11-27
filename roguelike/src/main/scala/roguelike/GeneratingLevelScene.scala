@@ -6,7 +6,6 @@ import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
 import indigo.*
 import indigo.scenes.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.GameEvent
 import roguelike.GenerateLevel
 import roguelike.assets.GameAssets
@@ -16,6 +15,7 @@ import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.*
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 

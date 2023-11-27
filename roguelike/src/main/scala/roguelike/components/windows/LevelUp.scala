@@ -2,7 +2,6 @@ package roguelike.components.windows
 
 import indigo.*
 import indigo.scenes.SceneContext
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
@@ -11,6 +10,7 @@ import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.viewmodel.GameViewModel
+import roguelikestarterkit.*
 
 object LevelUp extends Component[Size, Model, GameViewModel]:
   type Command            = HandleInput

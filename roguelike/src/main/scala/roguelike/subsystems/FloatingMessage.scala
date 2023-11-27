@@ -2,10 +2,10 @@ package roguelike.subsystems
 
 import indigo.*
 import indigoextras.subsystems.*
-import io.indigoengine.roguelike.starterkit.terminal.TerminalText
-import io.indigoengine.roguelike.starterkit.tiles.RoguelikeTiles
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
+import roguelikestarterkit.terminal.TerminalText
+import roguelikestarterkit.tiles.RoguelikeTiles
 
 object FloatingMessage:
 

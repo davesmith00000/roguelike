@@ -5,7 +5,6 @@ import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoaderAnim
@@ -15,6 +14,7 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.*
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 

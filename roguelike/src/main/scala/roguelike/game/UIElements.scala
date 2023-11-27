@@ -2,7 +2,6 @@ package roguelike.game
 
 import indigo.*
 import indigo.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.ColorScheme
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
@@ -17,6 +16,7 @@ import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Melee
+import roguelikestarterkit.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*

@@ -5,7 +5,6 @@ import indigo.platform.assets.AssetLoader
 import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.assets.GameAssets
 import roguelike.config.Config
 import roguelike.game.GameScene
@@ -16,6 +15,7 @@ import roguelike.screeneffects.InnerGlow
 import roguelike.shaders.Hover
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.*
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 

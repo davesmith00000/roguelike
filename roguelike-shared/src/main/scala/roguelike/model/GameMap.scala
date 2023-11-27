@@ -4,12 +4,12 @@ import indigo.*
 import indigo.syntax.*
 import io.circe.*
 import io.circe.syntax.*
-import io.indigoengine.roguelike.starterkit.utils.FOV
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.PositionedTile
 import roguelike.model.entity.*
 import roguelike.util.Indices
 import roguelike.util.PathFinder
+import roguelikestarterkit.utils.FOV
 
 import scala.annotation.tailrec
 import scala.scalajs.js

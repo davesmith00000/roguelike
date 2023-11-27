@@ -4,7 +4,6 @@ import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
 import indigo.syntax.*
-import io.indigoengine.roguelike.starterkit.*
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.assets.GameGraphics
@@ -23,6 +22,7 @@ import roguelike.model.gamedata.Ranged
 import roguelike.shaders.Hover
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.*
 
 object GameView:
 

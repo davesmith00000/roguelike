@@ -5,7 +5,7 @@ import dungeonviewer.generated.Config
 import indigo.*
 import indigo.scenes.*
 import indigoextras.subsystems.FPSCounter
-import io.indigoengine.roguelike.starterkit.*
+import roguelikestarterkit.*
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -32,7 +32,6 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
         .withAssets(Assets.assets.assetSet)
         .withShaders(
-          TerminalEntity.shader(maxTileCount),
           TerminalText.standardShader
         )
     )
