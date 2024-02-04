@@ -5,7 +5,6 @@ import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
-import indigoextras.trees.QuadTree
 import io.circe.*
 import io.circe.parser.decode
 import io.circe.syntax.*

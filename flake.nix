@@ -8,13 +8,20 @@
         pkgs = import nixpkgs { inherit system; };
         jdkToUse = pkgs.jdk17;
         sbtWithJRE = pkgs.sbt.override { jre = jdkToUse; };
+
+        startupHook = ''
+          JAVA_HOME="${jdkToUse}"
+          yarn install
+        '';
       in
       {
         devShells.default = pkgs.mkShell {
           packages = [
             jdkToUse
             sbtWithJRE
+            pkgs.yarn
           ];
+          shellHook = startupHook;
         };
       }
     );

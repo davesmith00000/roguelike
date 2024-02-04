@@ -22,8 +22,8 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.15.2"
-val roguelikeStarterKitVersion = "0.4.0"
+val indigoVersion              = "0.16.0"
+val roguelikeStarterKitVersion = "0.5.0"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(
@@ -115,8 +115,7 @@ lazy val roguelikeGenerated =
           .toSourceFiles((Compile / sourceManaged).value)
       },
       Compile / sourceGenerators += Def.task {
-        IndigoGenerators("roguelike.model.gamedata")
-          .embedMarkdownTable
+        IndigoGenerators("roguelike.model.gamedata").embedMarkdownTable
           .asEnum(
             "Armour",
             os.pwd / "roguelike-generated" / "gamedata" / "armour.md",
@@ -170,6 +169,7 @@ lazy val dungeonViewerOptions: IndigoOptions =
     .withAssetDirectory("dungeon-viewer/assets")
     .withWindowSize(800, 500)
     .withBackgroundColor("black")
+    .useElectronExecutable("npx electron")
 
 lazy val dungeonViewer =
   (project in file("dungeon-viewer"))
@@ -200,6 +200,7 @@ lazy val roguelikeOptions: IndigoOptions =
       case p if p.endsWith(".json")     => true
       case p if p.startsWith("shaders") => true
     }
+    .useElectronExecutable("npx electron")
 
 lazy val roguelike =
   project
