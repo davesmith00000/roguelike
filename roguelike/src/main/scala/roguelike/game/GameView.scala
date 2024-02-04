@@ -138,17 +138,13 @@ object GameView:
     val camera =
       model.gameState match
         case GameState.LookAround(_) =>
-          val offset =
-            (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-          Camera.Fixed(
-            viewModel.lookAtPosition - offset + (viewModel.squareSize / 2)
+          Camera.LookAt(
+            viewModel.lookAtPosition + (viewModel.squareSize / 2)
           )
 
         case _ =>
-          val offset =
-            (viewModel.viewportSize.toPoint / viewModel.magnification) / 2
-          Camera.Fixed(
-            viewModel.playerPosition.moving(viewModel.squareSize) - offset
+          Camera.LookAt(
+            viewModel.playerPosition.moving(viewModel.squareSize)
           )
 
     for {
