@@ -9,6 +9,7 @@ import roguelike.GenerateLevel
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
@@ -20,6 +21,7 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelikestarterkit.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
@@ -37,9 +39,10 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     loadInfo: GameLoadInfo,
     currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
     autoMovePath: Batch[Point],
-    windowManager: ActiveWindow,
+    activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool
+    hostiles: HostilesPool,
+    windowManager: WindowManagerModel[Size, Unit]
 ):
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
@@ -449,6 +452,13 @@ object Model:
   val DropWindowSize: Size      = Size(30, 10)
   val QuitWindowSize: Size      = Size(30, 10)
 
+  val defaultCharSheet: CharSheet =
+    CharSheet(
+      GameAssets.assets.init.AnikkiSquare10x10,
+      Size(10),
+      RoguelikeTiles.Size10x10.charCrops
+    )
+
   def blank(dice: Dice): Model =
     val p = Player.initial(dice, Point.zero)
     Model(
@@ -464,7 +474,13 @@ object Model:
       Batch.empty,
       WindowManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty)
+      HostilesPool(Batch.empty),
+      WindowManagerModel.initial
+        .add(
+          ColourWindow.window(
+            defaultCharSheet
+          )
+        )
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -504,6 +520,7 @@ object Model:
               currentFloor = dungeon.currentFloor,
               hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
             )
+
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)
             Model(
@@ -519,7 +536,172 @@ object Model:
               Batch.empty,
               WindowManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles))
+              HostilesPool(Batch.fromList(dungeon.hostiles)),
+              WindowManagerModel.initial
+                .add(
+                  ColourWindow.window(
+                    defaultCharSheet
+                  )
+                )
             )
         }
       }
+
+// TODO: Test window! Remove!
+object ColourWindow {
+
+  final case class ColorPaletteReference(name: String, count: Int, colors: Batch[RGBA])
+
+  val outrunner16 = ColorPaletteReference(
+    "outrunner-16",
+    16,
+    Batch(
+      RGBA.fromHexString("4d004c"),
+      RGBA.fromHexString("8f0076"),
+      RGBA.fromHexString("c70083"),
+      RGBA.fromHexString("f50078"),
+      RGBA.fromHexString("ff4764"),
+      RGBA.fromHexString("ff9393"),
+      RGBA.fromHexString("ffd5cc"),
+      RGBA.fromHexString("fff3f0"),
+      RGBA.fromHexString("000221"),
+      RGBA.fromHexString("000769"),
+      RGBA.fromHexString("00228f"),
+      RGBA.fromHexString("0050c7"),
+      RGBA.fromHexString("008bf5"),
+      RGBA.fromHexString("00bbff"),
+      RGBA.fromHexString("47edff"),
+      RGBA.fromHexString("93fff8")
+    )
+  )
+
+  final case class ColorPalette(components: ComponentGroup)
+
+  private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
+
+  def window(
+      charSheet: CharSheet
+  ): WindowModel[Size, Unit, ColorPalette] =
+    WindowModel(
+      WindowId("Color palette"),
+      charSheet,
+      ColorPalette(
+        ComponentGroup(Bounds(0, 0, 23, 23))
+          .withLayout(ComponentLayout.Vertical())
+          .add(
+            ComponentGroup(Bounds(0, 0, 23, 10))
+              .withLayout(ComponentLayout.Horizontal(Overflow.Wrap))
+              .add(
+                outrunner16.colors.map { rgba =>
+                  Button(Bounds(0, 0, 3, 3))(presentSwatch(charSheet, rgba, None))
+                    // .onClick(<Emit some event...>)
+                    .presentOver(presentSwatch(charSheet, rgba, Option(RGBA.White)))
+                    .presentDown(presentSwatch(charSheet, rgba, Option(RGBA.Black)))
+                }
+              )
+          )
+          .add(
+            Button(Bounds(0, 0, 14, 3))(
+              presentButton(charSheet, "Load palette", RGBA.Silver, RGBA.Black)
+            )
+              // .onClick(<Emit some event...>)
+              .presentOver(presentButton(charSheet, "Load palette", RGBA.White, RGBA.Black))
+              .presentDown(presentButton(charSheet, "Load palette", RGBA.Black, RGBA.White))
+          )
+      )
+    )
+      .withTitle("Colour Palette")
+      .moveTo(0, 0)
+      .resizeTo(25, 25)
+      .isDraggable
+      .isResizable
+      .isCloseable
+      .updateModel(updateModel)
+      .present(present)
+
+  def updateModel(
+      context: UiContext[Size, Unit],
+      model: ColorPalette
+  ): GlobalEvent => Outcome[ColorPalette] =
+    case e =>
+      model.components.update(context)(e).map { c =>
+        model.copy(components = c)
+      }
+
+  def present(
+      context: UiContext[Size, Unit],
+      model: ColorPalette
+  ): Outcome[SceneUpdateFragment] =
+    model.components.present(context).map { c =>
+      SceneUpdateFragment(c.nodes).addCloneBlanks(c.cloneBlanks)
+    }
+
+  def presentSwatch(
+      charSheet: CharSheet,
+      colour: RGBA,
+      stroke: Option[RGBA]
+  ): (Coords, Bounds) => Outcome[ComponentFragment] =
+    (offset, bounds) =>
+      Outcome(
+        ComponentFragment(
+          stroke match
+            case None =>
+              Shape.Box(
+                Rectangle(
+                  offset.toScreenSpace(charSheet.size),
+                  bounds.dimensions.toScreenSpace(charSheet.size)
+                ),
+                Fill.Color(colour)
+              )
+
+            case Some(strokeColor) =>
+              Shape.Box(
+                Rectangle(
+                  offset.toScreenSpace(charSheet.size),
+                  bounds.dimensions.toScreenSpace(charSheet.size)
+                ),
+                Fill.Color(colour),
+                Stroke(2, strokeColor)
+              )
+        )
+      )
+
+  def presentButton(
+      charSheet: CharSheet,
+      text: String,
+      fgColor: RGBA,
+      bgColor: RGBA
+  ): (Coords, Bounds) => Outcome[ComponentFragment] =
+    (offset, bounds) =>
+      val hBar = Batch.fill(text.length)("─").mkString
+      val size = bounds.dimensions.unsafeToSize
+
+      val terminal =
+        RogueTerminalEmulator(size)
+          .put(Point(0, 0), Tile.`┌`, fgColor, bgColor)
+          .put(Point(size.width - 1, 0), Tile.`┐`, fgColor, bgColor)
+          .put(Point(0, size.height - 1), Tile.`└`, fgColor, bgColor)
+          .put(Point(size.width - 1, size.height - 1), Tile.`┘`, fgColor, bgColor)
+          .put(Point(0, 1), Tile.`│`, fgColor, bgColor)
+          .put(Point(size.width - 1, 1), Tile.`│`, fgColor, bgColor)
+          .putLine(Point(1, 0), hBar, fgColor, bgColor)
+          .putLine(Point(1, 1), text, fgColor, bgColor)
+          .putLine(Point(1, 2), hBar, fgColor, bgColor)
+          .toCloneTiles(
+            CloneId("button"),
+            bounds.coords
+              .toScreenSpace(charSheet.size)
+              .moveBy(offset.toScreenSpace(charSheet.size)),
+            charSheet.charCrops
+          ) { case (fg, bg) =>
+            graphic.withMaterial(TerminalMaterial(charSheet.assetName, fg, bg))
+          }
+
+      Outcome(
+        ComponentFragment(
+          terminal.clones
+        ).addCloneBlanks(terminal.blanks)
+      )
+}
+
+final case class ColorPalette(components: ComponentGroup)

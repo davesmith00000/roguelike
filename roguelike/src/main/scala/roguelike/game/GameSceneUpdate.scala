@@ -14,6 +14,7 @@ import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.model.gamedata.KeyMapping
+import roguelikestarterkit.ui.datatypes.UiContext
 
 object GameSceneUpdate:
 
@@ -158,8 +159,13 @@ object GameSceneUpdate:
     case e: GameEvent =>
       model.update(context)(e)
 
-    case _ =>
-      Outcome(model)
+    case e =>
+      model.windowManager.update(UiContext(context.frameContext, Model.defaultCharSheet), e).map {
+        wm =>
+          model.copy(
+            windowManager = wm
+          )
+      }
 
   def updateNpcPhase(
       context: SceneContext[Size],

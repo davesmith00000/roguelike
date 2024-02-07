@@ -31,10 +31,24 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
+    val windows =
+      roguelikestarterkit.WindowManager
+        .present(
+          UiContext(
+            context.frameContext,
+            Model.defaultCharSheet,
+            ()
+          ),
+          1,
+          model.windowManager,
+          viewModel.windowManager
+        )
+
     for {
       gl <- drawGameLayer(context, model, viewModel)
       ul <- drawUiLayer(context, model, viewModel)
-    } yield gl |+| ul
+      wl <- windows
+    } yield gl |+| ul |+| wl
 
   def drawGameLayer(
       context: SceneContext[Size],

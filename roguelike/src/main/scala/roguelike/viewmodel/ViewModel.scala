@@ -2,6 +2,7 @@ package roguelike.viewmodel
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
@@ -25,7 +26,10 @@ import roguelikestarterkit.*
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class ViewModel(game: GameViewModel, mainMenu: MainMenuUi)
+final case class ViewModel(
+    game: GameViewModel,
+    mainMenu: MainMenuUi
+)
 
 object ViewModel:
 
@@ -49,7 +53,8 @@ final case class GameViewModel(
     collectables: js.Array[Collectable],
     terminals: CachedTerminals,
     helpControlsText: String,
-    sprites: Option[GameSprites]
+    sprites: Option[GameSprites],
+    windowManager: WindowManagerViewModel[Size, Unit]
 ):
 
   def update(
@@ -102,8 +107,12 @@ final case class GameViewModel(
     case e: GameEvent =>
       updateGameEvent(context, model)(e)
 
-    case _ =>
-      Outcome(this)
+    case e =>
+      windowManager
+        .update(UiContext(context.frameContext, Model.defaultCharSheet), model.windowManager, e)
+        .map { wvm =>
+          this.copy(windowManager = wvm)
+        }
 
   def updateGameEvent(
       context: SceneContext[Size],
@@ -256,7 +265,8 @@ object GameViewModel:
       collectables = js.Array(),
       terminals = CachedTerminals.initial,
       helpControlsText = helpControlsText,
-      sprites = None
+      sprites = None,
+      windowManager = WindowManagerViewModel.initial
     )
 
   def nextViewModel(
@@ -308,7 +318,15 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
+    val windows =
+      viewModel.windowManager
+        .update(
+          UiContext(context.frameContext, Model.defaultCharSheet),
+          model.windowManager,
+          FrameTick
+        )
+
+    (nextPlayerPosition combine hostilesPositions combine windows).map { case ((pp, hps), wvm) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
@@ -317,7 +335,8 @@ object GameViewModel:
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),
-        collectables = collectables
+        collectables = collectables,
+        windowManager = wvm
       )
     }
 
