@@ -139,9 +139,12 @@ final case class GameViewModel(
       val shortLog =
         model.messageLog
           .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(CloneId("short_log_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+          .toCloneTiles(
+            CloneId("short_log_tiles"),
+            Point(3, 4),
+            RoguelikeTiles.Size10x10.charCrops
+          ) { (fg, bg) =>
+            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
           }
 
       Outcome(
