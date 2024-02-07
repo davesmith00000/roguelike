@@ -27,7 +27,7 @@ object GameSceneUpdate:
       case GameState.WaitForInput   => onWaitingForInput(context, model)
       case GameState.UpdateNPCs     => updateNpcPhase(context, model)
       case GameState.UpdatingPlayer => otherPhase(context, model)
-      case GameState.LookAround(_)  => otherPhase(context, model)
+      case GameState.LookAround(_)  => onWaitingForInput(context, model)
       case GameState.ShowingWindow  => otherPhase(context, model)
 
   def onWaitingForInput(
