@@ -195,7 +195,7 @@ lazy val roguelikeOptions: IndigoOptions =
   IndigoOptions.defaults
     .withTitle("My Generic Roguelike")
     .withWindowSize(1280, 720)
-    .withBackgroundColor("#21293f")
+    .withBackgroundColor("#21293F")
     .excludeAssetPaths {
       case p if p.endsWith(".json")     => true
       case p if p.startsWith("shaders") => true
