@@ -53,7 +53,7 @@ final case class GameViewModel(
     tiles: Batch[(GameTile, Point)],
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
-    terminals: CachedTerminals,
+    // terminals: CachedTerminals,
     helpControlsText: String,
     sprites: Option[GameSprites],
     windowManager: WindowManagerViewModel[Size, GameWindowContext]
@@ -142,31 +142,31 @@ final case class GameViewModel(
           )
         )
 
-    case GameEvent.RedrawHistoryLog =>
-      val history =
-        model.messageLog
-          .toTerminal(Size(50, 30), false, 0, true)
-          .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
+    // case GameEvent.RedrawHistoryLog =>
+    //   val history =
+    //     model.messageLog
+    //       .toTerminal(Size(50, 30), false, 0, true)
+    //       .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
+    //         (fg, bg) =>
+    //           Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+    //       }
 
-      val shortLog =
-        model.messageLog
-          .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(
-            CloneId("short_log_tiles"),
-            Point(3, 4),
-            RoguelikeTiles.Size10x10.charCrops
-          ) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
+    //   val shortLog =
+    //     model.messageLog
+    //       .toTerminal(Size(50, 5), false, 0, false)
+    //       .toCloneTiles(
+    //         CloneId("short_log_tiles"),
+    //         Point(3, 4),
+    //         RoguelikeTiles.Size10x10.charCrops
+    //       ) { (fg, bg) =>
+    //         Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+    //       }
 
-      Outcome(
-        this.copy(
-          terminals = terminals.copy(history = history, shortLog = shortLog)
-        )
-      )
+    //   Outcome(
+    //     this.copy(
+    //       terminals = terminals.copy(history = history, shortLog = shortLog)
+    //     )
+    //   )
 
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
@@ -269,7 +269,7 @@ object GameViewModel:
       tiles = Batch.empty,
       tilePositions = Batch.empty,
       collectables = js.Array(),
-      terminals = CachedTerminals.initial,
+      // terminals = CachedTerminals.initial,
       helpControlsText = helpControlsText,
       sprites = None,
       windowManager = WindowManagerViewModel.initial
@@ -346,13 +346,13 @@ object GameViewModel:
       )
     }
 
-final case class CachedTerminals(
-    history: TerminalClones,
-    shortLog: TerminalClones
-)
+// final case class CachedTerminals(
+//     history: TerminalClones,
+//     shortLog: TerminalClones
+// )
 
-object CachedTerminals:
-  def initial: CachedTerminals =
-    CachedTerminals(TerminalClones.empty, TerminalClones.empty)
+// object CachedTerminals:
+//   def initial: CachedTerminals =
+//     CachedTerminals(TerminalClones.empty, TerminalClones.empty)
 
 final case class GameSprites(player: Sprite[Bitmap], orc: Sprite[Bitmap], troll: Sprite[Bitmap])

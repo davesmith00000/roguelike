@@ -2,6 +2,7 @@ package roguelike.model
 
 import indigo.*
 import roguelike.assets.GameAssets
+import roguelike.components.windows.HistoryWindow
 import roguelike.components.windows.InfoPanel
 import roguelike.components.windows.MenuWindow
 import roguelike.model.entity.Player
@@ -24,10 +25,13 @@ object GameWindows:
         InfoPanel.window(defaultCharSheet)
       )
       .add(
+        HistoryWindow.window(defaultCharSheet)
+      )
+      .add(
         MenuWindow.window(
           Dimensions(1280, 720) / 10,
           defaultCharSheet
         )
       )
 
-final case class GameWindowContext(currentFloor: Int, player: Player)
+final case class GameWindowContext(currentFloor: Int, player: Player, messageLog: MessageLog)

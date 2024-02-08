@@ -70,7 +70,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         .addShaders(roguelikestarterkit.shaders.all)
         .withSubSystems(
           FPSCounter(
-            Point(5, 100),
+            Point(0, 700),
             layerKeyFPS
           ),
           FloatingMessage.subSystem

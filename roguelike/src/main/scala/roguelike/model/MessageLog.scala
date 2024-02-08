@@ -41,7 +41,7 @@ final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
       reversed: Boolean,
       startOffset: Int,
       fadeOut: Boolean
-  ): TerminalEmulator =
+  ): RogueTerminalEmulator =
     MessageLog.logToTerminal(size, messages, reversed, startOffset, fadeOut)
 
   def render(
@@ -90,12 +90,12 @@ object MessageLog:
       reversed: Boolean,
       startOffset: Int,
       fadeOut: Boolean
-  ): TerminalEmulator =
+  ): RogueTerminalEmulator =
     val msgs =
       (if reversed then messages.reverse else messages).drop(startOffset)
     msgs
       .take(size.height)
-      .foldLeft((TerminalEmulator(size), 0)) { case ((t, r), m) =>
+      .foldLeft((RogueTerminalEmulator(size), 0)) { case ((t, r), m) =>
         val darkenAmount =
           if fadeOut then (0.8 * (r.toDouble / size.height.toDouble)) + 0.2
           else 0.0
@@ -122,10 +122,3 @@ object MessageLog:
       .toCloneTiles(CloneId("messages"), position, RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
         Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
       }
-    // .draw(
-    //   GameAssets.assets.init.AnikkiSquare10x10,
-    //   RogueLikeGame.charSize,
-    //   MapTile(Tile.SPACE),
-    //   4000
-    // )
-    // .moveTo(position)

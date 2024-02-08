@@ -114,11 +114,11 @@ object GameSceneUpdate:
         )
 
     // Window toggles
-    case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-        if model.gameState.isWaitForInput ||
-          !WindowManager.showingWindow(model) =>
-      WindowManager
-        .updateModel(context, model, WindowManagerCommand.ShowHistory)
+    // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
+    //     if model.gameState.isWaitForInput ||
+    //       !WindowManager.showingWindow(model) =>
+    //   WindowManager
+    //     .updateModel(context, model, WindowManagerCommand.ShowHistory)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||

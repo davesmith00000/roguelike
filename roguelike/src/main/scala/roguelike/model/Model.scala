@@ -45,7 +45,7 @@ final case class Model(
     windowManager: WindowManagerModel[Size, GameWindowContext]
 ):
   val gameWindowContext: GameWindowContext =
-    GameWindowContext(currentFloor, player)
+    GameWindowContext(currentFloor, player, messageLog)
 
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
@@ -169,8 +169,8 @@ final case class Model(
       Outcome(
         this.copy(
           messageLog = messageLog.addMessage(message)
-        ),
-        Batch(GameEvent.RedrawHistoryLog)
+        ) // ,
+        // Batch(GameEvent.RedrawHistoryLog)
       )
 
     case GameEvent.Inventory(e) =>
@@ -394,8 +394,8 @@ final case class Model(
     case GameEvent.PlayerDescended =>
       Outcome(this).addGlobalEvents(GenerateLevel)
 
-    case GameEvent.RedrawHistoryLog =>
-      Outcome(this)
+    // case GameEvent.RedrawHistoryLog =>
+    //   Outcome(this)
 
     case GameEvent.CameraSnapToPlayer =>
       Outcome(this)

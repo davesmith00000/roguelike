@@ -45,8 +45,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
         updateActive.set(model.pauseForWindow, ActiveWindow.InventoryMenu)
       )
 
-    case WindowManagerCommand.ShowHistory =>
-      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
+    // case WindowManagerCommand.ShowHistory =>
+    //   Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
 
     case WindowManagerCommand.CloseAll =>
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
@@ -83,8 +83,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
             InventoryMenu.HandleInput(key)
           )
 
-        case ActiveWindow.History =>
-          Outcome(model)
+        // case ActiveWindow.History =>
+        //   Outcome(model)
 
         case ActiveWindow.None =>
           Outcome(model)
@@ -117,8 +117,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
       case ActiveWindow.InventoryMenu =>
         InventoryMenu.present(context, model, viewModel)
 
-      case ActiveWindow.History =>
-        History.present(context, model, viewModel)
+      // case ActiveWindow.History =>
+      //   History.present(context, model, viewModel)
 
       case ActiveWindow.None =>
         Outcome(Batch.empty)
@@ -149,5 +149,5 @@ enum ActiveWindow(val closeable: Boolean):
   case LevelUp       extends ActiveWindow(false)
   case DropMenu      extends ActiveWindow(true)
   case EquipMenu     extends ActiveWindow(true)
-  case History       extends ActiveWindow(true)
+  // case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)
