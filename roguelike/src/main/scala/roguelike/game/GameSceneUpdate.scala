@@ -10,6 +10,7 @@ import roguelike.components.entities.HostilesManager
 import roguelike.components.windows.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.GameState
+import roguelike.model.GameWindows
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
@@ -160,12 +161,16 @@ object GameSceneUpdate:
       model.update(context)(e)
 
     case e =>
-      model.windowManager.update(UiContext(context.frameContext, Model.defaultCharSheet), e).map {
-        wm =>
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .map { wm =>
           model.copy(
             windowManager = wm
           )
-      }
+        }
 
   def updateNpcPhase(
       context: SceneContext[Size],

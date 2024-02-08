@@ -1,6 +1,7 @@
 package roguelike.components.windows
 
 import indigo.*
+import roguelike.model.GameWindowContext
 import roguelikestarterkit.*
 
 object MenuWindow:
@@ -11,7 +12,7 @@ object MenuWindow:
   def window(
       screenSize: Dimensions,
       charSheet: CharSheet
-  ): WindowModel[Size, Unit, MainMenu] =
+  ): WindowModel[Size, GameWindowContext, MainMenu] =
     WindowModel(
       WindowId("Menu"),
       charSheet,
@@ -47,7 +48,7 @@ object MenuWindow:
       .present(present)
 
   def updateModel(
-      context: UiContext[Size, Unit],
+      context: UiContext[Size, GameWindowContext],
       model: MainMenu
   ): GlobalEvent => Outcome[MainMenu] =
     case e =>
@@ -56,7 +57,7 @@ object MenuWindow:
       }
 
   def present(
-      context: UiContext[Size, Unit],
+      context: UiContext[Size, GameWindowContext],
       model: MainMenu
   ): Outcome[SceneUpdateFragment] =
     model.components.present(context).map { c =>

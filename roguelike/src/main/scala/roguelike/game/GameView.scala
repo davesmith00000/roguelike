@@ -12,6 +12,7 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
+import roguelike.model.GameWindows
 import roguelike.model.Model
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
@@ -36,7 +37,8 @@ object GameView:
         .present(
           UiContext(
             context.frameContext,
-            Model.defaultCharSheet
+            GameWindows.defaultCharSheet,
+            model.gameWindowContext
           ),
           1,
           model.windowManager,
@@ -195,15 +197,6 @@ object GameView:
         Layer(
           RogueLikeGame.layerKeyUi,
           Batch(
-            UIElements.renderBar(
-              model.player,
-              20,
-              Point(0, vpSize.height - 40)
-            ),
-            UIElements.renderLevel(
-              Point(0, vpSize.height - 20),
-              model.currentFloor
-            ),
             UIElements.renderCharacterInfo(model.player),
             UIElements.renderControls(
               vpSize,

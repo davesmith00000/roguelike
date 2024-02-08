@@ -27,24 +27,26 @@ import roguelikestarterkit.*
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class Model( // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+// TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+final case class Model(
     player: Player,
-    stairsPosition: Point, // TODO: Move into game map?
+    stairsPosition: Point,
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
     gameState: GameState,
-    targetingWithRangedAt: Option[
-      (Ranged, Int)
-    ], // TODO - is this really an 'active' inventory slot?
+    targetingWithRangedAt: Option[(Ranged, Int)],
     loadInfo: GameLoadInfo,
-    currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
+    currentFloor: Int,
     autoMovePath: Batch[Point],
     activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
     hostiles: HostilesPool,
-    windowManager: WindowManagerModel[Size, Unit]
+    windowManager: WindowManagerModel[Size, GameWindowContext]
 ):
+  val gameWindowContext: GameWindowContext =
+    GameWindowContext(currentFloor, player)
+
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
       hostiles.toJSArray.sortBy(_.isAlive))
@@ -453,13 +455,6 @@ object Model:
   val DropWindowSize: Size      = Size(30, 10)
   val QuitWindowSize: Size      = Size(30, 10)
 
-  val defaultCharSheet: CharSheet =
-    CharSheet(
-      GameAssets.assets.init.AnikkiSquare10x10,
-      Size(10),
-      RoguelikeTiles.Size10x10.charCrops
-    )
-
   def blank(dice: Dice): Model =
     val p = Player.initial(dice, Point.zero)
     Model(
@@ -476,13 +471,7 @@ object Model:
       WindowManager.initialModel,
       Batch.empty,
       HostilesPool(Batch.empty),
-      WindowManagerModel.initial
-        .add(
-          MenuWindow.window(
-            Dimensions(100, 100),
-            defaultCharSheet
-          )
-        )
+      GameWindows.addWindows(WindowManagerModel.initial)
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -539,13 +528,7 @@ object Model:
               WindowManager.initialModel,
               Batch.fromList(dungeon.collectables),
               HostilesPool(Batch.fromList(dungeon.hostiles)),
-              WindowManagerModel.initial
-                .add(
-                  MenuWindow.window(
-                    Dimensions(1280, 720) / 10,
-                    defaultCharSheet
-                  )
-                )
+              GameWindows.addWindows(WindowManagerModel.initial)
             )
         }
       }

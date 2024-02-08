@@ -14,6 +14,8 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameMap
 import roguelike.model.GameTile
+import roguelike.model.GameWindowContext
+import roguelike.model.GameWindows
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
 import roguelike.model.entity.Hostile
@@ -54,7 +56,7 @@ final case class GameViewModel(
     terminals: CachedTerminals,
     helpControlsText: String,
     sprites: Option[GameSprites],
-    windowManager: WindowManagerViewModel[Size, Unit]
+    windowManager: WindowManagerViewModel[Size, GameWindowContext]
 ):
 
   def update(
@@ -109,7 +111,11 @@ final case class GameViewModel(
 
     case e =>
       windowManager
-        .update(UiContext(context.frameContext, Model.defaultCharSheet), model.windowManager, e)
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          model.windowManager,
+          e
+        )
         .map { wvm =>
           this.copy(windowManager = wvm)
         }
@@ -321,7 +327,7 @@ object GameViewModel:
     val windows =
       viewModel.windowManager
         .update(
-          UiContext(context.frameContext, Model.defaultCharSheet),
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
           model.windowManager,
           FrameTick
         )

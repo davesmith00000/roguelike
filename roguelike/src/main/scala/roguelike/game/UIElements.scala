@@ -23,17 +23,6 @@ import scala.scalajs.js.JSConverters.*
 
 object UIElements:
 
-  def formatStatus(player: Player): String =
-    s"HP: ${Math.max(0, player.fighter.hp)}/${player.fighter.maxHp}"
-
-  val healthStatusLine: Text[TerminalText] =
-    Text(
-      "",
-      RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
-    )
-      .moveTo(1, 2)
-
   val dungeonLevelLine: Text[TerminalText] =
     Text(
       "",
@@ -63,29 +52,6 @@ object UIElements:
 
   val letters: Batch[String]            = ('a' to 'z').toBatch.map(_.toString)
   val letterPositions: Map[String, Int] = letters.zipWithIndex.toMap
-
-  def renderBar(player: Player, totalWidth: Int, position: Point): Group =
-    val height = RogueLikeGame.charSize.height + 4
-    val width  = RogueLikeGame.charSize.width * totalWidth
-    val barWidth =
-      (player.fighter.hp.toFloat / player.fighter.maxHp.toFloat * width).toInt
-
-    Group(
-      Shape.Box(
-        Rectangle(0, 0, width, height),
-        Fill.Color(ColorScheme.barEmpty)
-      ),
-      Shape.Box(
-        Rectangle(0, 0, barWidth, height),
-        Fill.Color(ColorScheme.barFilled)
-      ),
-      healthStatusLine.withText(formatStatus(player))
-    ).moveTo(position)
-
-  def renderLevel(position: Point, currentFloor: Int): Text[TerminalText] =
-    healthStatusLine
-      .withText("Dungeon level: " + currentFloor.toString)
-      .moveTo(position)
 
   def renderNameHints(
       squareSize: Point,
