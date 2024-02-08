@@ -36,8 +36,7 @@ object GameView:
         .present(
           UiContext(
             context.frameContext,
-            Model.defaultCharSheet,
-            ()
+            Model.defaultCharSheet
           ),
           1,
           model.windowManager,
