@@ -64,13 +64,13 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
         .withAssets(GameAssets.initialAssets)
         .withShaders(
-          TerminalText.standardShader,
           InnerGlow.shader,
           Hover.shader
         )
+        .addShaders(roguelikestarterkit.shaders.all)
         .withSubSystems(
           FPSCounter(
-            Point(5, 100),
+            Point(0, 700),
             layerKeyFPS
           ),
           FloatingMessage.subSystem

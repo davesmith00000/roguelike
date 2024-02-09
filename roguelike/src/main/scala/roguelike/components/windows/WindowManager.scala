@@ -20,8 +20,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
 
   val updateActive: Lens[Model, ActiveWindow] =
     Lens(
-      _.windowManager,
-      (m, next) => m.copy(windowManager = next)
+      _.activeWindow,
+      (m, next) => m.copy(activeWindow = next)
     )
 
   def nextModel(
@@ -45,14 +45,14 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
         updateActive.set(model.pauseForWindow, ActiveWindow.InventoryMenu)
       )
 
-    case WindowManagerCommand.ShowHistory =>
-      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
+    // case WindowManagerCommand.ShowHistory =>
+    //   Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
 
     case WindowManagerCommand.CloseAll =>
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
 
     case WindowManagerCommand.HandleQuitKeyPress =>
-      model.windowManager match
+      model.activeWindow match
         case ActiveWindow.Quit =>
           Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
 
@@ -63,7 +63,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
           Outcome(model)
 
     case WindowManagerCommand.DelegateInput(key) =>
-      model.windowManager match
+      model.activeWindow match
         case ActiveWindow.Quit =>
           QuitMenu.updateModel(context, model, QuitMenu.HandleInput(key))
 
@@ -83,8 +83,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
             InventoryMenu.HandleInput(key)
           )
 
-        case ActiveWindow.History =>
-          Outcome(model)
+        // case ActiveWindow.History =>
+        //   Outcome(model)
 
         case ActiveWindow.None =>
           Outcome(model)
@@ -101,7 +101,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[Batch[SceneNode]] =
-    model.windowManager match
+    model.activeWindow match
       case ActiveWindow.Quit =>
         QuitMenu.present(context, model, viewModel)
 
@@ -117,8 +117,8 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
       case ActiveWindow.InventoryMenu =>
         InventoryMenu.present(context, model, viewModel)
 
-      case ActiveWindow.History =>
-        History.present(context, model, viewModel)
+      // case ActiveWindow.History =>
+      //   History.present(context, model, viewModel)
 
       case ActiveWindow.None =>
         Outcome(Batch.empty)
@@ -127,7 +127,7 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
     ActiveWindow.None
 
   def showingWindow(model: Model): Boolean =
-    modelLens.get(model).windowManager match
+    modelLens.get(model).activeWindow match
       case ActiveWindow.None => false
       case _                 => true
 
@@ -138,10 +138,10 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
     showingWindow(model) && isCloseable(model)
 
   def isCloseable(model: Model): Boolean =
-    modelLens.get(model).windowManager.closeable
+    modelLens.get(model).activeWindow.closeable
 
   def isUnCloseable(model: Model): Boolean =
-    !modelLens.get(model).windowManager.closeable
+    !modelLens.get(model).activeWindow.closeable
 
 enum ActiveWindow(val closeable: Boolean):
   case None          extends ActiveWindow(true)
@@ -149,5 +149,5 @@ enum ActiveWindow(val closeable: Boolean):
   case LevelUp       extends ActiveWindow(false)
   case DropMenu      extends ActiveWindow(true)
   case EquipMenu     extends ActiveWindow(true)
-  case History       extends ActiveWindow(true)
+  // case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)

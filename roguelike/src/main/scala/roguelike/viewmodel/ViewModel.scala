@@ -2,6 +2,7 @@ package roguelike.viewmodel
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
@@ -13,6 +14,8 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameMap
 import roguelike.model.GameTile
+import roguelike.model.GameWindowContext
+import roguelike.model.GameWindows
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
 import roguelike.model.entity.Hostile
@@ -25,7 +28,10 @@ import roguelikestarterkit.*
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class ViewModel(game: GameViewModel, mainMenu: MainMenuUi)
+final case class ViewModel(
+    game: GameViewModel,
+    mainMenu: MainMenuUi
+)
 
 object ViewModel:
 
@@ -47,9 +53,10 @@ final case class GameViewModel(
     tiles: Batch[(GameTile, Point)],
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
-    terminals: CachedTerminals,
+    // terminals: CachedTerminals,
     helpControlsText: String,
-    sprites: Option[GameSprites]
+    sprites: Option[GameSprites],
+    windowManager: WindowManagerViewModel[Size, GameWindowContext]
 ):
 
   def update(
@@ -100,10 +107,30 @@ final case class GameViewModel(
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
     case e: GameEvent =>
-      updateGameEvent(context, model)(e)
+      windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          model.windowManager,
+          e
+        )
+        .flatMap { wvm =>
+          updateGameEvent(context, model)(e).map {
+            _.copy(
+              windowManager = wvm
+            )
+          }
+        }
 
-    case _ =>
-      Outcome(this)
+    case e =>
+      windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          model.windowManager,
+          e
+        )
+        .map { wvm =>
+          this.copy(windowManager = wvm)
+        }
 
   def updateGameEvent(
       context: SceneContext[Size],
@@ -128,30 +155,31 @@ final case class GameViewModel(
         )
 
     case GameEvent.RedrawHistoryLog =>
-      val history =
-        model.messageLog
-          .toTerminal(Size(50, 30), false, 0, true)
-          .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
+      Outcome(this)
+    //   val history =
+    //     model.messageLog
+    //       .toTerminal(Size(50, 30), false, 0, true)
+    //       .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
+    //         (fg, bg) =>
+    //           Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+    //       }
 
-      val shortLog =
-        model.messageLog
-          .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(
-            CloneId("short_log_tiles"),
-            Point(3, 4),
-            RoguelikeTiles.Size10x10.charCrops
-          ) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
+    //   val shortLog =
+    //     model.messageLog
+    //       .toTerminal(Size(50, 5), false, 0, false)
+    //       .toCloneTiles(
+    //         CloneId("short_log_tiles"),
+    //         Point(3, 4),
+    //         RoguelikeTiles.Size10x10.charCrops
+    //       ) { (fg, bg) =>
+    //         Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
+    //       }
 
-      Outcome(
-        this.copy(
-          terminals = terminals.copy(history = history, shortLog = shortLog)
-        )
-      )
+    //   Outcome(
+    //     this.copy(
+    //       terminals = terminals.copy(history = history, shortLog = shortLog)
+    //     )
+    //   )
 
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
@@ -254,9 +282,10 @@ object GameViewModel:
       tiles = Batch.empty,
       tilePositions = Batch.empty,
       collectables = js.Array(),
-      terminals = CachedTerminals.initial,
+      // terminals = CachedTerminals.initial,
       helpControlsText = helpControlsText,
-      sprites = None
+      sprites = None,
+      windowManager = WindowManagerViewModel.initial
     )
 
   def nextViewModel(
@@ -308,7 +337,15 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
+    val windows =
+      viewModel.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          model.windowManager,
+          FrameTick
+        )
+
+    (nextPlayerPosition combine hostilesPositions combine windows).map { case ((pp, hps), wvm) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
@@ -317,17 +354,18 @@ object GameViewModel:
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),
-        collectables = collectables
+        collectables = collectables,
+        windowManager = wvm
       )
     }
 
-final case class CachedTerminals(
-    history: TerminalClones,
-    shortLog: TerminalClones
-)
+// final case class CachedTerminals(
+//     history: TerminalClones,
+//     shortLog: TerminalClones
+// )
 
-object CachedTerminals:
-  def initial: CachedTerminals =
-    CachedTerminals(TerminalClones.empty, TerminalClones.empty)
+// object CachedTerminals:
+//   def initial: CachedTerminals =
+//     CachedTerminals(TerminalClones.empty, TerminalClones.empty)
 
 final case class GameSprites(player: Sprite[Bitmap], orc: Sprite[Bitmap], troll: Sprite[Bitmap])

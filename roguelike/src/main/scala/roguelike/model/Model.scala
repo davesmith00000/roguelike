@@ -9,9 +9,11 @@ import roguelike.GenerateLevel
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
+import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
+import roguelike.components.windows.MenuWindow
 import roguelike.components.windows.WindowManager
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.dungeon.Dungeon
@@ -20,27 +22,31 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelikestarterkit.*
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class Model( // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+// TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+final case class Model(
     player: Player,
-    stairsPosition: Point, // TODO: Move into game map?
+    stairsPosition: Point,
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
     gameState: GameState,
-    targetingWithRangedAt: Option[
-      (Ranged, Int)
-    ], // TODO - is this really an 'active' inventory slot?
+    targetingWithRangedAt: Option[(Ranged, Int)],
     loadInfo: GameLoadInfo,
-    currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
+    currentFloor: Int,
     autoMovePath: Batch[Point],
-    windowManager: ActiveWindow,
+    activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool
+    hostiles: HostilesPool,
+    windowManager: WindowManagerModel[Size, GameWindowContext]
 ):
+  val gameWindowContext: GameWindowContext =
+    GameWindowContext(currentFloor, player, messageLog)
+
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
       hostiles.toJSArray.sortBy(_.isAlive))
@@ -464,7 +470,8 @@ object Model:
       Batch.empty,
       WindowManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty)
+      HostilesPool(Batch.empty),
+      GameWindows.addWindows(WindowManagerModel.initial)
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -504,6 +511,7 @@ object Model:
               currentFloor = dungeon.currentFloor,
               hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
             )
+
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)
             Model(
@@ -519,7 +527,8 @@ object Model:
               Batch.empty,
               WindowManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles))
+              HostilesPool(Batch.fromList(dungeon.hostiles)),
+              GameWindows.addWindows(WindowManagerModel.initial)
             )
         }
       }

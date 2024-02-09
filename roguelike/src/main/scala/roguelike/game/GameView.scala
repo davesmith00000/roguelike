@@ -12,6 +12,7 @@ import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
+import roguelike.model.GameWindows
 import roguelike.model.Model
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
@@ -31,10 +32,24 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
+    val windows =
+      roguelikestarterkit.WindowManager
+        .present(
+          UiContext(
+            context.frameContext,
+            GameWindows.defaultCharSheet,
+            model.gameWindowContext
+          ),
+          1,
+          model.windowManager,
+          viewModel.windowManager
+        )
+
     for {
       gl <- drawGameLayer(context, model, viewModel)
       ul <- drawUiLayer(context, model, viewModel)
-    } yield gl |+| ul
+      wl <- windows
+    } yield gl |+| ul |+| wl
 
   def drawGameLayer(
       context: SceneContext[Size],
@@ -182,15 +197,6 @@ object GameView:
         Layer(
           RogueLikeGame.layerKeyUi,
           Batch(
-            UIElements.renderBar(
-              model.player,
-              20,
-              Point(0, vpSize.height - 40)
-            ),
-            UIElements.renderLevel(
-              Point(0, vpSize.height - 20),
-              model.currentFloor
-            ),
             UIElements.renderCharacterInfo(model.player),
             UIElements.renderControls(
               vpSize,
@@ -202,14 +208,15 @@ object GameView:
               model.entitiesList,
               model.stairsPosition,
               viewModel.hoverSquare
-            ),
-            UIElements.renderShortLog(
-              vpSize,
-              viewModel.terminals.shortLog.clones
-            )
+            )//,
+            // UIElements.renderShortLog(
+            //   vpSize,
+            //   viewModel.terminals.shortLog.clones
+            // )
           ) ++ windows
         )
       ).addCloneBlanks(
-        GameGraphics.tileClone :: GameGraphics.tileShadowClone :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
+        GameGraphics.tileClone,
+        GameGraphics.tileShadowClone// :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
       )
     }

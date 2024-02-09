@@ -10,10 +10,12 @@ import roguelike.components.entities.HostilesManager
 import roguelike.components.windows.*
 import roguelike.model.GameLoadInfo
 import roguelike.model.GameState
+import roguelike.model.GameWindows
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
 import roguelike.model.gamedata.KeyMapping
+import roguelikestarterkit.ui.datatypes.UiContext
 
 object GameSceneUpdate:
 
@@ -112,11 +114,11 @@ object GameSceneUpdate:
         )
 
     // Window toggles
-    case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-        if model.gameState.isWaitForInput ||
-          !WindowManager.showingWindow(model) =>
-      WindowManager
-        .updateModel(context, model, WindowManagerCommand.ShowHistory)
+    // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
+    //     if model.gameState.isWaitForInput ||
+    //       !WindowManager.showingWindow(model) =>
+    //   WindowManager
+    //     .updateModel(context, model, WindowManagerCommand.ShowHistory)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||
@@ -156,10 +158,30 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
-    case _ =>
-      Outcome(model)
+    case e =>
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .map { wm =>
+          model.copy(
+            windowManager = wm
+          )
+        }
 
   def updateNpcPhase(
       context: SceneContext[Size],
@@ -174,7 +196,18 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
     case _ =>
       Outcome(model)
@@ -185,7 +218,18 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
     case _ =>
       Outcome(model)
