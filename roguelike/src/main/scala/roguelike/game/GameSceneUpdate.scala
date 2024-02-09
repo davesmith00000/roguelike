@@ -158,7 +158,18 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
     case e =>
       model.windowManager
@@ -185,7 +196,18 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
     case _ =>
       Outcome(model)
@@ -196,7 +218,18 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Other
     case e: GameEvent =>
-      model.update(context)(e)
+      model.windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          e
+        )
+        .flatMap { wm =>
+          model.update(context)(e).map {
+            _.copy(
+              windowManager = wm
+            )
+          }
+        }
 
     case _ =>
       Outcome(model)

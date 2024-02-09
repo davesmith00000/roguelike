@@ -107,7 +107,19 @@ final case class GameViewModel(
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
     case e: GameEvent =>
-      updateGameEvent(context, model)(e)
+      windowManager
+        .update(
+          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+          model.windowManager,
+          e
+        )
+        .flatMap { wvm =>
+          updateGameEvent(context, model)(e).map {
+            _.copy(
+              windowManager = wvm
+            )
+          }
+        }
 
     case e =>
       windowManager
@@ -142,7 +154,8 @@ final case class GameViewModel(
           )
         )
 
-    // case GameEvent.RedrawHistoryLog =>
+    case GameEvent.RedrawHistoryLog =>
+      Outcome(this)
     //   val history =
     //     model.messageLog
     //       .toTerminal(Size(50, 30), false, 0, true)

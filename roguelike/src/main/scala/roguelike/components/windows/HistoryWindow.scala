@@ -2,6 +2,7 @@ package roguelike.components.windows
 
 import indigo.*
 import roguelike.ColorScheme
+import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.model.GameWindowContext
 import roguelike.model.entity.Player
@@ -13,11 +14,11 @@ object HistoryWindow:
 
   def window(
       charSheet: CharSheet
-  ): WindowModel[Size, GameWindowContext, Unit] =
+  ): WindowModel[Size, GameWindowContext, TerminalClones] =
     WindowModel(
       WindowId("History"),
       charSheet,
-      ()
+      TerminalClones.empty
     )
       .withTitle("History")
       .moveTo(0, 10)
@@ -31,24 +32,27 @@ object HistoryWindow:
 
   def updateModel(
       context: UiContext[Size, GameWindowContext],
-      model: Unit
-  ): GlobalEvent => Outcome[Unit] =
+      model: TerminalClones
+  ): GlobalEvent => Outcome[TerminalClones] =
+    case GameEvent.RedrawHistoryLog =>
+      val tcs =
+        context.data.messageLog
+          .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
+          .toCloneTiles(
+            CloneId("history clones"),
+            context.screenSpaceBounds.position,
+            context.charSheet.charCrops
+          ) { (fg, bg) =>
+            Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
+          }
+
+      Outcome(tcs)
+
     case _ =>
       Outcome(model)
 
   def present(
       context: UiContext[Size, GameWindowContext],
-      model: Unit
+      model: TerminalClones
   ): Outcome[SceneUpdateFragment] =
-    Outcome(
-      context.data.messageLog
-        .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
-        .toCloneTiles(
-          CloneId("history clones"),
-          context.screenSpaceBounds.position,
-          context.charSheet.charCrops
-        ) { (fg, bg) =>
-          Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
-        }
-        .toSceneUpdateFragment
-    )
+    Outcome(model.toSceneUpdateFragment)
