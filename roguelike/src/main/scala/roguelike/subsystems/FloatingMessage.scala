@@ -4,9 +4,9 @@ import indigo.*
 import indigoextras.subsystems.*
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
+import roguelike.model.Model
 import roguelikestarterkit.terminal.TerminalText
 import roguelikestarterkit.tiles.RoguelikeTiles
-import roguelike.model.Model
 
 object FloatingMessage:
 

@@ -16,7 +16,7 @@ object HistoryWindow:
 
   def window(
       charSheet: CharSheet
-  ): WindowModel[Size, GameWindowContext, TerminalClones] =
+  ): WindowModel[TerminalClones, GameWindowContext] =
     WindowModel(
       windowId,
       charSheet,
@@ -29,32 +29,35 @@ object HistoryWindow:
       )
       .isDraggable
       .isResizable
-      .updateModel(updateModel)
-      .present(present)
 
-  def updateModel(
-      context: UiContext[Size, GameWindowContext],
-      model: TerminalClones
-  ): GlobalEvent => Outcome[TerminalClones] =
-    case GameEvent.RedrawHistoryLog =>
-      val tcs =
-        context.data.messageLog
-          .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
-          .toCloneTiles(
-            CloneId("history clones"),
-            context.screenSpaceBounds.position,
-            context.charSheet.charCrops
-          ) { (fg, bg) =>
-            Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
-          }
+  given WindowContent[TerminalClones, GameWindowContext] with
 
-      Outcome(tcs)
+    def updateModel(
+        context: UiContext[GameWindowContext],
+        model: TerminalClones
+    ): GlobalEvent => Outcome[TerminalClones] =
+      case GameEvent.RedrawHistoryLog =>
+        val tcs =
+          context.reference.messageLog
+            .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
+            .toCloneTiles(
+              CloneId("history clones"),
+              context.screenSpaceBounds.position,
+              context.charSheet.charCrops
+            ) { (fg, bg) =>
+              Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
+            }
 
-    case _ =>
-      Outcome(model)
+        Outcome(tcs)
 
-  def present(
-      context: UiContext[Size, GameWindowContext],
-      model: TerminalClones
-  ): Outcome[SceneUpdateFragment] =
-    Outcome(model.toSceneUpdateFragment)
+      case _ =>
+        Outcome(model)
+
+    def present(
+        context: UiContext[GameWindowContext],
+        model: TerminalClones
+    ): Outcome[Layer] =
+      Outcome(model.toLayer)
+
+    def cascade(model: TerminalClones, newBounds: Bounds): TerminalClones =
+      model

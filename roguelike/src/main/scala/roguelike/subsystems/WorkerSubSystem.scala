@@ -21,11 +21,13 @@ import scala.scalajs.js
 final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
     worker: IndigoWorker[A, B]
 ) extends SubSystem[Model]:
-  val id: SubSystemId =
-    SubSystemId("[WorkerSubSystem] " + worker.name.toString)
 
   type EventType      = GlobalEvent
   type SubSystemModel = Unit
+  type ReferenceData  = Unit
+
+  val id: SubSystemId =
+    SubSystemId("[WorkerSubSystem] " + worker.name.toString)
 
   def send(value: A): WorkerEvent.Send =
     WorkerEvent.Send(value)
@@ -44,11 +46,14 @@ final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
     case e: WorkerEvent => Some(e)
     case _              => None
 
+  def reference(model: Model): ReferenceData =
+    ()
+
   def initialModel: Outcome[Unit] =
     Outcome(())
 
   def update(
-      context: SubSystemFrameContext[Model],
+      context: SubSystemFrameContext[ReferenceData],
       model: Unit
   ): GlobalEvent => Outcome[Unit] =
     case WorkerEvent.Send(value) =>
@@ -62,7 +67,7 @@ final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
       Outcome(model)
 
   def present(
-      context: SubSystemFrameContext[Model],
+      context: SubSystemFrameContext[ReferenceData],
       model: Unit
   ): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment.empty)

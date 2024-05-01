@@ -27,32 +27,37 @@ object InfoPanel:
       )
       .isDraggable
 
-  def updateModel(
-      context: UiContext[GameWindowContext],
-      model: Unit
-  ): GlobalEvent => Outcome[Unit] =
-    case _ =>
-      Outcome(model)
+  given WindowContent[Unit, GameWindowContext] with
 
-  def present(
-      context: UiContext[GameWindowContext],
-      model: Unit
-  ): Outcome[SceneUpdateFragment] =
-    Outcome(
-      SceneUpdateFragment(
-        renderLevel(
-          context.charSheet,
-          context.screenSpaceBounds.position,
-          context.reference.currentFloor
-        ),
-        renderBar(
-          context.charSheet,
-          context.reference.player,
-          20,
-          context.screenSpaceBounds.position + Point(0, context.charSheet.size.height + 4)
+    def updateModel(
+        context: UiContext[GameWindowContext],
+        model: Unit
+    ): GlobalEvent => Outcome[Unit] =
+      case _ =>
+        Outcome(model)
+
+    def present(
+        context: UiContext[GameWindowContext],
+        model: Unit
+    ): Outcome[Layer] =
+      Outcome(
+        Layer(
+          renderLevel(
+            context.charSheet,
+            context.screenSpaceBounds.position,
+            context.reference.currentFloor
+          ),
+          renderBar(
+            context.charSheet,
+            context.reference.player,
+            20,
+            context.screenSpaceBounds.position + Point(0, context.charSheet.size.height + 4)
+          )
         )
       )
-    )
+
+    def cascade(model: Unit, newBounds: Bounds): Unit =
+      model
 
   def renderBar(charSheet: CharSheet, player: Player, totalWidth: Int, position: Point): Group =
     val height = charSheet.size.height + 4
