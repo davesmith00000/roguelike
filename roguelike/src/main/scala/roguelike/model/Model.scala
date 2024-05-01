@@ -41,8 +41,8 @@ final case class Model(
     autoMovePath: Batch[Point],
     activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool,
-    windowManager: WindowManagerModel[Size, GameWindowContext]
+    hostiles: HostilesPool
+    // windowManager: WindowManagerModel[GameWindowContext]
 ):
   val gameWindowContext: GameWindowContext =
     GameWindowContext(currentFloor, player, messageLog)
@@ -470,8 +470,8 @@ object Model:
       Batch.empty,
       WindowManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty),
-      GameWindows.addWindows(WindowManagerModel.initial)
+      HostilesPool(Batch.empty)
+      // GameWindows.addWindows(WindowManagerModel.initial)
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -527,8 +527,8 @@ object Model:
               Batch.empty,
               WindowManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles)),
-              GameWindows.addWindows(WindowManagerModel.initial)
+              HostilesPool(Batch.fromList(dungeon.hostiles))
+              // GameWindows.addWindows(WindowManagerModel.initial)
             )
         }
       }

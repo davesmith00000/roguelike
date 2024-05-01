@@ -31,7 +31,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(

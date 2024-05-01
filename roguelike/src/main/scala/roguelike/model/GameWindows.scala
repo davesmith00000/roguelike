@@ -14,24 +14,25 @@ object GameWindows:
     CharSheet(
       GameAssets.assets.init.AnikkiSquare10x10,
       Size(10),
-      RoguelikeTiles.Size10x10.charCrops
+      RoguelikeTiles.Size10x10.charCrops,
+      RoguelikeTiles.Size10x10.Fonts.fontKey
     )
 
-  def addWindows(
-      windowManager: WindowManagerModel[Size, GameWindowContext]
-  ): WindowManagerModel[Size, GameWindowContext] =
-    windowManager
-      .add(
-        InfoPanel.window(defaultCharSheet)
-      )
-      .add(
-        HistoryWindow.window(defaultCharSheet)
-      )
-      .add(
-        MenuWindow.window(
-          Dimensions(1280, 720) / 10,
-          defaultCharSheet
-        )
-      )
+  // def addWindows(
+  //     windowManager: WindowManagerModel[GameWindowContext]
+  // ): WindowManagerModel[GameWindowContext] =
+  //   windowManager
+  //     .add(
+  //       InfoPanel.window(defaultCharSheet)
+  //     )
+  //     .add(
+  //       HistoryWindow.window(defaultCharSheet)
+  //     )
+  //     .add(
+  //       MenuWindow.window(
+  //         Dimensions(1280, 720) / 10,
+  //         defaultCharSheet
+  //       )
+  //     )
 
 final case class GameWindowContext(currentFloor: Int, player: Player, messageLog: MessageLog)

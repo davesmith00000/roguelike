@@ -32,24 +32,24 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    val windows =
-      roguelikestarterkit.WindowManager
-        .present(
-          UiContext(
-            context.frameContext,
-            GameWindows.defaultCharSheet,
-            model.gameWindowContext
-          ),
-          1,
-          model.windowManager,
-          viewModel.windowManager
-        )
+    // val windows =
+    //   roguelikestarterkit.WindowManager
+    //     .present(
+    //       UiContext(
+    //         context.frameContext,
+    //         GameWindows.defaultCharSheet,
+    //         model.gameWindowContext
+    //       ),
+    //       1,
+    //       model.windowManager,
+    //       viewModel.windowManager
+    //     )
 
     for {
       gl <- drawGameLayer(context, model, viewModel)
       ul <- drawUiLayer(context, model, viewModel)
-      wl <- windows
-    } yield gl |+| ul |+| wl
+      // wl <- windows
+    } yield gl |+| ul // |+| wl
 
   def drawGameLayer(
       context: SceneContext[Size],
@@ -170,19 +170,20 @@ object GameView:
         HostilesManager.viewModelLens.get(viewModel)
       )
     } yield SceneUpdateFragment(
-      Layer(
-        RogueLikeGame.layerKeyGame,
-        gameGrid ++
-          hover ++
-          collectables ++
-          hostiles ++
-          plr ++
-          lookAround
-      ).withCamera(camera)
-        .withMagnification(viewModel.magnification),
-      Layer(RogueLikeGame.layerKeyUiOverlay)
-        .withCamera(camera)
-        .withMagnification(viewModel.magnification)
+      RogueLikeGame.layerKeyGame ->
+        Layer(
+          gameGrid ++
+            hover ++
+            collectables ++
+            hostiles ++
+            plr ++
+            lookAround
+        ).withCamera(camera)
+          .withMagnification(viewModel.magnification),
+      RogueLikeGame.layerKeyUiOverlay ->
+        Layer.empty
+          .withCamera(camera)
+          .withMagnification(viewModel.magnification)
     )
 
   def drawUiLayer(
@@ -192,31 +193,31 @@ object GameView:
   ): Outcome[SceneUpdateFragment] =
     val vpSize = viewModel.viewportSize
 
-    WindowManager.present(context, model, viewModel).map { windows =>
+    Outcome(
       SceneUpdateFragment(
-        Layer(
-          RogueLikeGame.layerKeyUi,
-          Batch(
-            UIElements.renderCharacterInfo(model.player),
-            UIElements.renderControls(
-              vpSize,
-              viewModel.helpControlsText
-            ),
-            UIElements.renderNameHints(
-              viewModel.squareSize,
-              context.mouse.position,
-              model.entitiesList,
-              model.stairsPosition,
-              viewModel.hoverSquare
-            )//,
-            // UIElements.renderShortLog(
-            //   vpSize,
-            //   viewModel.terminals.shortLog.clones
-            // )
-          ) ++ windows
-        )
+        RogueLikeGame.layerKeyUi ->
+          Layer(
+            Batch(
+              UIElements.renderCharacterInfo(model.player),
+              UIElements.renderControls(
+                vpSize,
+                viewModel.helpControlsText
+              ),
+              UIElements.renderNameHints(
+                viewModel.squareSize,
+                context.mouse.position,
+                model.entitiesList,
+                model.stairsPosition,
+                viewModel.hoverSquare
+              ) // ,
+              // UIElements.renderShortLog(
+              //   vpSize,
+              //   viewModel.terminals.shortLog.clones
+              // )
+            )
+          )
       ).addCloneBlanks(
         GameGraphics.tileClone,
-        GameGraphics.tileShadowClone// :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
+        GameGraphics.tileShadowClone // :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
       )
-    }
+    )

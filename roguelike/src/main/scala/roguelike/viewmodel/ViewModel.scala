@@ -55,8 +55,8 @@ final case class GameViewModel(
     collectables: js.Array[Collectable],
     // terminals: CachedTerminals,
     helpControlsText: String,
-    sprites: Option[GameSprites],
-    windowManager: WindowManagerViewModel[Size, GameWindowContext]
+    sprites: Option[GameSprites]
+    // windowManager: WindowManagerViewModel[GameWindowContext]
 ):
 
   def update(
@@ -107,30 +107,33 @@ final case class GameViewModel(
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
     case e: GameEvent =>
-      windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          model.windowManager,
-          e
-        )
-        .flatMap { wvm =>
-          updateGameEvent(context, model)(e).map {
-            _.copy(
-              windowManager = wvm
-            )
-          }
-        }
+      updateGameEvent(context, model)(e)
+    // windowManager
+    //   .update(
+    //     UiContext(context.frameContext, GameWindows.defaultCharSheet/*, model.gameWindowContext*/),
+    //     model.windowManager,
+    //     e
+    //   )
+    //   .flatMap { wvm =>
+    //     updateGameEvent(context, model)(e).map {
+    //       _.copy(
+    //         windowManager = wvm
+    //       )
+    //     }
+    //   }
 
-    case e =>
-      windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          model.windowManager,
-          e
-        )
-        .map { wvm =>
-          this.copy(windowManager = wvm)
-        }
+    // case e =>
+    //   windowManager
+    //     .update(
+    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+    //       model.windowManager,
+    //       e
+    //     )
+    //     .map { wvm =>
+    //       this.copy(windowManager = wvm)
+    //     }
+    case _ =>
+      Outcome(this)
 
   def updateGameEvent(
       context: SceneContext[Size],
@@ -284,8 +287,8 @@ object GameViewModel:
       collectables = js.Array(),
       // terminals = CachedTerminals.initial,
       helpControlsText = helpControlsText,
-      sprites = None,
-      windowManager = WindowManagerViewModel.initial
+      sprites = None
+      // windowManager = WindowManagerViewModel.initial
     )
 
   def nextViewModel(
@@ -337,15 +340,15 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    val windows =
-      viewModel.windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          model.windowManager,
-          FrameTick
-        )
+    // val windows =
+    //   viewModel.windowManager
+    //     .update(
+    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+    //       model.windowManager,
+    //       FrameTick
+    //     )
 
-    (nextPlayerPosition combine hostilesPositions combine windows).map { case ((pp, hps), wvm) =>
+    (nextPlayerPosition `combine` hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
@@ -354,8 +357,8 @@ object GameViewModel:
         hoverSquare = hoverSquare,
         tiles = tiles,
         tilePositions = tiles.map(_._2),
-        collectables = collectables,
-        windowManager = wvm
+        collectables = collectables
+        // windowManager = wvm
       )
     }
 

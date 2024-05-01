@@ -33,8 +33,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
-    Set(AssetBundleLoader)
+  val subSystems: Set[SubSystem[Model]] =
+    Set(AssetBundleLoader[Model])
 
   val loadBindingKey: BindingKey = BindingKey("initial game load")
 

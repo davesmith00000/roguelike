@@ -6,6 +6,7 @@ import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelikestarterkit.terminal.TerminalText
 import roguelikestarterkit.tiles.RoguelikeTiles
+import roguelike.model.Model
 
 object FloatingMessage:
 
@@ -13,7 +14,7 @@ object FloatingMessage:
 
   private val poolKey = AutomataPoolKey("floating messages")
 
-  def subSystem: Automata =
+  def subSystem: Automata[Model] =
     Automata(
       poolKey,
       Automaton(

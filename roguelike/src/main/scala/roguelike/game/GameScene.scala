@@ -15,6 +15,13 @@ import roguelike.model.dungeon.Dungeon
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
+import roguelikestarterkit.ui.window.WindowManager
+import roguelike.model.GameWindowContext
+import roguelike.model.GameWindows
+import roguelike.components.windows.InfoPanel
+import roguelike.components.windows.HistoryWindow
+import roguelike.components.windows.MenuWindow
+import roguelikestarterkit.Dimensions
 
 object GameScene extends Scene[Size, Model, ViewModel]:
 
@@ -35,8 +42,31 @@ object GameScene extends Scene[Size, Model, ViewModel]:
 
   val workerSubSystem =
     WorkerSubSystem(DungeonGenWorker)
-  val subSystems: Set[SubSystem] =
-    Set(workerSubSystem)
+
+  val subSystems: Set[SubSystem[Model]] =
+    Set(
+      workerSubSystem,
+      WindowManager[Model, GameWindowContext](
+        SubSystemId("window manager"),
+        1, // TODO: Needs to propogate into the windows.
+        GameWindows.defaultCharSheet,
+        _.gameWindowContext
+      )
+        .withLayerKey(RogueLikeGame.layerKeyWindows)
+        .register(
+          InfoPanel.window(GameWindows.defaultCharSheet)
+        )
+        .register(
+          HistoryWindow.window(GameWindows.defaultCharSheet)
+        )
+        .register(
+          MenuWindow.window(
+            Dimensions(1280, 720) / 10,
+            GameWindows.defaultCharSheet
+          )
+        )
+        .open(InfoPanel.windowId, HistoryWindow.windowId, MenuWindow.windowId)
+    )
 
   val sprite: Set[Sprite[Material.ImageEffects]] = Set.empty
 

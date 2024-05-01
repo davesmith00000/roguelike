@@ -36,7 +36,8 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 
   val workerSubSystem =
     WorkerSubSystem(DungeonGenWorker)
-  val subSystems: Set[SubSystem] =
+    
+  val subSystems: Set[SubSystem[Model]] =
     Set(workerSubSystem)
 
   def updateModel(

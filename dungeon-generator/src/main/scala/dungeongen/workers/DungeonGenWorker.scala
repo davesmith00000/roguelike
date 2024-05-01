@@ -23,7 +23,7 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
 
   @JSExport
   def doWork(): Unit =
-    WorkerGlobal.addEventListener("message", onMessage _)
+    WorkerGlobal.addEventListener("message", onMessage)
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.asInstanceOf"))
   def onMessage(msg: dom.MessageEvent): Unit =

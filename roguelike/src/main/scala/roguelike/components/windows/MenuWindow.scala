@@ -9,12 +9,14 @@ object MenuWindow:
   private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
   private val saveKey = "save1"
 
+  val windowId: WindowId = WindowId("Menu")
+
   def window(
       screenSize: Dimensions,
       charSheet: CharSheet
   ): WindowModel[Size, GameWindowContext, MainMenu] =
     WindowModel(
-      WindowId("Menu"),
+      windowId,
       charSheet,
       MainMenu(
         ComponentGroup(Bounds(0, 0, 16, 1))

@@ -12,11 +12,13 @@ object HistoryWindow:
 
   private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
 
+  val windowId: WindowId = WindowId("History")
+
   def window(
       charSheet: CharSheet
   ): WindowModel[Size, GameWindowContext, TerminalClones] =
     WindowModel(
-      WindowId("History"),
+      windowId,
       charSheet,
       TerminalClones.empty
     )

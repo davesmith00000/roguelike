@@ -10,11 +10,13 @@ object InfoPanel:
 
   private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
 
+  val windowId: WindowId = WindowId("Info")
+
   def window(
       charSheet: CharSheet
-  ): WindowModel[Size, GameWindowContext, Unit] =
+  ): WindowModel[Unit, GameWindowContext] =
     WindowModel(
-      WindowId("Info"),
+      windowId,
       charSheet,
       ()
     )
@@ -24,18 +26,16 @@ object InfoPanel:
         Dimensions(25, 7)
       )
       .isDraggable
-      .updateModel(updateModel)
-      .present(present)
 
   def updateModel(
-      context: UiContext[Size, GameWindowContext],
+      context: UiContext[GameWindowContext],
       model: Unit
   ): GlobalEvent => Outcome[Unit] =
     case _ =>
       Outcome(model)
 
   def present(
-      context: UiContext[Size, GameWindowContext],
+      context: UiContext[GameWindowContext],
       model: Unit
   ): Outcome[SceneUpdateFragment] =
     Outcome(
@@ -43,11 +43,11 @@ object InfoPanel:
         renderLevel(
           context.charSheet,
           context.screenSpaceBounds.position,
-          context.data.currentFloor
+          context.reference.currentFloor
         ),
         renderBar(
           context.charSheet,
-          context.data.player,
+          context.reference.player,
           20,
           context.screenSpaceBounds.position + Point(0, context.charSheet.size.height + 4)
         )

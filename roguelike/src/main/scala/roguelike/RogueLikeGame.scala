@@ -28,6 +28,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val layerKeyGame      = BindingKey("game")
   val layerKeyUiOverlay = BindingKey("ui-overlay")
   val layerKeyUi        = BindingKey("ui")
+  val layerKeyWindows   = BindingKey("windows")
   val layerKeyFPS       = BindingKey("fps")
 
   def initialScene(bootData: Size): Option[SceneName] =
@@ -45,7 +46,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[Size]] =
+  def boot(flags: Map[String, String]): Outcome[BootResult[Size, Model]] =
     val gameViewport =
       (flags.get("width"), flags.get("height")) match {
         case (Some(w), Some(h)) =>
@@ -133,9 +134,10 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        Layer(layerKeyGame),
-        Layer(layerKeyUiOverlay),
-        Layer(layerKeyUi),
-        Layer(layerKeyFPS)
+        layerKeyGame      -> Layer.empty,
+        layerKeyUiOverlay -> Layer.empty,
+        layerKeyUi        -> Layer.empty,
+        layerKeyWindows        -> Layer.empty,
+        layerKeyFPS       -> Layer.empty
       )
     )

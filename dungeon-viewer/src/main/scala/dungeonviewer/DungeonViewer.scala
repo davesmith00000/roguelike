@@ -25,7 +25,7 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[Unit]] =
+  def boot(flags: Map[String, String]): Outcome[BootResult[Unit, Model]] =
     Outcome(
       BootResult
         .noData(Config.config)

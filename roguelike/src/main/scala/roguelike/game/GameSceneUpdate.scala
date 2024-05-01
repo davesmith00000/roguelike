@@ -158,30 +158,34 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          e
-        )
-        .flatMap { wm =>
-          model.update(context)(e).map {
-            _.copy(
-              windowManager = wm
-            )
-          }
-        }
+      model.update(context)(e)
 
-    case e =>
-      model.windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          e
-        )
-        .map { wm =>
-          model.copy(
-            windowManager = wm
-          )
-        }
+    case _ =>
+      Outcome(model)
+      // model.windowManager
+      //   .update(
+      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+      //     e
+      //   )
+      //   .flatMap { wm =>
+      //     model.update(context)(e).map {
+      //       _.copy(
+      //         windowManager = wm
+      //       )
+      //     }
+      //   }
+
+    // case e =>
+    //   model.windowManager
+    //     .update(
+    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+    //       e
+    //     )
+    //     .map { wm =>
+    //       model.copy(
+    //         windowManager = wm
+    //       )
+    //     }
 
   def updateNpcPhase(
       context: SceneContext[Size],
@@ -196,18 +200,19 @@ object GameSceneUpdate:
 
     // Other
     case e: GameEvent =>
-      model.windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          e
-        )
-        .flatMap { wm =>
-          model.update(context)(e).map {
-            _.copy(
-              windowManager = wm
-            )
-          }
-        }
+      model.update(context)(e)
+      // model.windowManager
+      //   .update(
+      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+      //     e
+      //   )
+      //   .flatMap { wm =>
+      //     model.update(context)(e).map {
+      //       _.copy(
+      //         windowManager = wm
+      //       )
+      //     }
+      //   }
 
     case _ =>
       Outcome(model)
@@ -218,18 +223,19 @@ object GameSceneUpdate:
   ): GlobalEvent => Outcome[Model] =
     // Other
     case e: GameEvent =>
-      model.windowManager
-        .update(
-          UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-          e
-        )
-        .flatMap { wm =>
-          model.update(context)(e).map {
-            _.copy(
-              windowManager = wm
-            )
-          }
-        }
+      model.update(context)(e)
+      // model.windowManager
+      //   .update(
+      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
+      //     e
+      //   )
+      //   .flatMap { wm =>
+      //     model.update(context)(e).map {
+      //       _.copy(
+      //         windowManager = wm
+      //       )
+      //     }
+      //   }
 
     case _ =>
       Outcome(model)

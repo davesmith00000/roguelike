@@ -37,7 +37,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(
@@ -198,7 +198,7 @@ object MainMenuTitle:
 
 object MainMenuItems:
 
-  def menuItems(mainMenuUi: MainMenuUi): Layer =
+  def menuItems(mainMenuUi: MainMenuUi): Layer.Content =
     Layer(Group(mainMenuUi.view)).withBlendMaterial(BlendMaterial.BlendEffects(0))
 
   def present(
@@ -206,7 +206,7 @@ object MainMenuItems:
       viewportSize: Size,
       model: Model,
       mainMenuUi: MainMenuUi
-  ): Batch[Layer] =
+  ): Batch[Layer.Content] =
     MenuAnimFunctions
       .layerFadeInAnimation(1.5.second, 1.second)
       .atOrLast(time) {
@@ -241,7 +241,7 @@ object MainMenuAudio:
 
 object MenuAnimFunctions:
 
-  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
+  val applyAlpha: Layer.Content => SignalFunction[Double, Layer.Content] = l =>
     SignalFunction { d =>
       val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
 
@@ -251,10 +251,10 @@ object MenuAnimFunctions:
         case _ => l
     }
 
-  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer] =
+  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer.Content] =
     timeline(
       layer(
-        startAfter[Layer](delay),
+        startAfter[Layer.Content](delay),
         animate(over)(lerp >>> applyAlpha(_))
       )
     )
