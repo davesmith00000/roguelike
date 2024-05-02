@@ -24,7 +24,7 @@ object GameSceneUpdate:
       model: Model
   ): GlobalEvent => Outcome[Model] =
     model.gameState match
-      case _ if WindowManager.showingWindow(model) =>
+      case _ if WindowStateManager.showingWindow(model) =>
         onWaitingForInput(context, model)
       case GameState.WaitForInput   => onWaitingForInput(context, model)
       case GameState.UpdateNPCs     => updateNpcPhase(context, model)
@@ -39,23 +39,23 @@ object GameSceneUpdate:
     // Window close keys
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
         if !model.gameState.isWaitForInput ||
-          WindowManager.showingCloseableWindow(model) =>
-      WindowManager
+          WindowStateManager.showingCloseableWindow(model) =>
+      WindowStateManager
         .updateModel(context, model, WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
 
     // Quit window toggle
     case KeyboardEvent.KeyUp(KeyMapping.Quit1) | KeyboardEvent.KeyUp(KeyMapping.Quit2)
         if model.gameState.isWaitForInput =>
-      WindowManager.updateModel(
+      WindowStateManager.updateModel(
         context,
         model,
         WindowManagerCommand.HandleQuitKeyPress
       )
 
     // Delegate input to WindowManager
-    case KeyboardEvent.KeyUp(key) if WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(
+    case KeyboardEvent.KeyUp(key) if WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
         context,
         model,
         WindowManagerCommand.DelegateInput(key)
@@ -116,14 +116,18 @@ object GameSceneUpdate:
     // Window toggles
     // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
     //     if model.gameState.isWaitForInput ||
+    //       !WindowStateManager.showingWindow(model) =>
+    //   WindowStateManager
+    //     .updateModel(context, model, WindowStateManager.ShowHistory)
+
+    // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
+    //     if model.gameState.isWaitForInput ||
     //       !WindowManager.showingWindow(model) =>
-    //   WindowManager
-    //     .updateModel(context, model, WindowManagerCommand.ShowHistory)
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||
-          !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(
+          !WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
         context,
         model,
         WindowManagerCommand.ShowInventoryMenu
@@ -131,8 +135,8 @@ object GameSceneUpdate:
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
         if model.gameState.isWaitForInput ||
-          !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(
+          !WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
         context,
         model,
         WindowManagerCommand.ShowEquipMenu
@@ -140,8 +144,8 @@ object GameSceneUpdate:
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
         if model.gameState.isWaitForInput ||
-          !WindowManager.showingWindow(model) =>
-      WindowManager.updateModel(
+          !WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
         context,
         model,
         WindowManagerCommand.ShowDropMenu
@@ -162,30 +166,6 @@ object GameSceneUpdate:
 
     case _ =>
       Outcome(model)
-      // model.windowManager
-      //   .update(
-      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-      //     e
-      //   )
-      //   .flatMap { wm =>
-      //     model.update(context)(e).map {
-      //       _.copy(
-      //         windowManager = wm
-      //       )
-      //     }
-      //   }
-
-    // case e =>
-    //   model.windowManager
-    //     .update(
-    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-    //       e
-    //     )
-    //     .map { wm =>
-    //       model.copy(
-    //         windowManager = wm
-    //       )
-    //     }
 
   def updateNpcPhase(
       context: SceneContext[Size],
@@ -201,18 +181,6 @@ object GameSceneUpdate:
     // Other
     case e: GameEvent =>
       model.update(context)(e)
-      // model.windowManager
-      //   .update(
-      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-      //     e
-      //   )
-      //   .flatMap { wm =>
-      //     model.update(context)(e).map {
-      //       _.copy(
-      //         windowManager = wm
-      //       )
-      //     }
-      //   }
 
     case _ =>
       Outcome(model)
@@ -224,18 +192,6 @@ object GameSceneUpdate:
     // Other
     case e: GameEvent =>
       model.update(context)(e)
-      // model.windowManager
-      //   .update(
-      //     UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-      //     e
-      //   )
-      //   .flatMap { wm =>
-      //     model.update(context)(e).map {
-      //       _.copy(
-      //         windowManager = wm
-      //       )
-      //     }
-      //   }
 
     case _ =>
       Outcome(model)

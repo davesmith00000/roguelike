@@ -65,7 +65,11 @@ object GameScene extends Scene[Size, Model, ViewModel]:
             GameWindows.defaultCharSheet
           )
         )
-        .open(InfoPanel.windowId, HistoryWindow.windowId, MenuWindow.windowId)
+        .open(
+          InfoPanel.windowId,
+          // HistoryWindow.windowId,
+          MenuWindow.windowId
+        )
     )
 
   val sprite: Set[Sprite[Material.ImageEffects]] = Set.empty

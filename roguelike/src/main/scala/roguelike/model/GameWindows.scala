@@ -18,21 +18,4 @@ object GameWindows:
       RoguelikeTiles.Size10x10.Fonts.fontKey
     )
 
-  // def addWindows(
-  //     windowManager: WindowManagerModel[GameWindowContext]
-  // ): WindowManagerModel[GameWindowContext] =
-  //   windowManager
-  //     .add(
-  //       InfoPanel.window(defaultCharSheet)
-  //     )
-  //     .add(
-  //       HistoryWindow.window(defaultCharSheet)
-  //     )
-  //     .add(
-  //       MenuWindow.window(
-  //         Dimensions(1280, 720) / 10,
-  //         defaultCharSheet
-  //       )
-  //     )
-
 final case class GameWindowContext(currentFloor: Int, player: Player, messageLog: MessageLog)

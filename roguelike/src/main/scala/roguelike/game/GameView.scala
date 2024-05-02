@@ -9,7 +9,7 @@ import roguelike.assets.GameAssets
 import roguelike.assets.GameGraphics
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.WindowManager
+import roguelike.components.windows.WindowStateManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
 import roguelike.model.GameWindows
@@ -32,23 +32,9 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    // val windows =
-    //   roguelikestarterkit.WindowManager
-    //     .present(
-    //       UiContext(
-    //         context.frameContext,
-    //         GameWindows.defaultCharSheet,
-    //         model.gameWindowContext
-    //       ),
-    //       1,
-    //       model.windowManager,
-    //       viewModel.windowManager
-    //     )
-
     for {
       gl <- drawGameLayer(context, model, viewModel)
       ul <- drawUiLayer(context, model, viewModel)
-      // wl <- windows
     } yield gl |+| ul // |+| wl
 
   def drawGameLayer(

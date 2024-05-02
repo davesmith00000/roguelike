@@ -14,8 +14,8 @@ import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.MenuWindow
-import roguelike.components.windows.WindowManager
 import roguelike.components.windows.WindowManagerCommand
+import roguelike.components.windows.WindowStateManager
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.*
 import roguelike.model.gamedata.Armour
@@ -42,7 +42,6 @@ final case class Model(
     activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
     hostiles: HostilesPool
-    // windowManager: WindowManagerModel[GameWindowContext]
 ):
   val gameWindowContext: GameWindowContext =
     GameWindowContext(currentFloor, player, messageLog)
@@ -163,7 +162,7 @@ final case class Model(
       pickUp
 
     case GameEvent.WindowEvent(command) =>
-      WindowManager.updateModel(context, this, command)
+      WindowStateManager.updateModel(context, this, command)
 
     case GameEvent.Log(message) =>
       Outcome(
@@ -468,10 +467,9 @@ object Model:
       GameLoadInfo.initial,
       0,
       Batch.empty,
-      WindowManager.initialModel,
+      WindowStateManager.initialModel,
       Batch.empty,
       HostilesPool(Batch.empty)
-      // GameWindows.addWindows(WindowManagerModel.initial)
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -525,10 +523,9 @@ object Model:
               GameLoadInfo.initial,
               dungeon.currentFloor,
               Batch.empty,
-              WindowManager.initialModel,
+              WindowStateManager.initialModel,
               Batch.fromList(dungeon.collectables),
               HostilesPool(Batch.fromList(dungeon.hostiles))
-              // GameWindows.addWindows(WindowManagerModel.initial)
             )
         }
       }

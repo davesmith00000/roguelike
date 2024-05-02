@@ -11,7 +11,7 @@ import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.WindowManager
+import roguelike.components.windows.WindowStateManager
 import roguelike.model.GameMap
 import roguelike.model.GameTile
 import roguelike.model.GameWindowContext
@@ -94,44 +94,21 @@ final case class GameViewModel(
       GameViewModel.nextViewModel(context, model, this)
 
     case _: MouseEvent.Click
-        if !WindowManager.showingWindow(model) &&
+        if !WindowStateManager.showingWindow(model) &&
           model.player.position == hoverSquare &&
           model.gameState.isWaitForInput =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerTryPickUp)
 
     case _: MouseEvent.Click
-        if !WindowManager.showingWindow(model) &&
+        if !WindowStateManager.showingWindow(model) &&
           model.gameState.isWaitForInput =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
     case e: GameEvent =>
       updateGameEvent(context, model)(e)
-    // windowManager
-    //   .update(
-    //     UiContext(context.frameContext, GameWindows.defaultCharSheet/*, model.gameWindowContext*/),
-    //     model.windowManager,
-    //     e
-    //   )
-    //   .flatMap { wvm =>
-    //     updateGameEvent(context, model)(e).map {
-    //       _.copy(
-    //         windowManager = wvm
-    //       )
-    //     }
-    //   }
 
-    // case e =>
-    //   windowManager
-    //     .update(
-    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-    //       model.windowManager,
-    //       e
-    //     )
-    //     .map { wvm =>
-    //       this.copy(windowManager = wvm)
-    //     }
     case _ =>
       Outcome(this)
 
@@ -159,30 +136,6 @@ final case class GameViewModel(
 
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)
-    //   val history =
-    //     model.messageLog
-    //       .toTerminal(Size(50, 30), false, 0, true)
-    //       .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-    //         (fg, bg) =>
-    //           Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-    //       }
-
-    //   val shortLog =
-    //     model.messageLog
-    //       .toTerminal(Size(50, 5), false, 0, false)
-    //       .toCloneTiles(
-    //         CloneId("short_log_tiles"),
-    //         Point(3, 4),
-    //         RoguelikeTiles.Size10x10.charCrops
-    //       ) { (fg, bg) =>
-    //         Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-    //       }
-
-    //   Outcome(
-    //     this.copy(
-    //       terminals = terminals.copy(history = history, shortLog = shortLog)
-    //     )
-    //   )
 
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
@@ -285,10 +238,8 @@ object GameViewModel:
       tiles = Batch.empty,
       tilePositions = Batch.empty,
       collectables = js.Array(),
-      // terminals = CachedTerminals.initial,
       helpControlsText = helpControlsText,
       sprites = None
-      // windowManager = WindowManagerViewModel.initial
     )
 
   def nextViewModel(
@@ -340,14 +291,6 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    // val windows =
-    //   viewModel.windowManager
-    //     .update(
-    //       UiContext(context.frameContext, GameWindows.defaultCharSheet, model.gameWindowContext),
-    //       model.windowManager,
-    //       FrameTick
-    //     )
-
     (nextPlayerPosition `combine` hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
@@ -358,17 +301,7 @@ object GameViewModel:
         tiles = tiles,
         tilePositions = tiles.map(_._2),
         collectables = collectables
-        // windowManager = wvm
       )
     }
-
-// final case class CachedTerminals(
-//     history: TerminalClones,
-//     shortLog: TerminalClones
-// )
-
-// object CachedTerminals:
-//   def initial: CachedTerminals =
-//     CachedTerminals(TerminalClones.empty, TerminalClones.empty)
 
 final case class GameSprites(player: Sprite[Bitmap], orc: Sprite[Bitmap], troll: Sprite[Bitmap])

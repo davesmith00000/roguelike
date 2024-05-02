@@ -7,7 +7,7 @@ import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 
-object WindowManager extends Component[Size, Model, GameViewModel]:
+object WindowStateManager extends Component[Size, Model, GameViewModel]:
   type Command            = WindowManagerCommand
   type ComponentModel     = Model
   type ComponentViewModel = GameViewModel
@@ -144,10 +144,10 @@ object WindowManager extends Component[Size, Model, GameViewModel]:
     !modelLens.get(model).activeWindow.closeable
 
 enum ActiveWindow(val closeable: Boolean):
-  case None          extends ActiveWindow(true)
-  case Quit          extends ActiveWindow(true)
-  case LevelUp       extends ActiveWindow(false)
-  case DropMenu      extends ActiveWindow(true)
-  case EquipMenu     extends ActiveWindow(true)
+  case None      extends ActiveWindow(true)
+  case Quit      extends ActiveWindow(true)
+  case LevelUp   extends ActiveWindow(false)
+  case DropMenu  extends ActiveWindow(true)
+  case EquipMenu extends ActiveWindow(true)
   // case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)

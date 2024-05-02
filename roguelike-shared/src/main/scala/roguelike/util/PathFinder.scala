@@ -8,6 +8,7 @@ import indigo.shared.dice.Dice
 
 import scala.annotation.tailrec
 
+// TODO: Deprecate?
 object PathFinder:
   private def sampleAt(
       coords: Point
