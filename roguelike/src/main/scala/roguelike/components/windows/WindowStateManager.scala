@@ -2,12 +2,12 @@ package roguelike.components.windows
 
 import indigo.*
 import indigo.scenes.SceneContext
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 
-object WindowStateManager extends Component[Size, Model, GameViewModel]:
+object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
   type Command            = WindowManagerCommand
   type ComponentModel     = Model
   type ComponentViewModel = GameViewModel

@@ -7,7 +7,7 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.assets.GameAssets
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameState
 import roguelike.model.Inventory
@@ -21,7 +21,7 @@ import roguelike.viewmodel.ActorMoveState
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
 
-object PlayerComponent extends Component[Size, Model, GameViewModel]:
+object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
   type ComponentModel     = PlayerM
   type ComponentViewModel = PlayerVM
   type Command            = Cmds

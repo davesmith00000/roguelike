@@ -5,7 +5,7 @@ import indigo.scenes.SceneContext
 import indigo.scenes.SceneEvent
 import roguelike.MainMenuScene
 import roguelike.assets.GameAssets
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.model.GameLoadInfo
 import roguelike.model.GameState
 import roguelike.model.Model
@@ -13,7 +13,7 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameViewModel
 import roguelikestarterkit.*
 
-object QuitMenu extends Component[Size, Model, GameViewModel]:
+object QuitMenu extends GameComponent[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Model
   type ComponentViewModel = Size

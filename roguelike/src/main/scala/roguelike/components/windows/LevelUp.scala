@@ -5,14 +5,14 @@ import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.viewmodel.GameViewModel
 import roguelikestarterkit.*
 
-object LevelUp extends Component[Size, Model, GameViewModel]:
+object LevelUp extends GameComponent[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = Player
   type ComponentViewModel = Size

@@ -5,7 +5,7 @@ import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.game.UIElements
 import roguelike.model.Inventory
 import roguelike.model.Message
@@ -14,7 +14,7 @@ import roguelike.model.entity.Collectable
 import roguelike.viewmodel.GameViewModel
 import roguelikestarterkit.*
 
-object DropMenu extends Component[Size, Model, GameViewModel]:
+object DropMenu extends GameComponent[Size, Model, GameViewModel]:
   type Command            = HandleInput
   type ComponentModel     = DropMenuModel
   type ComponentViewModel = Size
