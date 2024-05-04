@@ -93,6 +93,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       val spriteAnimationLoader: (SpriteAssetData, Depth) => Outcome[SpriteAndAnimations] =
         GameAssetLoader.loadAnimation(assetCollection, dice)
 
+      // TODO: Can this be replaced with generated code?
       val spritesAndAnimations: Outcome[Batch[(AssetName, SpriteAndAnimations)]] =
         SpriteAssetData.spriteData.map { s =>
           spriteAnimationLoader(s, Depth.zero)
@@ -107,7 +108,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
               sprites.map(_._2.animations).toList
             )
         ).addGlobalEvents(
-          LoadEvent.SpritesLoaded(
+          GameEvent.SpritesLoaded(
             sprites.map(s => (s._1, s._2.sprite))
           )
         )

@@ -3,6 +3,7 @@ package roguelike.viewmodel.ui
 import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
+import roguelike.GameEvent
 import roguelike.components.ui.ButtonComponent
 
 final case class MainMenuUi(
@@ -15,9 +16,10 @@ final case class MainMenuUi(
 
   def view: Batch[SceneNode] =
     val activeShadowColor = RGBA.Orange.mix(RGBA.Black, 0.25)
-    newGame.draw(RGBA.White, activeShadowColor) ++
-      (if canLoadGame then loadGame.draw(RGBA.White, activeShadowColor)
-       else loadGame.draw(RGBA.SlateGray, RGBA.Black))
+    newGame.draw(RGBA.White, activeShadowColor) ++ {
+      if canLoadGame then loadGame.draw(RGBA.White, activeShadowColor)
+      else loadGame.draw(RGBA.SlateGray, RGBA.Black)
+    }
 
   def moveTo(pos: Point): MainMenuUi =
     copy(
@@ -32,15 +34,15 @@ final case class MainMenuUi(
     ).moveTo(position)
 
 object MainMenuUi:
-  def apply(
-      newGame: Batch[GlobalEvent],
-      loadGame: Batch[GlobalEvent],
-      canLoadGame: Boolean
-  ): MainMenuUi =
+  def apply(canLoadGame: Boolean): MainMenuUi =
     val buttonSize = 208
     MainMenuUi(
-      ButtonComponent("[n] Play a new game", buttonSize, newGame),
-      ButtonComponent("[c] Continue last game", buttonSize, loadGame),
+      ButtonComponent("[n] Play a new game", buttonSize, Batch(GameEvent.NewGame)),
+      ButtonComponent(
+        "[c] Continue last game",
+        buttonSize,
+        if canLoadGame then Batch(GameEvent.LoadGame) else Batch.empty
+      ),
       Point.zero,
       canLoadGame
     )

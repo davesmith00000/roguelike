@@ -5,7 +5,6 @@ import indigo.scenes.SceneContext
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.GenerateLevel
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
@@ -158,6 +157,18 @@ final case class Model(
   }
 
   def update(context: SceneContext[Size]): GameEvent => Outcome[Model] =
+    case GameEvent.GenerateLevel =>
+      Outcome(this)
+
+    case GameEvent.NewGame =>
+      Outcome(this)
+
+    case GameEvent.LoadGame =>
+      Outcome(this)
+
+    case GameEvent.SpritesLoaded(_) =>
+      Outcome(this)
+
     case GameEvent.PlayerTryPickUp =>
       pickUp
 
@@ -391,7 +402,7 @@ final case class Model(
       )
 
     case GameEvent.PlayerDescended =>
-      Outcome(this).addGlobalEvents(GenerateLevel)
+      Outcome(this).addGlobalEvents(GameEvent.GenerateLevel)
 
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)

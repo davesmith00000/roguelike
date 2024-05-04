@@ -6,7 +6,6 @@ import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.NewGame
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
@@ -38,7 +37,7 @@ object ViewModel:
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(
       GameViewModel.initial(player, initialViewportSize),
-      MainMenuUi(Batch(NewGame), Batch.empty, false)
+      MainMenuUi(false)
     )
 
 final case class GameViewModel(
@@ -116,6 +115,18 @@ final case class GameViewModel(
       context: SceneContext[Size],
       model: Model
   ): GameEvent => Outcome[GameViewModel] =
+    case GameEvent.GenerateLevel =>
+      Outcome(this)
+
+    case GameEvent.NewGame =>
+      Outcome(this)
+
+    case GameEvent.LoadGame =>
+      Outcome(this)
+
+    case GameEvent.SpritesLoaded(_) =>
+      Outcome(this)
+
     case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
       Outcome(this)
         .addGlobalEvents(

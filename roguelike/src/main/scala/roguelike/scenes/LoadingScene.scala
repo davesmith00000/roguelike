@@ -5,7 +5,7 @@ import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
-import roguelike.LoadEvent
+import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoaderAnim
@@ -97,7 +97,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
-    case LoadEvent.SpritesLoaded(sprites) =>
+    case GameEvent.SpritesLoaded(sprites) =>
       val player = sprites.find(_._1 == GameAssets.assets.game.Player).map(_._2)
       val orc    = sprites.find(_._1 == GameAssets.assets.game.enemy1).map(_._2)
       val troll  = sprites.find(_._1 == GameAssets.assets.game.ENEMY2).map(_._2)

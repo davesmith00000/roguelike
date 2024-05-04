@@ -8,9 +8,6 @@ import indigo.syntax.animations.*
 import indigoextras.ui.Button
 import indigoextras.ui.HitArea
 import roguelike.GameEvent
-import roguelike.GenerateLevel
-import roguelike.LoadGame
-import roguelike.NewGame
 import roguelike.assets.GameAssets
 import roguelike.model.Message
 import roguelike.model.Model
@@ -47,14 +44,14 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
-    case NewGame =>
+    case GameEvent.NewGame =>
       Outcome(model)
         .addGlobalEvents(
           SceneEvent.JumpTo(GeneratingLevelScene.name),
-          GenerateLevel
+          GameEvent.GenerateLevel
         )
 
-    case LoadGame =>
+    case GameEvent.LoadGame =>
       model.loadInfo.loadedData match
         case None =>
           Outcome(model)
@@ -66,10 +63,10 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             )
 
     case KeyboardEvent.KeyUp(Key.KEY_N) =>
-      Outcome(model).addGlobalEvents(NewGame)
+      Outcome(model).addGlobalEvents(GameEvent.NewGame)
 
     case KeyboardEvent.KeyUp(Key.KEY_C) =>
-      Outcome(model).addGlobalEvents(LoadGame)
+      Outcome(model).addGlobalEvents(GameEvent.LoadGame)
 
     case _ =>
       Outcome(model)
@@ -85,8 +82,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       val menuMagnification = 2
 
       val mainMenu = {
-        if model.loadInfo.loadedData.isDefined then
-          MainMenuUi(Batch(NewGame), Batch(LoadGame), true)
+        if model.loadInfo.loadedData.isDefined then MainMenuUi(true)
         else viewModel
       }
         .withScale(menuMagnification)
@@ -99,7 +95,9 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
       val newGame = mainMenu.newGame.update(context.mouse)
 
-      (Outcome(mainMenu), newGame).map2((vm, ng) => vm.copy(newGame = ng))
+      (Outcome(mainMenu), newGame).map2 { (vm, ng) =>
+        vm.copy(newGame = ng)
+      }
 
     case _ =>
       Outcome(viewModel)

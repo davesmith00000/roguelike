@@ -8,7 +8,6 @@ import dungeongen.workers.DungeonGenWorker
 import indigo.*
 import indigo.scenes.*
 import roguelike.GameEvent
-import roguelike.GenerateLevel
 import roguelike.RogueLikeGame
 import roguelike.model.GameWindowContext
 import roguelike.model.GameWindows
@@ -78,7 +77,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
-    case GenerateLevel =>
+    case GameEvent.GenerateLevel =>
       Outcome(model).addGlobalEvents(
         workerSubSystem.WorkerEvent.Send(
           DungeonGenConfig(

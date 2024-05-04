@@ -45,6 +45,10 @@ enum GameEvent extends GlobalEvent:
   case RedrawHistoryLog
   case Targeted(position: Point)
   case WindowEvent(command: WindowManagerCommand)
+  case GenerateLevel
+  case NewGame
+  case LoadGame
+  case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
 
   // ViewModel events
   case CameraSnapToPlayer
@@ -60,14 +64,3 @@ enum InventoryEvent:
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)
   case RemoveFromInventory(inventoryPosition: Int)
-
-// TODO: Incorporate into the main GameEvents..
-enum LoadEvent extends GlobalEvent:
-  case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
-
-// TODO: Incorporate into the main GameEvents..
-case object GenerateLevel extends GlobalEvent
-// TODO: Incorporate into the main GameEvents..
-case object NewGame       extends GlobalEvent
-// TODO: Incorporate into the main GameEvents..
-case object LoadGame      extends GlobalEvent
