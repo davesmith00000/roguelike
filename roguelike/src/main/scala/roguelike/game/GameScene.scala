@@ -10,9 +10,6 @@ import indigo.scenes.*
 import roguelike.GameEvent
 import roguelike.GenerateLevel
 import roguelike.RogueLikeGame
-import roguelike.components.windows.HistoryWindow
-import roguelike.components.windows.InfoPanel
-import roguelike.components.windows.MenuWindow
 import roguelike.model.GameWindowContext
 import roguelike.model.GameWindows
 import roguelike.model.Model
@@ -20,6 +17,9 @@ import roguelike.model.dungeon.Dungeon
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
+import roguelike.windows.HistoryWindow
+import roguelike.windows.InfoPanel
+import roguelike.windows.MenuWindow
 import roguelikestarterkit.Dimensions
 import roguelikestarterkit.ui.window.WindowManager
 

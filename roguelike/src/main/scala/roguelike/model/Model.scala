@@ -13,7 +13,6 @@ import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
-import roguelike.components.windows.MenuWindow
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.components.windows.WindowStateManager
 import roguelike.model.dungeon.Dungeon
@@ -22,6 +21,7 @@ import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelike.windows.MenuWindow
 import roguelikestarterkit.*
 
 import scala.scalajs.js

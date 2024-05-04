@@ -2,10 +2,10 @@ package roguelike.model
 
 import indigo.*
 import roguelike.assets.GameAssets
-import roguelike.components.windows.HistoryWindow
-import roguelike.components.windows.InfoPanel
-import roguelike.components.windows.MenuWindow
 import roguelike.model.entity.Player
+import roguelike.windows.HistoryWindow
+import roguelike.windows.InfoPanel
+import roguelike.windows.MenuWindow
 import roguelikestarterkit.*
 
 object GameWindows:

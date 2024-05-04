@@ -137,7 +137,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         layerKeyGame      -> Layer.empty,
         layerKeyUiOverlay -> Layer.empty,
         layerKeyUi        -> Layer.empty,
-        layerKeyWindows        -> Layer.empty,
+        layerKeyWindows   -> Layer.empty,
         layerKeyFPS       -> Layer.empty
       )
     )

@@ -1,4 +1,4 @@
-package roguelike.components.windows
+package roguelike.windows
 
 import indigo.*
 import roguelike.ColorScheme
