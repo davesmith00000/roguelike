@@ -7,10 +7,10 @@ import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
 import roguelike.assets.GameAssets
 import roguelike.config.Config
-import roguelike.game.GameScene
 import roguelike.model.GameAssetLoader
 import roguelike.model.Model
 import roguelike.model.SpriteAssetData
+import roguelike.scenes.*
 import roguelike.screeneffects.InnerGlow
 import roguelike.shaders.Hover
 import roguelike.subsystems.FloatingMessage

@@ -1,4 +1,4 @@
-package roguelike.game
+package roguelike.scenes
 
 import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon

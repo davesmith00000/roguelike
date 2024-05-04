@@ -1,4 +1,4 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
@@ -8,10 +8,13 @@ import indigo.syntax.animations.*
 import indigoextras.ui.Button
 import indigoextras.ui.HitArea
 import roguelike.GameEvent
+import roguelike.GenerateLevel
+import roguelike.LoadGame
+import roguelike.NewGame
 import roguelike.assets.GameAssets
-import roguelike.game.GameScene
 import roguelike.model.Message
 import roguelike.model.Model
+import roguelike.scenes.GameScene
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.MainMenuUi

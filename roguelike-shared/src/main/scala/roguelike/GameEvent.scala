@@ -61,9 +61,13 @@ enum InventoryEvent:
   case PickedUp(item: Item)
   case RemoveFromInventory(inventoryPosition: Int)
 
+// TODO: Incorporate into the main GameEvents..
 enum LoadEvent extends GlobalEvent:
   case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
 
+// TODO: Incorporate into the main GameEvents..
 case object GenerateLevel extends GlobalEvent
+// TODO: Incorporate into the main GameEvents..
 case object NewGame       extends GlobalEvent
+// TODO: Incorporate into the main GameEvents..
 case object LoadGame      extends GlobalEvent

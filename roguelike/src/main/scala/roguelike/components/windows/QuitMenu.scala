@@ -3,13 +3,13 @@ package roguelike.components.windows
 import indigo.*
 import indigo.scenes.SceneContext
 import indigo.scenes.SceneEvent
-import roguelike.MainMenuScene
 import roguelike.assets.GameAssets
 import roguelike.components.GameComponent
 import roguelike.model.GameLoadInfo
 import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.model.ModelSaveData
+import roguelike.scenes.MainMenuScene
 import roguelike.viewmodel.GameViewModel
 import roguelikestarterkit.*
 

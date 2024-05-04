@@ -6,11 +6,11 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.components.GameComponent
-import roguelike.game.UIElements
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
+import roguelike.scenes.UIElements
 import roguelike.viewmodel.GameViewModel
 import roguelikestarterkit.*
 

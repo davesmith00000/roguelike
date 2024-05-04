@@ -1,10 +1,11 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
+import roguelike.LoadEvent
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoaderAnim

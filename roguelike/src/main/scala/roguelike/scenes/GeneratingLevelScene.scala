@@ -1,4 +1,4 @@
-package roguelike
+package roguelike.scenes
 
 import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
@@ -8,11 +8,12 @@ import indigo.*
 import indigo.scenes.*
 import roguelike.GameEvent
 import roguelike.GenerateLevel
+import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelike.game.GameScene
 import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
+import roguelike.scenes.GameScene
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
 import roguelikestarterkit.*

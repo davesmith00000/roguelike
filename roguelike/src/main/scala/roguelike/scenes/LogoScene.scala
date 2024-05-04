@@ -1,4 +1,4 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
