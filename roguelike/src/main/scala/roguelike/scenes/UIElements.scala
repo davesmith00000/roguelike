@@ -6,7 +6,6 @@ import roguelike.assets.GameAssets
 import roguelike.model.GameState
 import roguelike.model.entity.Entity
 import roguelike.model.entity.Hostile
-import roguelike.model.entity.Player
 import roguelikestarterkit._
 
 import scala.scalajs.js
@@ -106,36 +105,6 @@ object UIElements:
 
       case _ =>
         Group.empty
-
-  def renderCharacterInfo(player: Player): Text[TerminalText] =
-    val powerBonus: String =
-      if player.inventory.equipment.powerBonus == 0 then ""
-      else s" + ${player.inventory.equipment.powerBonus}"
-
-    val defenseBonus: String =
-      if player.inventory.equipment.defenseBonus == 0 then ""
-      else s" + ${player.inventory.equipment.defenseBonus}"
-
-    val text =
-      s"""Level: ${player.level}
-      |XP: ${player.xp}
-      |XP for next level: ${player.experienceToNextLevel}
-      |Attack: ${player.fighter.power}$powerBonus
-      |Defense: ${player.fighter.defense}$defenseBonus
-      |Weapon: ${player.inventory.equipment.weapon
-          .map(_.name)
-          .getOrElse("--none--")}
-      |Armour: ${player.inventory.equipment.armour
-          .map(_.name)
-          .getOrElse("--none--")}
-      |""".stripMargin
-
-    Text(
-      text,
-      RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
-    )
-      .moveTo(5, 5)
 
   def renderControls(
       viewportSize: Size,

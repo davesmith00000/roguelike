@@ -178,7 +178,6 @@ object GameView:
         RogueLikeGame.layerKeyUi ->
           Layer(
             Batch(
-              UIElements.renderCharacterInfo(model.player),
               UIElements.renderControls(
                 vpSize,
                 viewModel.helpControlsText

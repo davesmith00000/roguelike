@@ -21,7 +21,7 @@ object InfoPanel:
       .withTitle("Info")
       .moveTo(0, 3)
       .resizeTo(
-        Dimensions(25, 7)
+        Dimensions(25, 16)
       )
       .isDraggable
 
@@ -50,6 +50,12 @@ object InfoPanel:
             context.reference.player,
             20,
             context.screenSpaceBounds.position + Point(0, context.charSheet.size.height + 4)
+          ),
+          renderCharacterInfo(
+            context.charSheet,
+            context.reference.player,
+            context.screenSpaceBounds.position,
+            Coords(0, 4)
           )
         )
       )
@@ -90,3 +96,38 @@ object InfoPanel:
       TerminalText(charSheet.assetName, RGBA.White, RGBA.Zero)
     )
       .moveTo(1, 2)
+
+  def renderCharacterInfo(
+      charSheet: CharSheet,
+      player: Player,
+      contentPosition: Point,
+      offset: Coords
+  ): Text[TerminalText] =
+    val powerBonus: String =
+      if player.inventory.equipment.powerBonus == 0 then ""
+      else s" + ${player.inventory.equipment.powerBonus}"
+
+    val defenseBonus: String =
+      if player.inventory.equipment.defenseBonus == 0 then ""
+      else s" + ${player.inventory.equipment.defenseBonus}"
+
+    val text =
+      s"""Level: ${player.level}
+      |XP: ${player.xp}
+      |XP for next level: ${player.experienceToNextLevel}
+      |Attack: ${player.fighter.power}$powerBonus
+      |Defense: ${player.fighter.defense}$defenseBonus
+      |Weapon: ${player.inventory.equipment.weapon
+          .map(_.name)
+          .getOrElse("--none--")}
+      |Armour: ${player.inventory.equipment.armour
+          .map(_.name)
+          .getOrElse("--none--")}
+      |""".stripMargin
+
+    Text(
+      text,
+      RoguelikeTiles.Size10x10.Fonts.fontKey,
+      TerminalText(charSheet.assetName, RGBA.White, RGBA.Zero)
+    )
+      .moveTo(contentPosition + offset.toScreenSpace(charSheet.size))
