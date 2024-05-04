@@ -24,6 +24,7 @@ object HistoryWindow:
       )
       .isDraggable
       .isResizable
+      .isCloseable
 
   given WindowContent[TerminalClones, GameWindowContext] with
 
@@ -37,7 +38,7 @@ object HistoryWindow:
             .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
             .toCloneTiles(
               CloneId("history clones"),
-              context.screenSpaceBounds.position,
+              Point.zero, // context.screenSpaceBounds.position,
               context.charSheet.charCrops
             ) { (fg, bg) =>
               Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
@@ -52,7 +53,21 @@ object HistoryWindow:
         context: UiContext[GameWindowContext],
         model: TerminalClones
     ): Outcome[Layer] =
-      Outcome(model.toLayer)
+      Outcome(
+        Layer.Content(
+          Batch(
+            Group(model.clones)
+              .moveTo(context.screenSpaceBounds.position)
+          ),
+          Batch.empty,
+          None,
+          None,
+          None,
+          None,
+          model.blanks,
+          None
+        )
+      )
 
     def cascade(model: TerminalClones, newBounds: Bounds): TerminalClones =
       model

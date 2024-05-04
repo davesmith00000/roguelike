@@ -1,12 +1,12 @@
 package roguelike.windows
 
 import indigo._
+import roguelike.GameEvent
+import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameWindowContext
 import roguelikestarterkit._
 
 object MenuWindow:
-
-  // private val saveKey = "save1"
 
   val windowId: WindowId = WindowId("Menu")
 
@@ -47,7 +47,11 @@ object MainMenu:
             Button(Bounds(0, 0, label.length(), 1))(
               presentButton(charSheet, label, RGBA.Silver, RGBA.Black)
             )
-              // .onClick(PaintEvent.Load(saveKey))
+              .onClick(
+                if label == "History" then
+                  Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory))
+                else Batch.empty
+              )
               .presentOver(presentButton(charSheet, label, RGBA.White, RGBA.Black))
               .presentDown(presentButton(charSheet, label, RGBA.Black, RGBA.White))
           }

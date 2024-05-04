@@ -10,6 +10,8 @@ import roguelike.model.GameState
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.gamedata.KeyMapping
+import roguelike.windows.HistoryWindow
+import roguelikestarterkit.WindowEvent
 
 object GameSceneUpdate:
 
@@ -34,6 +36,11 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
         if !model.gameState.isWaitForInput ||
           WindowStateManager.showingCloseableWindow(model) =>
+      WindowStateManager
+        .updateModel(context, model, WindowManagerCommand.CloseAll)
+        .map(_.closeAllWindows)
+
+    case WindowEvent.Closed(HistoryWindow.windowId) =>
       WindowStateManager
         .updateModel(context, model, WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
@@ -108,15 +115,14 @@ object GameSceneUpdate:
         )
 
     // Window toggles
-    // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-    //     if model.gameState.isWaitForInput ||
-    //       !WindowStateManager.showingWindow(model) =>
-    //   WindowStateManager
-    //     .updateModel(context, model, WindowStateManager.ShowHistory)
-
-    // case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
-    //     if model.gameState.isWaitForInput ||
-    //       !WindowManager.showingWindow(model) =>
+    case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
+        if model.gameState.isWaitForInput ||
+          !WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.ShowHistory
+      )
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||
