@@ -6,7 +6,7 @@ import roguelike.model.entity.Troll
 
 import scala.scalajs.js
 
-import js.JSConverters._
+import js.JSConverters.*
 
 trait JsHostile extends js.Object:
   val id: Int

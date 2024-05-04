@@ -1,7 +1,7 @@
 package roguelike.components.ui
 
-import indigo._
-import indigo.shared.scenegraph._
+import indigo.*
+import indigo.shared.scenegraph.*
 import indigoextras.ui.HitArea
 import roguelike.assets.GameAssets
 import roguelikestarterkit.terminal.TerminalText

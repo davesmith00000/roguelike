@@ -1,6 +1,6 @@
 package roguelike.model.entity
 
-import indigo._
+import indigo.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.model.Message

@@ -1,6 +1,6 @@
 package roguelike.viewmodel
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
@@ -15,10 +15,10 @@ import roguelike.model.entity.Collectable
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
-import roguelike.viewmodel.ui._
+import roguelike.viewmodel.ui.*
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.JSConverters.*
 
 final case class ViewModel(
     game: GameViewModel,

@@ -1,6 +1,6 @@
 package roguelike.viewmodel
 
-import indigo._
+import indigo.*
 
 /** ActorPosition is a view model helper to track the position actors should be rendered at on the
   * screen.

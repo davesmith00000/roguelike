@@ -1,9 +1,9 @@
 package roguelike.windows
 
-import indigo._
+import indigo.*
 import roguelike.GameEvent
 import roguelike.model.GameWindowContext
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object HistoryWindow:
 

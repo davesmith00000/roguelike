@@ -1,6 +1,6 @@
 package roguelike.components
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 
 trait GameComponent[StartupData, ParentModel, ParentViewModel]:

@@ -3,8 +3,8 @@ package dungeongen.v2
 import dungeongen.classic.DungeonCreation
 import dungeongen.classic.DungeonPlacement
 import dungeongen.classic.DungeonProcessing
-import indigo._
-import indigo.syntax._
+import indigo.*
+import indigo.syntax.*
 import roguelike.model.GameTile
 import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
@@ -13,7 +13,7 @@ import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.DungeonMetadata
 import roguelike.model.dungeon.PositionedTile
 import roguelike.model.dungeon.WallCode
-import roguelike.model.entity._
+import roguelike.model.entity.*
 
 import scala.annotation.tailrec
 

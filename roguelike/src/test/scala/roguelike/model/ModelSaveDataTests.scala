@@ -4,9 +4,9 @@ import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
-import io.circe._
+import io.circe.*
 import io.circe.parser.decode
-import io.circe.syntax._
+import io.circe.syntax.*
 import roguelike.model.dungeon.WallCode
 import roguelike.model.entity.Collectable
 import roguelike.model.entity.Fighter

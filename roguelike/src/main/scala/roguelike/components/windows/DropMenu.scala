@@ -1,6 +1,6 @@
 package roguelike.components.windows
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
@@ -12,7 +12,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Collectable
 import roguelike.scenes.UIElements
 import roguelike.viewmodel.GameViewModel
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object DropMenu extends GameComponent[Size, Model, GameViewModel]:
   type Command            = HandleInput

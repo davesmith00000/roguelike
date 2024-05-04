@@ -1,6 +1,6 @@
 package roguelike
 
-import indigo._
+import indigo.*
 
 object RogueMath:
   def lerp(start: Double, end: Double, percentage: Double): Double =

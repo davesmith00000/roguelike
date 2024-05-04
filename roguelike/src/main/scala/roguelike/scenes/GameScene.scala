@@ -4,8 +4,8 @@ import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
-import indigo._
-import indigo.scenes._
+import indigo.*
+import indigo.scenes.*
 import roguelike.GameEvent
 import roguelike.RogueLikeGame
 import roguelike.model.GameWindowContext

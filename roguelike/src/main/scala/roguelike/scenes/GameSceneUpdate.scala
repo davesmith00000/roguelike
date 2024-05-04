@@ -1,11 +1,11 @@
 package roguelike.scenes
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.components.entities.HostilesManager
-import roguelike.components.windows._
+import roguelike.components.windows.*
 import roguelike.model.GameState
 import roguelike.model.Message
 import roguelike.model.Model

@@ -1,10 +1,10 @@
 package roguelike.model
 
-import indigo._
-import indigo.syntax._
+import indigo.*
+import indigo.syntax.*
 import indigoextras.utils.Bresenham
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.PositionedTile
 import roguelike.util.Indices

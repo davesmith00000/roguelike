@@ -3,7 +3,7 @@ package roguelike.model
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
-import io.circe._
+import io.circe.*
 
 object SharedCodecs:
 

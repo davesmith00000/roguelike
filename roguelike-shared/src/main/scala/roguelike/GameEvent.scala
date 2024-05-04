@@ -1,6 +1,6 @@
 package roguelike
 
-import indigo._
+import indigo.*
 import indigo.shared.materials.Material.Bitmap
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message

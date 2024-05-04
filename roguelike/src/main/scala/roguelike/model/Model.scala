@@ -1,8 +1,8 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
-import indigo.syntax._
+import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
@@ -14,7 +14,7 @@ import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.components.windows.WindowStateManager
 import roguelike.model.dungeon.Dungeon
-import roguelike.model.entity._
+import roguelike.model.entity.*
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Ranged
 

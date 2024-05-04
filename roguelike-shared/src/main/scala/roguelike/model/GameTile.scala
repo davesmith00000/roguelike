@@ -1,6 +1,6 @@
 package roguelike.model
 
-import io.circe._
+import io.circe.*
 import roguelike.model.dungeon.WallCode
 
 sealed trait GameTile:

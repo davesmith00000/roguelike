@@ -1,9 +1,9 @@
 package roguelike.components.entities
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
-import indigo.syntax._
+import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.components.GameComponent

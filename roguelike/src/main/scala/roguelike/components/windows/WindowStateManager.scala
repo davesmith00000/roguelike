@@ -1,6 +1,6 @@
 package roguelike.components.windows
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.GameEvent
 import roguelike.components.GameComponent

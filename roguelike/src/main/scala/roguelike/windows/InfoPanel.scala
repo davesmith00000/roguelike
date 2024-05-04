@@ -1,10 +1,10 @@
 package roguelike.windows
 
-import indigo._
+import indigo.*
 import roguelike.ColorScheme
 import roguelike.model.GameWindowContext
 import roguelike.model.entity.Player
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object InfoPanel:
 

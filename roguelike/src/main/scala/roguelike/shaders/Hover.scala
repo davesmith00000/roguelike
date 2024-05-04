@@ -1,6 +1,6 @@
 package roguelike.shaders
 
-import indigo._
+import indigo.*
 
 import scala.annotation.nowarn
 

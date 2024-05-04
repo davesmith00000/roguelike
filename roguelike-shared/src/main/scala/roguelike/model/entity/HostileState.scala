@@ -1,6 +1,6 @@
 package roguelike.model.entity
 
-import io.circe._
+import io.circe.*
 
 enum HostileState:
   case Normal                   extends HostileState

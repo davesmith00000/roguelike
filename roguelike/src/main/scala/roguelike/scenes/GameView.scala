@@ -1,9 +1,9 @@
 package roguelike.scenes
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
-import indigo.syntax._
+import indigo.syntax.*
 import roguelike.RogueLikeGame
 import roguelike.assets.GameGraphics
 import roguelike.components.entities.HostilesManager

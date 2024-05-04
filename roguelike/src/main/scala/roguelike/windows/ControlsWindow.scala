@@ -1,9 +1,9 @@
 package roguelike.windows
 
-import indigo._
+import indigo.*
 import roguelike.model.GameWindowContext
 import roguelike.model.gamedata.KeyMapping
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object ControlsWindow:
 

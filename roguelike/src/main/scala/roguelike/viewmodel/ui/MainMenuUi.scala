@@ -1,6 +1,6 @@
 package roguelike.viewmodel.ui
 
-import indigo._
+import indigo.*
 import roguelike.GameEvent
 import roguelike.components.ui.ButtonComponent
 

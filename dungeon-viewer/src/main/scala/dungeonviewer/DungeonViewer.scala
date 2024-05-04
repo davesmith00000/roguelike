@@ -2,9 +2,9 @@ package dungeonviewer
 
 import dungeonviewer.generated.Assets
 import dungeonviewer.generated.Config
-import indigo._
-import indigo.scenes._
-import roguelikestarterkit._
+import indigo.*
+import indigo.scenes.*
+import roguelikestarterkit.*
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 

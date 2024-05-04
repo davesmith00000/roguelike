@@ -1,7 +1,7 @@
 package roguelike.subsystems
 
-import indigo._
-import indigoextras.subsystems._
+import indigo.*
+import indigoextras.subsystems.*
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.model.Model

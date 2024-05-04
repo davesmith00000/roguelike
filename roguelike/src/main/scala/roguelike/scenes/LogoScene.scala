@@ -1,9 +1,9 @@
 package roguelike.scenes
 
-import indigo._
-import indigo.scenes._
-import indigo.syntax._
-import indigo.syntax.animations._
+import indigo.*
+import indigo.scenes.*
+import indigo.syntax.*
+import indigo.syntax.animations.*
 import roguelike.assets.GameAssets
 import roguelike.model.Model
 import roguelike.viewmodel.ViewModel

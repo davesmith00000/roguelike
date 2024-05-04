@@ -1,16 +1,16 @@
 package roguelike.scenes
 
-import indigo._
-import indigo.scenes._
-import indigo.syntax._
-import indigo.syntax.animations._
+import indigo.*
+import indigo.scenes.*
+import indigo.syntax.*
+import indigo.syntax.animations.*
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.model.Model
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.MainMenuUi
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object MainMenuScene extends Scene[Size, Model, ViewModel]:
 

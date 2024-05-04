@@ -1,12 +1,12 @@
 package roguelike.scenes
 
-import indigo._
-import indigo.syntax._
+import indigo.*
+import indigo.syntax.*
 import roguelike.assets.GameAssets
 import roguelike.model.GameState
 import roguelike.model.entity.Entity
 import roguelike.model.entity.Hostile
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 import scala.scalajs.js
 

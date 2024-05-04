@@ -1,7 +1,7 @@
 package roguelike.model
 
-import indigo._
-import indigo.syntax._
+import indigo.*
+import indigo.syntax.*
 import roguelike.GameEvent
 import roguelike.model.entity.Hostile
 

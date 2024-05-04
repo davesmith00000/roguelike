@@ -1,9 +1,9 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 import roguelike.assets.GameAssets
 import roguelike.model.entity.Player
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object GameWindows:
 

@@ -1,9 +1,9 @@
 package roguelike.model
 
-import indigo._
+import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.assets.GameAssets
-import roguelikestarterkit._
+import roguelikestarterkit.*
 
 object LoaderAnim:
 

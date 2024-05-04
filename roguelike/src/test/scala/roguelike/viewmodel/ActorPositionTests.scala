@@ -1,6 +1,6 @@
 package roguelike.viewmodel
 
-import indigo._
+import indigo.*
 
 class ActorPositionTests extends munit.FunSuite {
 

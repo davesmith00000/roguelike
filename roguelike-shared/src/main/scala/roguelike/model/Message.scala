@@ -1,8 +1,8 @@
 package roguelike.model
 
 import indigo.shared.datatypes.RGBA
-import io.circe._
-import io.circe.syntax._
+import io.circe.*
+import io.circe.syntax.*
 import roguelike.ColorScheme
 
 final case class Message(
