@@ -1,7 +1,7 @@
 package dungeongen.classic
 
-import indigo.*
-import roguelike.model.entity.*
+import indigo._
+import roguelike.model.entity._
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee

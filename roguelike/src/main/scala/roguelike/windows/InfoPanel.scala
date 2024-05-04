@@ -1,14 +1,12 @@
 package roguelike.windows
 
-import indigo.*
+import indigo._
 import roguelike.ColorScheme
 import roguelike.model.GameWindowContext
 import roguelike.model.entity.Player
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object InfoPanel:
-
-  private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
 
   val windowId: WindowId = WindowId("Info")
 

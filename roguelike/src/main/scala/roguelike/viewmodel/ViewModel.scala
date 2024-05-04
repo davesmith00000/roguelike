@@ -1,31 +1,24 @@
 package roguelike.viewmodel
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowStateManager
-import roguelike.model.GameMap
 import roguelike.model.GameTile
-import roguelike.model.GameWindowContext
-import roguelike.model.GameWindows
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
-import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
-import roguelike.viewmodel.ui.*
-import roguelikestarterkit.*
+import roguelike.viewmodel.ui._
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
+import scala.scalajs.js.JSConverters._
 
 final case class ViewModel(
     game: GameViewModel,

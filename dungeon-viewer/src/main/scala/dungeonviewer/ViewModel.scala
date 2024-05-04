@@ -2,21 +2,20 @@ package dungeonviewer
 
 import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
-import indigo.*
-import indigo.syntax.*
+import indigo._
+import indigo.syntax._
 import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.Collectable
-import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
-import roguelikestarterkit.*
+import roguelikestarterkit._
 import roguelikestarterkit.terminal.MapTile
 
 import scala.annotation.tailrec

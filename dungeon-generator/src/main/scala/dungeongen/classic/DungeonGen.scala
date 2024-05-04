@@ -1,19 +1,12 @@
 package dungeongen.classic
 
-import indigo.*
+import indigo._
 import roguelike.model.GameTile
 import roguelike.model.GameTile.DownStairs
-import roguelike.model.GameTile.Ground
-import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.DungeonMetadata
 import roguelike.model.dungeon.PositionedTile
-import roguelike.model.entity.*
-import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
-import roguelike.model.gamedata.Ranged
-import roguelike.model.items.Item
+import roguelike.model.entity._
 
 import scala.annotation.tailrec
 

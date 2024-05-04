@@ -6,7 +6,7 @@ import roguelike.model.dungeon.PositionedTile
 
 import scala.scalajs.js
 
-import js.JSConverters.*
+import js.JSConverters._
 
 trait JsDungeon extends js.Object:
   val playerStart: JsPoint

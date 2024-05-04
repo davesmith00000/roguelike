@@ -1,20 +1,15 @@
 package roguelike.scenes
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
-import indigo.scenes.SceneEvent
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.components.entities.HostilesManager
-import roguelike.components.windows.*
-import roguelike.model.GameLoadInfo
+import roguelike.components.windows._
 import roguelike.model.GameState
-import roguelike.model.GameWindows
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.ModelSaveData
 import roguelike.model.gamedata.KeyMapping
-import roguelikestarterkit.ui.datatypes.UiContext
 
 object GameSceneUpdate:
 

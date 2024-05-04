@@ -1,6 +1,6 @@
 package dungeongen.classic
 
-import indigo.*
+import indigo._
 import roguelike.model.GameTile
 import roguelike.model.dungeon.PositionedTile
 import roguelike.model.dungeon.WallCode

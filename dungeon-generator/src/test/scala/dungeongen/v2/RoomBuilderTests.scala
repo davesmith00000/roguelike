@@ -1,6 +1,6 @@
 package dungeongen.v2
 
-import indigo.*
+import indigo._
 
 class RoomBuilderTests extends munit.FunSuite:
 

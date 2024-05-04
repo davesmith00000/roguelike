@@ -1,8 +1,6 @@
 package roguelike.viewmodel.ui
 
-import indigo.*
-import indigo.scenes.SceneContext
-import indigo.shared.materials.Material.Bitmap
+import indigo._
 import roguelike.GameEvent
 import roguelike.components.ui.ButtonComponent
 

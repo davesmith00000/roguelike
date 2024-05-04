@@ -1,29 +1,23 @@
 package roguelike.scenes
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
-import indigo.syntax.*
+import indigo.syntax._
 import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.assets.GameGraphics
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.WindowStateManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
-import roguelike.model.GameWindows
 import roguelike.model.Model
-import roguelike.model.entity.Orc
-import roguelike.model.entity.Troll
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 import roguelike.shaders.Hover
 import roguelike.viewmodel.GameViewModel
-import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object GameView:
 

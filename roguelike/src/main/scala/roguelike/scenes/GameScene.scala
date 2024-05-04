@@ -2,17 +2,15 @@ package roguelike.scenes
 
 import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
-import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
-import indigo.*
-import indigo.scenes.*
+import indigo._
+import indigo.scenes._
 import roguelike.GameEvent
 import roguelike.RogueLikeGame
 import roguelike.model.GameWindowContext
 import roguelike.model.GameWindows
 import roguelike.model.Model
-import roguelike.model.dungeon.Dungeon
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel

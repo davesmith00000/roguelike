@@ -18,7 +18,6 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   testFrameworks += new TestFramework("munit.Framework"),
   scalafixOnCompile := true,
   semanticdbEnabled := true,
-  semanticdbVersion := scalafixSemanticdb.revision,
   autoAPIMappings   := true
 )
 

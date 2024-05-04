@@ -4,22 +4,15 @@ import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Point
 import indigo.shared.datatypes.RGBA
 import indigo.shared.datatypes.Size
-import indigo.shared.dice.Dice
-import io.circe.*
+import io.circe._
 import io.circe.parser.decode
-import io.circe.syntax.*
+import io.circe.syntax._
 import roguelike.model.dungeon.WallCode
 import roguelike.model.entity.Collectable
 import roguelike.model.entity.Fighter
-import roguelike.model.entity.HostileState
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Player
-import roguelike.model.entity.Troll
-import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
-import roguelike.model.gamedata.Ranged
-import roguelike.model.items.Item
 
 class ModelSaveDataTests extends munit.FunSuite:
 

@@ -2,7 +2,6 @@ package roguelike.assets
 
 import indigo.platform.assets.AssetCollection
 import indigo.shared.assets.AssetType
-import roguelike.assets.GeneratedAssets
 
 object GameAssets:
 

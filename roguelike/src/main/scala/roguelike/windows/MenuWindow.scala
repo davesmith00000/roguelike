@@ -1,12 +1,12 @@
 package roguelike.windows
 
-import indigo.*
+import indigo._
 import roguelike.model.GameWindowContext
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object MenuWindow:
 
-  private val saveKey = "save1"
+  // private val saveKey = "save1"
 
   val windowId: WindowId = WindowId("Menu")
 

@@ -4,18 +4,15 @@ import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
-import indigo.*
-import indigo.scenes.*
+import indigo._
+import indigo.scenes._
 import roguelike.GameEvent
 import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.scenes.GameScene
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 

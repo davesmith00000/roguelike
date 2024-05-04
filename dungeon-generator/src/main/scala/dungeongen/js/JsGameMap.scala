@@ -5,7 +5,7 @@ import roguelike.model.GameMap
 
 import scala.scalajs.js
 
-import js.JSConverters.*
+import js.JSConverters._
 
 trait JsGameMap extends js.Object:
   val size: JsSize

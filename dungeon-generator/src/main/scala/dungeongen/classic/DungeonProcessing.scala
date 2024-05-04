@@ -1,8 +1,7 @@
 package dungeongen.classic
 
-import indigo.*
+import indigo._
 import roguelike.model.GameTile
-import roguelike.model.GameTile.DownStairs
 import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.PositionedTile

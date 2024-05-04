@@ -1,7 +1,6 @@
 package roguelike.model.entity
 
 import io.circe._
-import io.circe.syntax._
 
 /** Fighter class
   * @param hp

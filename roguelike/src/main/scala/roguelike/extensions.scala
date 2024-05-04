@@ -1,6 +1,6 @@
 package roguelike.extensions
 
-import indigo.*
+import indigo._
 import roguelike.RogueMath
 
 extension (m: Material.ImageEffects)

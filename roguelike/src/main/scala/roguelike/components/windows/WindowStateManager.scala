@@ -1,9 +1,8 @@
 package roguelike.components.windows
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import roguelike.components.GameComponent
-import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 

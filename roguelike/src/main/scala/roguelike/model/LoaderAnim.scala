@@ -1,9 +1,9 @@
 package roguelike.model
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import roguelike.assets.GameAssets
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object LoaderAnim:
 
@@ -32,9 +32,7 @@ object LoaderAnim:
         GameAssets.assets.init.loadingMaterial
       )
 
-    val midX       = textBounds.width * 0.5
-    val screenMidX = viewportSize.width * 0.5
-    val screenMidY = viewportSize.height * 0.5
+    val midX = textBounds.width * 0.5
 
     Group(
       graphic.moveTo((midX - 16).toInt, 0),

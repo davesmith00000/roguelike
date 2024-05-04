@@ -1,30 +1,24 @@
 package roguelike.model
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
-import indigo.syntax.*
+import indigo.syntax._
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.components.windows.WindowStateManager
 import roguelike.model.dungeon.Dungeon
-import roguelike.model.entity.*
-import roguelike.model.gamedata.Armour
+import roguelike.model.entity._
 import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
-import roguelike.windows.MenuWindow
-import roguelikestarterkit.*
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 
 // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
 final case class Model(

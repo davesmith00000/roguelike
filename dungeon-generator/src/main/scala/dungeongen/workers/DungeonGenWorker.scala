@@ -5,7 +5,6 @@ import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap
-import indigo.shared.IndigoLogger
 import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
@@ -13,6 +12,7 @@ import org.scalajs.dom
 import org.scalajs.dom.Worker
 import roguelike.model.GameMap
 
+import scala.annotation.nowarn
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -26,6 +26,7 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
     WorkerGlobal.addEventListener("message", onMessage)
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.asInstanceOf"))
+  @nowarn("msg=discarded")
   def onMessage(msg: dom.MessageEvent): Unit =
     process(msg.data.asInstanceOf[A])
       .map(WorkerGlobal.postMessage(_))

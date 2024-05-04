@@ -1,14 +1,14 @@
 package roguelike.model
 
-import indigo.*
-import indigo.syntax.*
-import io.circe.*
-import io.circe.syntax.*
+import indigo._
+import indigo.syntax._
+import io.circe._
+import io.circe.syntax._
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.model.entity.*
-import roguelike.model.gamedata.*
+import roguelike.model.entity._
+import roguelike.model.gamedata._
 import roguelike.model.items.Item
 
 final case class Inventory(backpack: Backpack, equipment: Equipment):

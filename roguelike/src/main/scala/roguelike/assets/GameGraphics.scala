@@ -1,6 +1,6 @@
 package roguelike.assets
 
-import indigo.*
+import indigo._
 import roguelike.model.dungeon.WallCode
 
 object GameGraphics:

@@ -1,12 +1,11 @@
 package roguelike.components.entities
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
-import roguelike.assets.GameAssets
 import roguelike.components.GameComponent
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameState

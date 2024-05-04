@@ -4,14 +4,12 @@ import dungeongen.classic.DungeonRules
 import dungeongen.v2.Mesh
 import dungeongen.v2.Triangle
 import dungeonviewer.generated.Assets
-import indigo.*
-import indigo.scenes.*
+import indigo._
+import indigo.scenes._
 import indigo.shared.geometry.LineSegment
-import indigo.syntax.*
+import indigo.syntax._
 import roguelike.model.dungeon.Dungeon
-import roguelikestarterkit.*
-
-import scala.annotation.tailrec
+import roguelikestarterkit._
 
 object ViewerScene extends Scene[Unit, Model, ViewModel]:
 

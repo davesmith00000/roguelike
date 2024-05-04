@@ -1,13 +1,10 @@
 package roguelike.model
 
-import indigo.shared.IndigoLogger
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGBA
-import indigo.shared.datatypes.Size
-import io.circe.*
+import io.circe._
 import io.circe.parser.decode
-import io.circe.syntax.*
-import roguelike.model.entity.*
+import io.circe.syntax._
+import roguelike.model.entity._
 
 final case class ModelSaveData(
     player: Player,

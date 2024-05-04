@@ -1,6 +1,6 @@
 package roguelike.model
 
-import indigo.*
+import indigo._
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.model.gamedata.Armour

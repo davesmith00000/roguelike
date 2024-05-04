@@ -1,7 +1,7 @@
 package roguelike.model.dungeon
 
-import indigo.*
-import roguelike.model.entity.*
+import indigo._
+import roguelike.model.entity._
 
 final case class Dungeon(
     playerStart: Point,

@@ -1,6 +1,6 @@
 package roguelike.components.windows
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
@@ -9,7 +9,7 @@ import roguelike.model.Inventory
 import roguelike.model.Model
 import roguelike.scenes.UIElements
 import roguelike.viewmodel.GameViewModel
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object EquipMenu extends GameComponent[Size, Model, GameViewModel]:
   type Command            = HandleInput

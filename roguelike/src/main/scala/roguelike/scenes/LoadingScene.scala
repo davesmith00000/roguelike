@@ -1,8 +1,8 @@
 package roguelike.scenes
 
-import indigo.*
-import indigo.scenes.*
-import indigo.syntax.*
+import indigo._
+import indigo.scenes._
+import indigo.syntax._
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
 import roguelike.GameEvent
@@ -15,7 +15,6 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 

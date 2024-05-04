@@ -1,15 +1,14 @@
 package roguelike.model.entity
 
-import indigo.*
-import io.circe.*
-import io.circe.syntax.*
+import indigo._
+import io.circe._
+import io.circe.syntax._
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.model.GameMap
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
-import roguelikestarterkit.*
 
 sealed trait Hostile extends Entity:
   val name: String

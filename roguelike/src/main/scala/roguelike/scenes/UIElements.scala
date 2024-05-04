@@ -1,25 +1,15 @@
 package roguelike.scenes
 
-import indigo.*
-import indigo.syntax.*
-import roguelike.ColorScheme
-import roguelike.RogueLikeGame
+import indigo._
+import indigo.syntax._
 import roguelike.assets.GameAssets
-import roguelike.model.Equipment
 import roguelike.model.GameState
-import roguelike.model.Inventory
-import roguelike.model.MessageLog
-import roguelike.model.entity.Collectable
 import roguelike.model.entity.Entity
-import roguelike.model.entity.Fighter
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
-import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.Melee
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 
 object UIElements:
 

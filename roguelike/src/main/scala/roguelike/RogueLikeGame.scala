@@ -1,21 +1,20 @@
 package roguelike
 
-import indigo.*
-import indigo.platform.assets.AssetLoader
-import indigo.scenes.*
-import indigo.syntax.*
+import indigo._
+import indigo.scenes._
+import indigo.syntax._
 import indigoextras.subsystems.FPSCounter
 import roguelike.assets.GameAssets
 import roguelike.config.Config
 import roguelike.model.GameAssetLoader
 import roguelike.model.Model
 import roguelike.model.SpriteAssetData
-import roguelike.scenes.*
+import roguelike.scenes._
 import roguelike.screeneffects.InnerGlow
 import roguelike.shaders.Hover
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 

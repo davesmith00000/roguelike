@@ -1,13 +1,11 @@
 package roguelike.model
 
-import indigo.*
-import io.circe.*
-import io.circe.syntax.*
-import roguelike.ColorScheme
+import indigo._
+import io.circe._
+import io.circe.syntax._
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelikestarterkit.*
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 final case class MessageLog(messages: List[Message], maxLength: Option[Int]):
 

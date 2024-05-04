@@ -1,6 +1,6 @@
 package roguelike.components.entities
 
-import indigo.*
+import indigo._
 import indigo.scenes.SceneContext
 import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
@@ -8,8 +8,6 @@ import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.components.GameComponent
 import roguelike.components.windows.WindowManagerCommand
-import roguelike.model.GameMap
-import roguelike.model.HostilesPool
 import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc

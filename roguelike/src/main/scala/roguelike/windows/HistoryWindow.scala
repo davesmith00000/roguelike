@@ -1,16 +1,11 @@
 package roguelike.windows
 
-import indigo.*
-import roguelike.ColorScheme
+import indigo._
 import roguelike.GameEvent
-import roguelike.assets.GameAssets
 import roguelike.model.GameWindowContext
-import roguelike.model.entity.Player
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object HistoryWindow:
-
-  private val graphic = Graphic(0, 0, TerminalMaterial(AssetName(""), RGBA.White, RGBA.Black))
 
   val windowId: WindowId = WindowId("History")
 

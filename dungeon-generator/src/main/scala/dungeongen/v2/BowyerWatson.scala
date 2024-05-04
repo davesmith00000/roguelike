@@ -1,7 +1,6 @@
 package dungeongen.v2
 
-import indigo.*
-import indigo.syntax.*
+import indigo._
 
 import scala.annotation.tailrec
 

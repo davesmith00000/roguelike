@@ -1,6 +1,8 @@
 package roguelike.shaders
 
-import indigo.*
+import indigo._
+
+import scala.annotation.nowarn
 
 object Hover:
 
@@ -20,6 +22,7 @@ object Hover:
 
     import ultraviolet.syntax.*
 
+    @nowarn("msg=unused")
     inline def fragment: Shader[FragmentEnv, Unit] =
       Shader[FragmentEnv] { env =>
 

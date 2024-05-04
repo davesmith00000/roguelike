@@ -1,12 +1,10 @@
 package roguelike.model.entity
 
-import indigo.*
-import io.circe.*
-import io.circe.syntax.*
-import roguelike.ColorScheme
+import indigo._
+import io.circe._
+import io.circe.syntax._
 import roguelike.model.SharedCodecs
 import roguelike.model.items.Item
-import roguelikestarterkit.*
 
 final case class Collectable(position: Point, item: Item) extends Entity:
   val blocksMovement: Boolean = false

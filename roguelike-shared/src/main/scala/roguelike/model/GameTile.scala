@@ -1,8 +1,6 @@
 package roguelike.model
 
-import indigo.*
-import io.circe.*
-import io.circe.syntax.*
+import io.circe._
 import roguelike.model.dungeon.WallCode
 
 sealed trait GameTile:

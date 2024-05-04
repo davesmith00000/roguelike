@@ -1,21 +1,16 @@
 package roguelike.scenes
 
-import indigo.*
-import indigo.scenes.*
-import indigo.shared.datatypes.Fill.Color.apply
-import indigo.syntax.*
-import indigo.syntax.animations.*
-import indigoextras.ui.Button
-import indigoextras.ui.HitArea
+import indigo._
+import indigo.scenes._
+import indigo.syntax._
+import indigo.syntax.animations._
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.scenes.GameScene
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
 import roguelike.viewmodel.ui.MainMenuUi
-import roguelikestarterkit.*
+import roguelikestarterkit._
 
 object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
@@ -174,7 +169,6 @@ object MainMenuTitle:
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     val groupAtStart = group.moveTo(titleStart)
-    val groupAtEnd   = group.moveTo(titleEnd)
 
     val titleAnimation: Timeline[Group] =
       timeline(

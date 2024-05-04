@@ -1,7 +1,7 @@
 package roguelike.components.ui
 
-import indigo.*
-import indigo.shared.scenegraph.*
+import indigo._
+import indigo.shared.scenegraph._
 import indigoextras.ui.HitArea
 import roguelike.assets.GameAssets
 import roguelikestarterkit.terminal.TerminalText
@@ -14,8 +14,6 @@ final case class ButtonComponent(
     hitArea: HitArea,
     scale: Int
 ):
-  private val tileWidth =
-    (ButtonComponent.baseTile * ButtonComponent.multiplier).toInt
   val height = (ButtonComponent.baseTile * ButtonComponent.multiplier).toInt
 
   def moveTo(pos: Point): ButtonComponent =

@@ -1,6 +1,5 @@
 package roguelike.model
 
-import indigo.Dice
 import indigo.Point
 import indigo.Rectangle
 import indigo.Size
@@ -9,7 +8,6 @@ import roguelike.model.dungeon.PositionedTile
 import roguelike.model.dungeon.WallCode
 
 import scalajs.js
-import scalajs.js.JSConverters.*
 
 class GameMapTests extends munit.FunSuite {
 

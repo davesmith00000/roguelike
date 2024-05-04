@@ -1,21 +1,16 @@
 package roguelike.model.entity
 
-import indigo.*
-import io.circe.*
-import io.circe.syntax.*
+import indigo._
+import io.circe._
+import io.circe.syntax._
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.model.Equipment
 import roguelike.model.GameMap
 import roguelike.model.HostilesPool
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
-import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.Melee
-import roguelike.model.items.Item
-import roguelikestarterkit.*
 
 final case class Player(
     position: Point,
