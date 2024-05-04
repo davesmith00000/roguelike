@@ -9,6 +9,7 @@ enum WindowManagerCommand:
   case ShowEquipMenu
   case ShowInventoryMenu
   case ShowHistory
+  case ShowControls
   case CloseAll
   case HandleQuitKeyPress
   case DelegateInput(key: Key)

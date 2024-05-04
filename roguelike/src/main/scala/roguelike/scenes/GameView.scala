@@ -17,7 +17,6 @@ import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 import roguelike.shaders.Hover
 import roguelike.viewmodel.GameViewModel
-import roguelikestarterkit._
 
 object GameView:
 
@@ -171,17 +170,11 @@ object GameView:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[SceneUpdateFragment] =
-    val vpSize = viewModel.viewportSize
-
     Outcome(
       SceneUpdateFragment(
         RogueLikeGame.layerKeyUi ->
           Layer(
             Batch(
-              UIElements.renderControls(
-                vpSize,
-                viewModel.helpControlsText
-              ),
               UIElements.renderNameHints(
                 viewModel.squareSize,
                 context.mouse.position,

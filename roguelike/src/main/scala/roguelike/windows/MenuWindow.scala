@@ -44,14 +44,21 @@ object MainMenu:
             "Controls",
             "Quit"
           ).map { label =>
+            val clickEvents =
+              label match
+                case "History" =>
+                  Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory))
+
+                case "Controls" =>
+                  Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowControls))
+
+                case _ =>
+                  Batch.empty
+
             Button(Bounds(0, 0, label.length(), 1))(
               presentButton(charSheet, label, RGBA.Silver, RGBA.Black)
             )
-              .onClick(
-                if label == "History" then
-                  Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory))
-                else Batch.empty
-              )
+              .onClick(clickEvents)
               .presentOver(presentButton(charSheet, label, RGBA.White, RGBA.Black))
               .presentDown(presentButton(charSheet, label, RGBA.Black, RGBA.White))
           }

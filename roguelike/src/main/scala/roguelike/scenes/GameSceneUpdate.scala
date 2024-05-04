@@ -123,6 +123,14 @@ object GameSceneUpdate:
         model,
         WindowManagerCommand.ShowHistory
       )
+    case KeyboardEvent.KeyUp(KeyMapping.ViewControls)
+        if model.gameState.isWaitForInput ||
+          !WindowStateManager.showingWindow(model) =>
+      WindowStateManager.updateModel(
+        context,
+        model,
+        WindowManagerCommand.ShowControls
+      )
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||

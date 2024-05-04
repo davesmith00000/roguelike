@@ -105,14 +105,3 @@ object UIElements:
 
       case _ =>
         Group.empty
-
-  def renderControls(
-      viewportSize: Size,
-      helpControlsText: String
-  ): Text[TerminalText] =
-    Text(
-      helpControlsText,
-      RoguelikeTiles.Size10x10.Fonts.fontKey,
-      TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
-    ).alignRight
-      .moveTo(viewportSize.width - 5, 5)

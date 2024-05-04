@@ -6,6 +6,7 @@ import roguelike.GameEvent
 import roguelike.components.GameComponent
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.ControlsWindow
 import roguelike.windows.HistoryWindow
 import roguelikestarterkit.WindowEvent
 
@@ -51,6 +52,10 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.History))
         .addGlobalEvents(WindowEvent.Open(HistoryWindow.windowId), GameEvent.RedrawHistoryLog)
 
+    case WindowManagerCommand.ShowControls =>
+      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.Controls))
+        .addGlobalEvents(WindowEvent.Open(ControlsWindow.windowId))
+
     case WindowManagerCommand.CloseAll =>
       val closeActive: Batch[WindowEvent] =
         model.activeWindow match
@@ -61,6 +66,7 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
           case ActiveWindow.EquipMenu     => Batch()
           case ActiveWindow.History       => Batch(WindowEvent.Close(HistoryWindow.windowId))
           case ActiveWindow.InventoryMenu => Batch()
+          case ActiveWindow.Controls      => Batch(WindowEvent.Close(ControlsWindow.windowId))
 
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
         .addGlobalEvents(closeActive)
@@ -100,6 +106,9 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
         case ActiveWindow.History =>
           Outcome(model)
 
+        case ActiveWindow.Controls =>
+          Outcome(model)
+
         case ActiveWindow.None =>
           Outcome(model)
 
@@ -134,6 +143,9 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       case ActiveWindow.History =>
         Outcome(Batch.empty)
 
+      case ActiveWindow.Controls =>
+        Outcome(Batch.empty)
+
       case ActiveWindow.None =>
         Outcome(Batch.empty)
 
@@ -165,3 +177,4 @@ enum ActiveWindow(val closeable: Boolean):
   case EquipMenu     extends ActiveWindow(true)
   case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)
+  case Controls      extends ActiveWindow(true)

@@ -45,10 +45,7 @@ final case class GameViewModel(
     tiles: Batch[(GameTile, Point)],
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
-    // terminals: CachedTerminals,
-    helpControlsText: String,
     sprites: Option[GameSprites]
-    // windowManager: WindowManagerViewModel[GameWindowContext]
 ):
 
   def update(
@@ -219,17 +216,6 @@ object GameViewModel:
   val SquareSize: Point = Point(32)
 
   def initial(player: Player, initialViewportSize: Size): GameViewModel =
-    val separator = " | "
-    val commandsAndValues =
-      KeyMapping.helpText.map(p => (p._1, p._2.mkString(separator)))
-    val longest = KeyMapping.longestMappings + separator.length
-    val helpControlsText = commandsAndValues
-      .map { case (cmd, value) =>
-        val v = List.fill(longest - value.length)(" ").mkString + value
-        s"$cmd $v"
-      }
-      .mkString("\n")
-
     GameViewModel(
       magnification = 2,
       viewportSize = initialViewportSize,
@@ -242,7 +228,6 @@ object GameViewModel:
       tiles = Batch.empty,
       tilePositions = Batch.empty,
       collectables = js.Array(),
-      helpControlsText = helpControlsText,
       sprites = None
     )
 
