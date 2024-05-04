@@ -14,10 +14,7 @@ import roguelike.model.Model
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
-import roguelike.windows.ControlsWindow
-import roguelike.windows.HistoryWindow
-import roguelike.windows.InfoPanel
-import roguelike.windows.MenuWindow
+import roguelike.windows.*
 import roguelikestarterkit.Dimensions
 import roguelikestarterkit.ui.window.WindowManager
 
@@ -69,9 +66,16 @@ object GameScene extends Scene[Size, Model, ViewModel]:
             GameWindows.defaultCharSheet
           )
         )
+        .register(
+          QuitSaveWindow.window(
+            Dimensions(1280, 720) / 10,
+            GameWindows.defaultCharSheet
+          )
+        )
         .open(
           InfoPanel.windowId,
-          MenuWindow.windowId
+          MenuWindow.windowId,
+          QuitSaveWindow.windowId
         )
     )
 
