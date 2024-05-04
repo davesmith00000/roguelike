@@ -38,7 +38,7 @@ object HistoryWindow:
             .toTerminal(context.bounds.dimensions.unsafeToSize, false, 0, false)
             .toCloneTiles(
               CloneId("history clones"),
-              Point.zero, // context.screenSpaceBounds.position,
+              Point.zero,
               context.charSheet.charCrops
             ) { (fg, bg) =>
               Graphic(10, 10, TerminalMaterial(context.charSheet.assetName, fg, bg))
