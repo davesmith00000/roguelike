@@ -147,17 +147,3 @@ object UIElements:
       TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Zero)
     ).alignRight
       .moveTo(viewportSize.width - 5, 5)
-
-  // def renderShortLog(viewportSize: Size, shortLogClones: Batch[CloneTiles]) =
-  //   val windowSize = Size(500, 60)
-
-  //   Group(
-  //     Shape.Box(
-  //       Rectangle(Point.zero, windowSize),
-  //       Fill.Color(RGBA.Black),
-  //       Stroke(2, RGBA.SlateGray)
-  //     ) :: shortLogClones
-  //   ).moveTo(
-  //     (viewportSize.width - windowSize.width) / 2,
-  //     viewportSize.height - windowSize.height - 5
-  //   )

@@ -189,15 +189,11 @@ object GameView:
                 model.entitiesList,
                 model.stairsPosition,
                 viewModel.hoverSquare
-              ) // ,
-              // UIElements.renderShortLog(
-              //   vpSize,
-              //   viewModel.terminals.shortLog.clones
-              // )
+              )
             )
           )
       ).addCloneBlanks(
         GameGraphics.tileClone,
-        GameGraphics.tileShadowClone // :: viewModel.terminals.history.blanks ++ viewModel.terminals.shortLog.blanks
+        GameGraphics.tileShadowClone
       )
     )
