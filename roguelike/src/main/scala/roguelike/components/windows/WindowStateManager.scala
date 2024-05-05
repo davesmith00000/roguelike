@@ -8,6 +8,7 @@ import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 import roguelike.windows.ControlsWindow
 import roguelike.windows.HistoryWindow
+import roguelike.windows.QuitSaveWindow
 import roguelikestarterkit.WindowEvent
 
 object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
@@ -33,6 +34,7 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
   ): WindowManagerCommand => Outcome[Model] =
     case WindowManagerCommand.ShowQuit =>
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.Quit))
+        .addGlobalEvents(WindowEvent.Open(QuitSaveWindow.windowId))
 
     case WindowManagerCommand.ShowLevelUp =>
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.LevelUp))
@@ -60,7 +62,7 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       val closeActive: Batch[WindowEvent] =
         model.activeWindow match
           case ActiveWindow.None          => Batch.empty
-          case ActiveWindow.Quit          => Batch()
+          case ActiveWindow.Quit          => Batch(WindowEvent.Close(QuitSaveWindow.windowId))
           case ActiveWindow.LevelUp       => Batch()
           case ActiveWindow.DropMenu      => Batch()
           case ActiveWindow.EquipMenu     => Batch()
@@ -70,47 +72,6 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
 
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
         .addGlobalEvents(closeActive)
-
-    case WindowManagerCommand.HandleQuitKeyPress =>
-      model.activeWindow match
-        case ActiveWindow.Quit =>
-          Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
-
-        case ActiveWindow.None =>
-          Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.Quit))
-
-        case _ =>
-          Outcome(model)
-
-    case WindowManagerCommand.DelegateInput(key) =>
-      model.activeWindow match
-        case ActiveWindow.Quit =>
-          QuitMenu.updateModel(context, model, QuitMenu.HandleInput(key))
-
-        case ActiveWindow.LevelUp =>
-          LevelUp.updateModel(context, model, LevelUp.HandleInput(key))
-
-        case ActiveWindow.DropMenu =>
-          DropMenu.updateModel(context, model, DropMenu.HandleInput(key))
-
-        case ActiveWindow.EquipMenu =>
-          EquipMenu.updateModel(context, model, EquipMenu.HandleInput(key))
-
-        case ActiveWindow.InventoryMenu =>
-          InventoryMenu.updateModel(
-            context,
-            model,
-            InventoryMenu.HandleInput(key)
-          )
-
-        case ActiveWindow.History =>
-          Outcome(model)
-
-        case ActiveWindow.Controls =>
-          Outcome(model)
-
-        case ActiveWindow.None =>
-          Outcome(model)
 
   def nextViewModel(
       context: SceneContext[Size],
@@ -124,30 +85,7 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       model: Model,
       viewModel: GameViewModel
   ): Outcome[Batch[SceneNode]] =
-    model.activeWindow match
-      case ActiveWindow.Quit =>
-        QuitMenu.present(context, model, viewModel)
-
-      case ActiveWindow.LevelUp =>
-        LevelUp.present(context, model, viewModel)
-
-      case ActiveWindow.DropMenu =>
-        DropMenu.present(context, model, viewModel)
-
-      case ActiveWindow.EquipMenu =>
-        EquipMenu.present(context, model, viewModel)
-
-      case ActiveWindow.InventoryMenu =>
-        InventoryMenu.present(context, model, viewModel)
-
-      case ActiveWindow.History =>
-        Outcome(Batch.empty)
-
-      case ActiveWindow.Controls =>
-        Outcome(Batch.empty)
-
-      case ActiveWindow.None =>
-        Outcome(Batch.empty)
+    Outcome(Batch.empty)
 
   val initialModel: ActiveWindow =
     ActiveWindow.None

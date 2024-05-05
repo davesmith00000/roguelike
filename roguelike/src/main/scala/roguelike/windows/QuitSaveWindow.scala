@@ -2,6 +2,7 @@ package roguelike.windows
 
 import indigo.*
 import indigo.scenes.SceneEvent
+import roguelike.GameEvent
 import roguelike.model.GameWindowContext
 import roguelike.scenes.MainMenuScene
 import roguelikestarterkit.*
@@ -36,12 +37,15 @@ object QuitMenu:
           ButtonHelper.makeButton(
             charSheet,
             "[1] Save",
-            Batch() // To replicate what happens in the QuitMenu, we need to think about model state. Or maybe just fire and event to something else that can deal with it.
+            Batch(GameEvent.SaveGame)
           ),
           ButtonHelper.makeButton(
             charSheet,
             "[2] Save and Quit",
-            Batch()
+            Batch(
+              GameEvent.SaveGame,
+              SceneEvent.JumpTo(MainMenuScene.name)
+            )
           ),
           ButtonHelper.makeButton(
             charSheet,
@@ -57,6 +61,19 @@ object QuitMenu:
         context: UiContext[GameWindowContext],
         model: QuitMenu
     ): GlobalEvent => Outcome[QuitMenu] =
+
+      // Save
+      case KeyboardEvent.KeyUp(Key.KEY_1) =>
+        Outcome(model, Batch(GameEvent.SaveGame))
+
+      // Save and Quit
+      case KeyboardEvent.KeyUp(Key.KEY_2) =>
+        Outcome(model, Batch(GameEvent.SaveGame, SceneEvent.JumpTo(MainMenuScene.name)))
+
+      // Quit
+      case KeyboardEvent.KeyUp(Key.KEY_3) =>
+        Outcome(model, Batch(SceneEvent.JumpTo(MainMenuScene.name)))
+
       case e =>
         model.components.update(context)(e).map { c =>
           model.copy(components = c)

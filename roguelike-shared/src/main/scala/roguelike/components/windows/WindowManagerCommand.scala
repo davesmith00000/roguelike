@@ -1,7 +1,5 @@
 package roguelike.components.windows
 
-import indigo.Key
-
 enum WindowManagerCommand:
   case ShowQuit
   case ShowLevelUp
@@ -11,5 +9,3 @@ enum WindowManagerCommand:
   case ShowHistory
   case ShowControls
   case CloseAll
-  case HandleQuitKeyPress
-  case DelegateInput(key: Key)

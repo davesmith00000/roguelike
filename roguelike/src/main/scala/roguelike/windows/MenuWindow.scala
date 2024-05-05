@@ -34,13 +34,13 @@ object MainMenu:
         .withLayout(ComponentLayout.Horizontal(Padding.right(1)))
         .add(
           Batch(
-            "Character" -> Batch.empty,
-            "Inventory" -> Batch.empty,
-            "Drop"      -> Batch.empty,
-            "Equip"     -> Batch.empty,
+            "Character" -> Batch(),
+            "Inventory" -> Batch(),
+            "Drop"      -> Batch(),
+            "Equip"     -> Batch(),
             "History"   -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory)),
             "Controls"  -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowControls)),
-            "Quit"      -> Batch.empty
+            "Quit"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowQuit))
           ).map { case (label, clickEvents) =>
             ButtonHelper.makeButton(charSheet, label, clickEvents)
           }

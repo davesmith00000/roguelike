@@ -114,6 +114,9 @@ final case class GameViewModel(
     case GameEvent.LoadGame =>
       Outcome(this)
 
+    case GameEvent.SaveGame =>
+      Outcome(this)
+
     case GameEvent.SpritesLoaded(_) =>
       Outcome(this)
 

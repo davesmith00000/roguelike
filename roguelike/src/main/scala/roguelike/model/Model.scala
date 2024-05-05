@@ -160,6 +160,22 @@ final case class Model(
     case GameEvent.LoadGame =>
       Outcome(this)
 
+    case GameEvent.SaveGame if player.isAlive =>
+      val saveData = this.toSaveData
+
+      Outcome(
+        this.copy(loadInfo = this.loadInfo.withSaveData(saveData)),
+        Batch(
+          StorageEvent.Save(
+            ModelSaveData.saveKey,
+            saveData.toJsonString
+          )
+        )
+      )
+
+    case GameEvent.SaveGame =>
+      Outcome(this)
+
     case GameEvent.SpritesLoaded(_) =>
       Outcome(this)
 

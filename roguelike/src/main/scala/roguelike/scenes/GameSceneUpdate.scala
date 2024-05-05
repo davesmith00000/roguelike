@@ -51,15 +51,7 @@ object GameSceneUpdate:
       WindowStateManager.updateModel(
         context,
         model,
-        WindowManagerCommand.HandleQuitKeyPress
-      )
-
-    // Delegate input to WindowManager
-    case KeyboardEvent.KeyUp(key) if WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
-        WindowManagerCommand.DelegateInput(key)
+        WindowManagerCommand.ShowQuit
       )
 
     // Looking around

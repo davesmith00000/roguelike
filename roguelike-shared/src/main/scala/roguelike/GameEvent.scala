@@ -46,6 +46,7 @@ enum GameEvent extends GlobalEvent:
   case GenerateLevel
   case NewGame
   case LoadGame
+  case SaveGame
   case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
 
   // ViewModel events
