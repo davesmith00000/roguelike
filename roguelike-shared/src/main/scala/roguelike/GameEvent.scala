@@ -2,11 +2,11 @@ package roguelike
 
 import indigo.*
 import indigo.shared.materials.Material.Bitmap
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Ranged
 import roguelike.model.items.Item
+import roguelike.windows.WindowManagerCommand
 
 enum GameEvent extends GlobalEvent:
   // Player events

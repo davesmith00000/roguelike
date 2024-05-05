@@ -9,6 +9,7 @@ import roguelike.model.Inventory
 import roguelike.model.Model
 import roguelike.scenes.UIElements
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.WindowManagerCommand
 import roguelikestarterkit.*
 
 object EquipMenu extends GameComponent[Size, Model, GameViewModel]:

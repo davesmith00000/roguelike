@@ -8,7 +8,6 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.WindowStateManager
 import roguelike.model.GameTile
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
@@ -16,6 +15,7 @@ import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ui.*
+import roguelike.windows.WindowStateManager
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*

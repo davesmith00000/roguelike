@@ -10,13 +10,13 @@ import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.ActiveWindow
-import roguelike.components.windows.WindowManagerCommand
-import roguelike.components.windows.WindowStateManager
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.*
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Ranged
+import roguelike.windows.ActiveWindow
+import roguelike.windows.WindowManagerCommand
+import roguelike.windows.WindowStateManager
 
 import scala.scalajs.js
 
@@ -183,7 +183,7 @@ final case class Model(
       pickUp
 
     case GameEvent.WindowEvent(command) =>
-      WindowStateManager.updateModel(context, this, command)
+      WindowStateManager.updateModel(context, this)(command)
 
     case GameEvent.Log(message) =>
       Outcome(

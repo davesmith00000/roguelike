@@ -2,7 +2,6 @@ package roguelike.windows
 
 import indigo.*
 import roguelike.GameEvent
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameWindowContext
 import roguelikestarterkit.*
 

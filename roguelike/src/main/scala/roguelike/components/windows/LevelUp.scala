@@ -10,6 +10,7 @@ import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.entity.Player
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.WindowManagerCommand
 import roguelikestarterkit.*
 
 object LevelUp extends GameComponent[Size, Model, GameViewModel]:

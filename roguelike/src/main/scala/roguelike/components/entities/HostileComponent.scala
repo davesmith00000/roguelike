@@ -7,12 +7,12 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.components.GameComponent
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 import roguelike.viewmodel.ActorPosition
+import roguelike.windows.WindowManagerCommand
 
 object HostileComponent extends GameComponent[Size, Hostile, HostilesManager.HostilesVM]:
   type Command            = Cmds

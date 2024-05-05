@@ -1,4 +1,4 @@
-package roguelike.components.windows
+package roguelike.windows
 
 enum WindowManagerCommand:
   case ShowQuit

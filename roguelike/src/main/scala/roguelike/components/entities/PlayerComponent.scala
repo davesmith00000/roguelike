@@ -7,7 +7,6 @@ import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.components.GameComponent
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameState
 import roguelike.model.Inventory
 import roguelike.model.Message
@@ -19,6 +18,7 @@ import roguelike.viewmodel.ActorDirection
 import roguelike.viewmodel.ActorMoveState
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.WindowManagerCommand
 
 object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
   type ComponentModel     = PlayerM

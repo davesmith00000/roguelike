@@ -12,6 +12,7 @@ import roguelike.model.Model
 import roguelike.model.entity.Collectable
 import roguelike.scenes.UIElements
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.WindowManagerCommand
 import roguelikestarterkit.*
 
 object DropMenu extends GameComponent[Size, Model, GameViewModel]:

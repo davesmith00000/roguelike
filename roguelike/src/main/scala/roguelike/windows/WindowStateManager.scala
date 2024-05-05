@@ -1,26 +1,12 @@
-package roguelike.components.windows
+package roguelike.windows
 
 import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.GameEvent
-import roguelike.components.GameComponent
 import roguelike.model.Model
-import roguelike.viewmodel.GameViewModel
-import roguelike.windows.ControlsWindow
-import roguelike.windows.HistoryWindow
-import roguelike.windows.QuitSaveWindow
 import roguelikestarterkit.WindowEvent
 
-object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
-  type Command            = WindowManagerCommand
-  type ComponentModel     = Model
-  type ComponentViewModel = GameViewModel
-
-  def modelLens: Lens[Model, Model] =
-    Lens.keepLatest
-
-  def viewModelLens: Lens[GameViewModel, GameViewModel] =
-    Lens.keepLatest
+object WindowStateManager:
 
   val updateActive: Lens[Model, ActiveWindow] =
     Lens(
@@ -28,7 +14,7 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       (m, next) => m.copy(activeWindow = next)
     )
 
-  def nextModel(
+  def updateModel(
       context: SceneContext[Size],
       model: Model
   ): WindowManagerCommand => Outcome[Model] =
@@ -73,25 +59,11 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
       Outcome(updateActive.set(model.closeAllWindows, ActiveWindow.None))
         .addGlobalEvents(closeActive)
 
-  def nextViewModel(
-      context: SceneContext[Size],
-      model: Model,
-      viewModel: GameViewModel
-  ): WindowManagerCommand => Outcome[GameViewModel] =
-    _ => Outcome(viewModel)
-
-  def view(
-      context: SceneContext[Size],
-      model: Model,
-      viewModel: GameViewModel
-  ): Outcome[Batch[SceneNode]] =
-    Outcome(Batch.empty)
-
   val initialModel: ActiveWindow =
     ActiveWindow.None
 
   def showingWindow(model: Model): Boolean =
-    modelLens.get(model).activeWindow match
+    model.activeWindow match
       case ActiveWindow.None => false
       case _                 => true
 
@@ -102,10 +74,10 @@ object WindowStateManager extends GameComponent[Size, Model, GameViewModel]:
     showingWindow(model) && isCloseable(model)
 
   def isCloseable(model: Model): Boolean =
-    modelLens.get(model).activeWindow.closeable
+    model.activeWindow.closeable
 
   def isUnCloseable(model: Model): Boolean =
-    !modelLens.get(model).activeWindow.closeable
+    !model.activeWindow.closeable
 
 enum ActiveWindow(val closeable: Boolean):
   case None          extends ActiveWindow(true)

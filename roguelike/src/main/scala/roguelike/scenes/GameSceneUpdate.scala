@@ -5,12 +5,13 @@ import indigo.scenes.SceneContext
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.components.entities.HostilesManager
-import roguelike.components.windows.*
 import roguelike.model.GameState
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.gamedata.KeyMapping
 import roguelike.windows.HistoryWindow
+import roguelike.windows.WindowManagerCommand
+import roguelike.windows.WindowStateManager
 import roguelikestarterkit.WindowEvent
 
 object GameSceneUpdate:
@@ -37,12 +38,12 @@ object GameSceneUpdate:
         if !model.gameState.isWaitForInput ||
           WindowStateManager.showingCloseableWindow(model) =>
       WindowStateManager
-        .updateModel(context, model, WindowManagerCommand.CloseAll)
+        .updateModel(context, model)(WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
 
     case WindowEvent.Closed(HistoryWindow.windowId) =>
       WindowStateManager
-        .updateModel(context, model, WindowManagerCommand.CloseAll)
+        .updateModel(context, model)(WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
 
     // Quit window toggle
@@ -50,9 +51,8 @@ object GameSceneUpdate:
         if model.gameState.isWaitForInput =>
       WindowStateManager.updateModel(
         context,
-        model,
-        WindowManagerCommand.ShowQuit
-      )
+        model
+      )(WindowManagerCommand.ShowQuit)
 
     // Looking around
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp) if model.gameState.lookingAround =>
@@ -110,44 +110,34 @@ object GameSceneUpdate:
     case KeyboardEvent.KeyUp(KeyMapping.ViewHistory)
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
+      WindowStateManager.updateModel(context, model)(
         WindowManagerCommand.ShowHistory
       )
     case KeyboardEvent.KeyUp(KeyMapping.ViewControls)
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
+      WindowStateManager.updateModel(context, model)(
         WindowManagerCommand.ShowControls
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Inventory)
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
+      WindowStateManager.updateModel(context, model)(
         WindowManagerCommand.ShowInventoryMenu
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Equipment)
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
+      WindowStateManager.updateModel(context, model)(
         WindowManagerCommand.ShowEquipMenu
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
-      WindowStateManager.updateModel(
-        context,
-        model,
+      WindowStateManager.updateModel(context, model)(
         WindowManagerCommand.ShowDropMenu
       )
 
