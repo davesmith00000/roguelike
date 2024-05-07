@@ -30,27 +30,36 @@ final case class QuitMenu(components: ComponentGroup)
 object QuitMenu:
 
   def initial(charSheet: CharSheet): QuitMenu =
+    val buttonTheme =
+      Button.Theme(
+        charSheet,
+        RGBA.Silver -> RGBA.Black,
+        RGBA.White  -> RGBA.Black,
+        RGBA.Black  -> RGBA.White
+      )
+
     QuitMenu(
       ComponentGroup(Bounds(0, 0, 16, 1))
         .withLayout(ComponentLayout.Vertical())
         .add(
-          ButtonHelper.makeButton(
-            charSheet,
+          Button(
             "[1] Save",
-            Batch(GameEvent.SaveGame)
-          ),
-          ButtonHelper.makeButton(
-            charSheet,
+            buttonTheme
+          ).onClick(GameEvent.SaveGame),
+          Button(
             "[2] Save and Quit",
-            Batch(
-              GameEvent.SaveGame,
-              SceneEvent.JumpTo(MainMenuScene.name)
-            )
+            buttonTheme
+          ).onClick(
+            GameEvent.SaveGame,
+            GameEvent.WindowEvent(WindowManagerCommand.CloseAll),
+            SceneEvent.JumpTo(MainMenuScene.name)
           ),
-          ButtonHelper.makeButton(
-            charSheet,
+          Button(
             "[3] Quit",
-            Batch(SceneEvent.JumpTo(MainMenuScene.name))
+            buttonTheme
+          ).onClick(
+            GameEvent.WindowEvent(WindowManagerCommand.CloseAll),
+            SceneEvent.JumpTo(MainMenuScene.name)
           )
         )
     )

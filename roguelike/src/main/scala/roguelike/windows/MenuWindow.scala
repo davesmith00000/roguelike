@@ -41,7 +41,10 @@ object MainMenu:
             "Controls"  -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowControls)),
             "Quit"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowQuit))
           ).map { case (label, clickEvents) =>
-            ButtonHelper.makeButton(charSheet, label, clickEvents)
+            Button(
+              label,
+              Button.Theme(charSheet)
+            ).onClick(clickEvents)
           }
         )
     )
