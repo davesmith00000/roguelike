@@ -26,7 +26,7 @@ object QuitSaveWindow:
       .moveTo(((screenSize - windowSize) / 2).toCoords)
       .resizeTo(windowSize)
 
-final case class QuitMenu(components: ComponentGroup)
+final case class QuitMenu(components: ComponentGroup[GameWindowContext])
 object QuitMenu:
 
   def initial(charSheet: CharSheet): QuitMenu =
@@ -96,3 +96,6 @@ object QuitMenu:
 
     def cascade(model: QuitMenu, newBounds: Bounds): QuitMenu =
       model.copy(components = model.components.cascade(newBounds))
+
+    def refresh(model: QuitMenu): QuitMenu =
+      model.copy(components = model.components.reflow)

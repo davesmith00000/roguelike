@@ -49,6 +49,9 @@ object ControlsWindow:
     def cascade(model: Unit, newBounds: Bounds): Unit =
       model
 
+    def refresh(model: Unit): Unit =
+      model
+
   private val separator         = " | "
   private val commandsAndValues = KeyMapping.helpText.map(p => (p._1, p._2.mkString(separator)))
   private val longest           = KeyMapping.longestMappings + separator.length

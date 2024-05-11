@@ -52,6 +52,11 @@ enum GameEvent extends GlobalEvent:
   // ViewModel events
   case CameraSnapToPlayer
 
+  // Stats
+  case ModifyPower(amount: Int)
+  case ModifyMaxHp(amount: Int)
+  case ModifyDefense(amount: Int)
+
 enum HostileEvent:
   case HostileMeleeAttack(attackerName: String, power: Int)
   case HostileGiveXP(amount: Int)

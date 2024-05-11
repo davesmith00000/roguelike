@@ -71,3 +71,6 @@ object HistoryWindow:
 
     def cascade(model: TerminalClones, newBounds: Bounds): TerminalClones =
       model
+
+    def refresh(model: TerminalClones): TerminalClones =
+      model

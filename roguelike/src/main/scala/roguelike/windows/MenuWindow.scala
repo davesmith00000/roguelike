@@ -24,7 +24,7 @@ object MenuWindow:
       )
       .isStatic
 
-final case class MainMenu(components: ComponentGroup)
+final case class MainMenu(components: ComponentGroup[GameWindowContext])
 object MainMenu:
 
   def initial(charSheet: CharSheet): MainMenu =
@@ -81,3 +81,6 @@ object MainMenu:
 
     def cascade(model: MainMenu, newBounds: Bounds): MainMenu =
       model.copy(components = model.components.cascade(newBounds))
+
+    def refresh(model: MainMenu): MainMenu =
+      model.copy(components = model.components.reflow)

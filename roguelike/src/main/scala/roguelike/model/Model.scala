@@ -151,6 +151,15 @@ final case class Model(
   }
 
   def update(context: SceneContext[Size]): GameEvent => Outcome[Model] =
+    case GameEvent.ModifyDefense(amount) =>
+      player.increaseDefense(amount).map(p => this.copy(player = p))
+
+    case GameEvent.ModifyMaxHp(amount) =>
+      player.increaseMaxHp(amount).map(p => this.copy(player = p))
+
+    case GameEvent.ModifyPower(amount) =>
+      player.increasePower(amount).map(p => this.copy(player = p))
+
     case GameEvent.GenerateLevel =>
       Outcome(this)
 

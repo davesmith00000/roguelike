@@ -63,6 +63,9 @@ object InfoPanel:
     def cascade(model: Unit, newBounds: Bounds): Unit =
       model
 
+    def refresh(model: Unit): Unit =
+      model
+
   def renderBar(charSheet: CharSheet, player: Player, totalWidth: Int, position: Point): Group =
     val height = charSheet.size.height + 4
     val width  = charSheet.size.width * totalWidth

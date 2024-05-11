@@ -105,6 +105,15 @@ final case class GameViewModel(
       context: SceneContext[Size],
       model: Model
   ): GameEvent => Outcome[GameViewModel] =
+    case GameEvent.ModifyDefense(_) =>
+      Outcome(this)
+
+    case GameEvent.ModifyMaxHp(_) =>
+      Outcome(this)
+
+    case GameEvent.ModifyPower(_) =>
+      Outcome(this)
+
     case GameEvent.GenerateLevel =>
       Outcome(this)
 

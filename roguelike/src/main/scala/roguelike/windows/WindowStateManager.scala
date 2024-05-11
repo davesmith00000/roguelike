@@ -24,6 +24,7 @@ object WindowStateManager:
 
     case WindowManagerCommand.ShowLevelUp =>
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.LevelUp))
+        .addGlobalEvents(WindowEvent.Open(LevelUpWindow.windowId))
 
     case WindowManagerCommand.ShowDropMenu =>
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.DropMenu))
@@ -49,7 +50,7 @@ object WindowStateManager:
         model.activeWindow match
           case ActiveWindow.None          => Batch.empty
           case ActiveWindow.Quit          => Batch(WindowEvent.Close(QuitSaveWindow.windowId))
-          case ActiveWindow.LevelUp       => Batch()
+          case ActiveWindow.LevelUp       => Batch(WindowEvent.Close(LevelUpWindow.windowId))
           case ActiveWindow.DropMenu      => Batch()
           case ActiveWindow.EquipMenu     => Batch()
           case ActiveWindow.History       => Batch(WindowEvent.Close(HistoryWindow.windowId))
