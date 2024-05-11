@@ -85,13 +85,15 @@ final case class GameViewModel(
     case _: MouseEvent.Click
         if !WindowStateManager.showingWindow(model) &&
           model.player.position == hoverSquare &&
-          model.gameState.isWaitForInput =>
+          model.gameState.isWaitForInput &&
+          model.gameClickAllowed =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerTryPickUp)
 
     case _: MouseEvent.Click
         if !WindowStateManager.showingWindow(model) &&
-          model.gameState.isWaitForInput =>
+          model.gameState.isWaitForInput &&
+          model.gameClickAllowed =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 

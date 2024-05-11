@@ -33,6 +33,12 @@ object GameSceneUpdate:
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
+    case WindowEvent.MouseOver(id) =>
+      Outcome(model.copy(mouseOverWindows = id :: model.mouseOverWindows))
+
+    case WindowEvent.MouseOut(id) =>
+      Outcome(model.copy(mouseOverWindows = model.mouseOverWindows.filterNot(_ == id)))
+
     // Window close keys
     case KeyboardEvent.KeyUp(KeyMapping.CloseWindow)
         if !model.gameState.isWaitForInput ||
@@ -42,9 +48,14 @@ object GameSceneUpdate:
         .map(_.closeAllWindows)
 
     case WindowEvent.Closed(HistoryWindow.windowId) =>
+      val filtered =
+        model.copy(mouseOverWindows = model.mouseOverWindows.filterNot(_ == HistoryWindow.windowId))
       WindowStateManager
-        .updateModel(context, model)(WindowManagerCommand.CloseAll)
+        .updateModel(context, filtered)(WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
+
+    case WindowEvent.Closed(id) =>
+      Outcome(model.copy(mouseOverWindows = model.mouseOverWindows.filterNot(_ == id)))
 
     // Quit window toggle
     case KeyboardEvent.KeyUp(KeyMapping.Quit1) | KeyboardEvent.KeyUp(KeyMapping.Quit2)

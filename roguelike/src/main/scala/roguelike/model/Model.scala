@@ -17,6 +17,7 @@ import roguelike.model.gamedata.Ranged
 import roguelike.windows.ActiveWindow
 import roguelike.windows.WindowManagerCommand
 import roguelike.windows.WindowStateManager
+import roguelikestarterkit.WindowId
 
 import scala.scalajs.js
 
@@ -34,10 +35,14 @@ final case class Model(
     autoMovePath: Batch[Point],
     activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool
+    hostiles: HostilesPool,
+    mouseOverWindows: Batch[WindowId]
 ):
   val gameWindowContext: GameWindowContext =
     GameWindowContext(currentFloor, player, messageLog)
+
+  lazy val gameClickAllowed: Boolean =
+    mouseOverWindows.isEmpty
 
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
@@ -499,7 +504,8 @@ object Model:
       Batch.empty,
       WindowStateManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty)
+      HostilesPool(Batch.empty),
+      Batch.empty
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -555,7 +561,8 @@ object Model:
               Batch.empty,
               WindowStateManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles))
+              HostilesPool(Batch.fromList(dungeon.hostiles)),
+              Batch.empty
             )
         }
       }
