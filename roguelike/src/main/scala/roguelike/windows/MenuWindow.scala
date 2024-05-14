@@ -31,9 +31,9 @@ object MainMenu:
     MainMenu(
       ComponentGroup(Bounds(0, 0, 16, 1))
         .withLayout(ComponentLayout.Horizontal(Padding.right(1)))
+        .inheritBounds
         .add(
           Batch(
-            "Character" -> Batch(),
             "Inventory" -> Batch(),
             "Drop"      -> Batch(),
             "Equip"     -> Batch(),
