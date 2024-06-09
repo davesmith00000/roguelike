@@ -29,7 +29,7 @@ object HistoryWindow:
   given WindowContent[TerminalClones, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: TerminalClones
     ): GlobalEvent => Outcome[TerminalClones] =
       case GameEvent.RedrawHistoryLog =>
@@ -50,7 +50,7 @@ object HistoryWindow:
         Outcome(model)
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: TerminalClones
     ): Outcome[Layer] =
       Outcome(
@@ -69,8 +69,5 @@ object HistoryWindow:
         )
       )
 
-    def cascade(model: TerminalClones, newBounds: Bounds): TerminalClones =
-      model
-
-    def refresh(model: TerminalClones): TerminalClones =
+    def refresh(reference: GameWindowContext, model: TerminalClones, contentDimensions: Dimensions): TerminalClones =
       model

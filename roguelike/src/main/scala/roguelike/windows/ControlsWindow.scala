@@ -27,14 +27,14 @@ object ControlsWindow:
   given WindowContent[Unit, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: Unit
     ): GlobalEvent => Outcome[Unit] =
       case _ =>
         Outcome(model)
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: Unit
     ): Outcome[Layer] =
       Outcome(
@@ -46,10 +46,7 @@ object ControlsWindow:
         )
       )
 
-    def cascade(model: Unit, newBounds: Bounds): Unit =
-      model
-
-    def refresh(model: Unit): Unit =
+    def refresh(reference: GameWindowContext, model: Unit, contentDimensions: Dimensions): Unit =
       model
 
   private val separator         = " | "

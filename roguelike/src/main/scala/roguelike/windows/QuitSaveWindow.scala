@@ -6,6 +6,7 @@ import roguelike.GameEvent
 import roguelike.model.GameWindowContext
 import roguelike.scenes.MainMenuScene
 import roguelikestarterkit.*
+import roguelikestarterkit.syntax.*
 
 object QuitSaveWindow:
 
@@ -39,7 +40,7 @@ object QuitMenu:
       )
 
     QuitMenu(
-      ComponentGroup(Bounds(0, 0, 16, 1))
+      ComponentGroup(BoundsType.fixed(16, 1))
         .withLayout(ComponentLayout.Vertical())
         .add(
           Button(
@@ -67,7 +68,7 @@ object QuitMenu:
   given WindowContent[QuitMenu, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: QuitMenu
     ): GlobalEvent => Outcome[QuitMenu] =
 
@@ -89,13 +90,11 @@ object QuitMenu:
         }
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: QuitMenu
     ): Outcome[Layer] =
       model.components.present(context).map(_.toLayer)
 
-    def cascade(model: QuitMenu, newBounds: Bounds): QuitMenu =
-      model.copy(components = model.components.cascade(newBounds))
+    def refresh(reference: GameWindowContext, model: QuitMenu, contentDimensions: Dimensions): QuitMenu =
+      model.copy(components = model.components.refresh(reference, contentDimensions))
 
-    def refresh(model: QuitMenu): QuitMenu =
-      model.copy(components = model.components.reflow)

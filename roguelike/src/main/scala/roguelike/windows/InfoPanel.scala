@@ -28,14 +28,14 @@ object InfoPanel:
   given WindowContent[Unit, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: Unit
     ): GlobalEvent => Outcome[Unit] =
       case _ =>
         Outcome(model)
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: Unit
     ): Outcome[Layer] =
       Outcome(
@@ -60,10 +60,7 @@ object InfoPanel:
         )
       )
 
-    def cascade(model: Unit, newBounds: Bounds): Unit =
-      model
-
-    def refresh(model: Unit): Unit =
+    def refresh(reference: GameWindowContext, model: Unit, contentDimensions: Dimensions): Unit =
       model
 
   def renderBar(charSheet: CharSheet, player: Player, totalWidth: Int, position: Point): Group =

@@ -4,12 +4,13 @@ import indigo.*
 import roguelike.model.GameWindowContext
 import roguelike.scenes.UIElements
 import roguelikestarterkit.*
+import roguelikestarterkit.syntax.*
 
 object DropWindow:
 
   val windowId: WindowId = WindowId("Drop")
 
-  private val windowSize = Dimensions(26, 22)
+  private val windowSize = Dimensions(35, 22)
 
   def window(
       screenSize: Dimensions,
@@ -29,10 +30,10 @@ object DropMenu:
 
   def initial(charSheet: CharSheet): DropMenu =
     DropMenu(
-      ComponentGroup(Bounds(0, 0, 16, 1))
+      ComponentGroup()
         .withLayout(ComponentLayout.Vertical())
         .add(
-          Label(
+          TextArea(
             (ctx: GameWindowContext) =>
               if ctx.player.inventory.backpack.count > 0 then
                 val collectables: String =
@@ -44,41 +45,20 @@ object DropMenu:
                     }
                     ._1
 
-                "Select a collectable to drop\n" + collectables
+                "Select a collectable to drop\n\n" + collectables
               else s"""Select an collectable to drop
                 |
                 |(Empty)
                 |""".stripMargin,
-            Label.Theme(charSheet)
+            TextArea.Theme(charSheet)
           )
         )
-        // .add(
-        //   Button(
-        //     "[1] Save",
-        //     buttonTheme
-        //   ).onClick(GameEvent.SaveGame),
-        //   Button(
-        //     "[2] Save and Quit",
-        //     buttonTheme
-        //   ).onClick(
-        //     GameEvent.SaveGame,
-        //     GameEvent.WindowEvent(WindowManagerCommand.CloseAll),
-        //     SceneEvent.JumpTo(MainMenuScene.name)
-        //   ),
-        //   Button(
-        //     "[3] Quit",
-        //     buttonTheme
-        //   ).onClick(
-        //     GameEvent.WindowEvent(WindowManagerCommand.CloseAll),
-        //     SceneEvent.JumpTo(MainMenuScene.name)
-        //   )
-        // )
     )
 
   given WindowContent[DropMenu, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: DropMenu
     ): GlobalEvent => Outcome[DropMenu] =
 
@@ -100,13 +80,14 @@ object DropMenu:
         }
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: DropMenu
     ): Outcome[Layer] =
       model.components.present(context).map(_.toLayer)
 
-    def cascade(model: DropMenu, newBounds: Bounds): DropMenu =
-      model.copy(components = model.components.cascade(newBounds))
-
-    def refresh(model: DropMenu): DropMenu =
-      model.copy(components = model.components.reflow)
+    def refresh(
+        reference: GameWindowContext,
+        model: DropMenu,
+        contentDimensions: Dimensions
+    ): DropMenu =
+      model.copy(components = model.components.refresh(reference, contentDimensions))

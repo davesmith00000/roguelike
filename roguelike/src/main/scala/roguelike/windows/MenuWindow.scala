@@ -4,6 +4,7 @@ import indigo.*
 import roguelike.GameEvent
 import roguelike.model.GameWindowContext
 import roguelikestarterkit.*
+import roguelikestarterkit.syntax.*
 
 object MenuWindow:
 
@@ -29,9 +30,8 @@ object MainMenu:
 
   def initial(charSheet: CharSheet): MainMenu =
     MainMenu(
-      ComponentGroup(Bounds(0, 0, 16, 1))
+      ComponentGroup()
         .withLayout(ComponentLayout.Horizontal(Padding.right(1)))
-        .inheritBounds
         .add(
           Batch(
             "Inventory" -> Batch(),
@@ -52,7 +52,7 @@ object MainMenu:
   given WindowContent[MainMenu, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: MainMenu
     ): GlobalEvent => Outcome[MainMenu] =
       case e =>
@@ -61,7 +61,7 @@ object MainMenu:
         }
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: MainMenu
     ): Outcome[Layer] =
       model.components.present(context).map { c =>
@@ -79,8 +79,5 @@ object MainMenu:
         ).addCloneBlanks(c.cloneBlanks)
       }
 
-    def cascade(model: MainMenu, newBounds: Bounds): MainMenu =
-      model.copy(components = model.components.cascade(newBounds))
-
-    def refresh(model: MainMenu): MainMenu =
-      model.copy(components = model.components.reflow)
+    def refresh(reference: GameWindowContext, model: MainMenu, contentDimensions: Dimensions): MainMenu =
+      model.copy(components = model.components.refresh(reference, contentDimensions))

@@ -4,6 +4,7 @@ import indigo.*
 import roguelike.GameEvent
 import roguelike.model.GameWindowContext
 import roguelikestarterkit.*
+import roguelikestarterkit.syntax.*
 
 object LevelUpWindow:
 
@@ -37,7 +38,7 @@ object LevelUpMenu:
       )
 
     LevelUpMenu(
-      ComponentGroup(Bounds(0, 0, 16, 1))
+      ComponentGroup(BoundsType.fixed(16, 1))
         .withLayout(ComponentLayout.Vertical())
         .add(
           Label("Congratulations! You level up!", Label.Theme(charSheet)),
@@ -77,7 +78,7 @@ object LevelUpMenu:
   ): WindowContent[LevelUpMenu, GameWindowContext] with
 
     def updateModel(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: LevelUpMenu
     ): GlobalEvent => Outcome[LevelUpMenu] =
 
@@ -108,13 +109,10 @@ object LevelUpMenu:
         }
 
     def present(
-        context: UiContext[GameWindowContext],
+        context: UIContext[GameWindowContext],
         model: LevelUpMenu
     ): Outcome[Layer] =
       cg.present(context, model.components)
 
-    def cascade(model: LevelUpMenu, newBounds: Bounds): LevelUpMenu =
-      model.copy(components = cg.cascade(model.components, newBounds))
-
-    def refresh(model: LevelUpMenu): LevelUpMenu =
-      model.copy(components = cg.refresh(model.components))
+    def refresh(reference: GameWindowContext, model: LevelUpMenu, contentDimensions: Dimensions): LevelUpMenu =
+      model.copy(components = model.components.refresh(reference, contentDimensions))
