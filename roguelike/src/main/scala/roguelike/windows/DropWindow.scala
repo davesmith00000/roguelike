@@ -1,7 +1,11 @@
 package roguelike.windows
 
 import indigo.*
+import roguelike.ColorScheme
+import roguelike.GameEvent
+import roguelike.InventoryEvent
 import roguelike.model.GameWindowContext
+import roguelike.model.Message
 import roguelike.scenes.UIElements
 import roguelikestarterkit.*
 import roguelikestarterkit.syntax.*
@@ -25,33 +29,43 @@ object DropWindow:
       .moveTo(((screenSize - windowSize) / 2).toCoords)
       .resizeTo(windowSize)
 
-final case class DropMenu(components: ComponentGroup[GameWindowContext])
+final case class DropMenu(components: ComponentList[GameWindowContext])
 object DropMenu:
 
   def initial(charSheet: CharSheet): DropMenu =
     DropMenu(
-      ComponentGroup()
-        .withLayout(ComponentLayout.Vertical())
-        .add(
-          TextArea(
-            (ctx: GameWindowContext) =>
-              if ctx.player.inventory.backpack.count > 0 then
-                val collectables: String =
-                  ctx.player.inventory.backpack.items
-                    .map(_.name)
-                    .zip(UIElements.letters)
-                    .foldLeft(("", 0)) { case ((str, r), (collectableName, letter)) =>
-                      (str + s"[$letter] $collectableName\n", r + 1)
-                    }
-                    ._1
+      ComponentList(Dimensions(35, 22)) { (_: GameWindowContext) =>
+        Batch(
+          Label[GameWindowContext]("Select a collectable to drop", Label.Theme(charSheet))
+        )
+      }
+        .withLayout(ComponentLayout.Vertical(Padding.zero.withBottom(1)))
+        .add(ctx =>
+          if ctx.player.inventory.backpack.count > 0 then Batch.empty
+          else
+            Batch(
+              Label(
+                "(Your inventory is empty.)",
+                Label.Theme(charSheet)
+              )
+            )
+        )
+        .add((ctx: GameWindowContext) =>
+          if ctx.player.inventory.backpack.count > 0 then
+            val collectables: Batch[String] =
+              ctx.player.inventory.backpack.items
+                .map(_.name)
+                .zip(UIElements.letters)
+                .map { case (name, letter) =>
+                  s"[$letter] $name"
+                }
 
-                "Select a collectable to drop\n\n" + collectables
-              else s"""Select an collectable to drop
-                |
-                |(Empty)
-                |""".stripMargin,
-            TextArea.Theme(charSheet)
-          )
+            collectables.map { label =>
+              Button[GameWindowContext](label, Button.Theme(charSheet))
+            // TODO: .onClick(GameEvent.Inventory(InventoryEvent.DropItem))
+            // Also there is a bug where opening the drop window with the keyboard drops entry 'd' from the inventory
+            }
+          else Batch.empty
         )
     )
 
@@ -61,18 +75,24 @@ object DropMenu:
         context: UIContext[GameWindowContext],
         model: DropMenu
     ): GlobalEvent => Outcome[DropMenu] =
+      case KeyboardEvent.KeyUp(key) =>
+        UIElements.letterPositions.get(key.key) match
+          case None =>
+            Outcome(model)
 
-      // // Save
-      // case KeyboardEvent.KeyUp(Key.KEY_1) =>
-      //   Outcome(model, Batch(GameEvent.SaveGame))
+          case Some(_) if context.reference.standingOn.isDefined =>
+            Outcome(model)
+              .addGlobalEvents(
+                GameEvent.Log(Message("Cannot drop here.", ColorScheme.invalid)),
+                GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+              )
 
-      // // Save and Quit
-      // case KeyboardEvent.KeyUp(Key.KEY_2) =>
-      //   Outcome(model, Batch(GameEvent.SaveGame, SceneEvent.JumpTo(MainMenuScene.name)))
-
-      // // Quit
-      // case KeyboardEvent.KeyUp(Key.KEY_3) =>
-      //   Outcome(model, Batch(SceneEvent.JumpTo(MainMenuScene.name)))
+          case Some(keyIndex) =>
+            Outcome(model)
+              .addGlobalEvents(
+                GameEvent.Inventory(InventoryEvent.DropItem(keyIndex)),
+                GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+              )
 
       case e =>
         model.components.update(context)(e).map { c =>

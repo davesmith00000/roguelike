@@ -2,6 +2,7 @@ package roguelike.model
 
 import indigo.*
 import roguelike.assets.GameAssets
+import roguelike.model.entity.Collectable
 import roguelike.model.entity.Player
 import roguelikestarterkit.*
 
@@ -15,4 +16,4 @@ object GameWindows:
       RoguelikeTiles.Size10x10.Fonts.fontKey
     )
 
-final case class GameWindowContext(currentFloor: Int, player: Player, messageLog: MessageLog)
+final case class GameWindowContext(currentFloor: Int, player: Player, standingOn: Option[Collectable], messageLog: MessageLog)

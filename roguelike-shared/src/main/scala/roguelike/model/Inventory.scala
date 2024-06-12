@@ -145,7 +145,7 @@ final case class Inventory(backpack: Backpack, equipment: Equipment):
         Outcome(
           next,
           Batch(
-            GameEvent.Inventory(InventoryEvent.DropItem(item, mapPosition)),
+            GameEvent.Inventory(InventoryEvent.DroppedItem(item, mapPosition)),
             GameEvent.Log(
               Message(
                 s"You dropped the ${item.name}.",

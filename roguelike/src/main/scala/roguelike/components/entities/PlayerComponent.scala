@@ -52,7 +52,17 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: PlayerM
   ): Cmds => Outcome[PlayerM] =
-    case Cmds.RemoveFromInvetory(at) =>
+    case Cmds.DropItem(at) =>
+      model.player.inventory
+        .drop(at, model.player.position)
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.RemoveFromInventory(at) =>
       Outcome(model.next(inventoryLens.modify(model.player, _.remove(at))))
 
     case Cmds.GiveToPlayer(i) =>
@@ -235,7 +245,8 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
 
   enum Cmds:
     case Update
-    case RemoveFromInvetory(at: Int)
+    case RemoveFromInventory(at: Int)
     case GiveToPlayer(item: Item)
     case UseConsumable(c: Consumables)
     case HostileInteraction(e: HostileEvent)
+    case DropItem(at: Int)

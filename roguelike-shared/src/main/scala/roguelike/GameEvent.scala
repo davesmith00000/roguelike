@@ -63,7 +63,8 @@ enum HostileEvent:
 
 enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
-  case DropItem(item: Item, mapPosition: Point)
+  case DropItem(inventoryPosition: Int)
+  case DroppedItem(item: Item, mapPosition: Point)
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)

@@ -34,9 +34,9 @@ object MainMenu:
         .withLayout(ComponentLayout.Horizontal(Padding.right(1)))
         .add(
           Batch(
-            "Inventory" -> Batch(),
-            "Drop"      -> Batch(),
-            "Equip"     -> Batch(),
+            "Inventory" -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowInventoryMenu)),
+            "Drop"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowDropMenu)),
+            "Equip"     -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowEquipMenu)),
             "History"   -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory)),
             "Controls"  -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowControls)),
             "Quit"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowQuit))
@@ -79,5 +79,9 @@ object MainMenu:
         ).addCloneBlanks(c.cloneBlanks)
       }
 
-    def refresh(reference: GameWindowContext, model: MainMenu, contentDimensions: Dimensions): MainMenu =
+    def refresh(
+        reference: GameWindowContext,
+        model: MainMenu,
+        contentDimensions: Dimensions
+    ): MainMenu =
       model.copy(components = model.components.refresh(reference, contentDimensions))

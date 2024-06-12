@@ -86,8 +86,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
         )
         .open(
           InfoPanel.windowId,
-          MenuWindow.windowId,
-          DropWindow.windowId
+          MenuWindow.windowId
         )
     )
 

@@ -140,7 +140,10 @@ final case class GameViewModel(
           )
         )
 
-    case GameEvent.Inventory(InventoryEvent.DropItem(item, _)) =>
+    case GameEvent.Inventory(InventoryEvent.DropItem(_)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.DroppedItem(item, _)) =>
       Outcome(this)
         .addGlobalEvents(
           FloatingMessage.spawnEvent(

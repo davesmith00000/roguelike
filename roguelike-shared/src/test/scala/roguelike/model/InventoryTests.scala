@@ -121,7 +121,7 @@ class InventoryTests extends munit.FunSuite {
     assert(actual.item(1) == Some(Ranged.FireballScroll))
     assert(
       events.head == GameEvent.Inventory(
-        InventoryEvent.DropItem(Ranged.LightningScroll, Point.zero)
+        InventoryEvent.DroppedItem(Ranged.LightningScroll, Point.zero)
       )
     )
     assert(events.reverse.head == GameEvent.PlayerTurnEnd)

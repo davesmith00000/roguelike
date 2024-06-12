@@ -39,7 +39,12 @@ final case class Model(
     mouseOverWindows: Batch[WindowId]
 ):
   val gameWindowContext: GameWindowContext =
-    GameWindowContext(currentFloor, player, messageLog)
+    GameWindowContext(
+      currentFloor,
+      player,
+      collectables.find(_.position == player.position),
+      messageLog
+    )
 
   lazy val gameClickAllowed: Boolean =
     mouseOverWindows.isEmpty
@@ -71,11 +76,18 @@ final case class Model(
   def handleInventoryEvent(
       context: SceneContext[Size]
   ): InventoryEvent => Outcome[Model] = {
+    case InventoryEvent.DropItem(at) =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.DropItem(at)
+      )
+
     case InventoryEvent.RemoveFromInventory(at) =>
       PlayerComponent.updateModel(
         context,
         this,
-        PlayerComponent.Cmds.RemoveFromInvetory(at)
+        PlayerComponent.Cmds.RemoveFromInventory(at)
       )
 
     case InventoryEvent.UseConsumables(c) =>
@@ -86,7 +98,7 @@ final case class Model(
           PlayerComponent.Cmds.UseConsumable(c)
         )
 
-    case InventoryEvent.DropItem(item, mapPosition) =>
+    case InventoryEvent.DroppedItem(item, mapPosition) =>
       Outcome(
         this.copy(
           collectables = Collectable(mapPosition, item) :: collectables
