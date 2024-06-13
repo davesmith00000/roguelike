@@ -59,7 +59,7 @@ object DropMenu:
                 .map(_.name)
                 .zipWithIndex
                 .map { case (name, num) =>
-                  s"$num. $name" -> num
+                  s"[$num] $name" -> num
                 }
 
             collectables.map { (label, num) =>
@@ -76,7 +76,6 @@ object DropMenu:
                       GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
                     )
                 )
-            // Also there is a bug where opening the drop window with the keyboard drops entry 'd' from the inventory
             }
           else Batch.empty
         )

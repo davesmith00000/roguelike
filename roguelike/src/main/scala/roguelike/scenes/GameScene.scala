@@ -84,6 +84,12 @@ object GameScene extends Scene[Size, Model, ViewModel]:
             GameWindows.defaultCharSheet
           )
         )
+        .register(
+          UnequipWindow.window(
+            Dimensions(1280, 720) / 10,
+            GameWindows.defaultCharSheet
+          )
+        )
         .open(
           InfoPanel.windowId,
           MenuWindow.windowId

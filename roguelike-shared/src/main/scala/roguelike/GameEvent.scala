@@ -65,6 +65,8 @@ enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
   case DropItem(inventoryPosition: Int)
   case DroppedItem(item: Item, mapPosition: Point)
+  case UnequipArmour
+  case UnequipWeapon
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)

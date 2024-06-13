@@ -77,6 +77,20 @@ final case class Model(
   def handleInventoryEvent(
       context: SceneContext[Size]
   ): InventoryEvent => Outcome[Model] = {
+    case InventoryEvent.UnequipArmour =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UnequipArmour
+      )
+
+    case InventoryEvent.UnequipWeapon =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UnequipWeapon
+      )
+
     case InventoryEvent.DropItem(at) =>
       PlayerComponent.updateModel(
         context,

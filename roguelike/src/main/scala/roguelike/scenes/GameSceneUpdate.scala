@@ -136,7 +136,7 @@ object GameSceneUpdate:
         if model.gameState.isWaitForInput ||
           !WindowStateManager.showingWindow(model) =>
       WindowStateManager.updateModel(context, model)(
-        WindowManagerCommand.ShowEquipMenu
+        WindowManagerCommand.ShowUnequipMenu
       )
 
     case KeyboardEvent.KeyUp(KeyMapping.Drop)

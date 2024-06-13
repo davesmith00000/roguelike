@@ -4,7 +4,7 @@ enum WindowManagerCommand:
   case ShowQuit
   case ShowLevelUp
   case ShowDropMenu
-  case ShowEquipMenu
+  case ShowUnequipMenu
   case ShowInventoryMenu
   case ShowHistory
   case ShowControls

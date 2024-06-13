@@ -52,6 +52,24 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: PlayerM
   ): Cmds => Outcome[PlayerM] =
+    case Cmds.UnequipArmour =>
+      model.player.inventory.unequipArmour
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.UnequipWeapon =>
+      model.player.inventory.unequipWeapon
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
     case Cmds.DropItem(at) =>
       model.player.inventory
         .drop(at, model.player.position)
@@ -250,3 +268,5 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
     case UseConsumable(c: Consumables)
     case HostileInteraction(e: HostileEvent)
     case DropItem(at: Int)
+    case UnequipArmour
+    case UnequipWeapon

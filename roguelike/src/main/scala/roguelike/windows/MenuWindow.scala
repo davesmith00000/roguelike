@@ -36,7 +36,7 @@ object MainMenu:
           Batch(
             "Inventory" -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowInventoryMenu)),
             "Drop"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowDropMenu)),
-            "Equip"     -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowEquipMenu)),
+            "Unequip"   -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowUnequipMenu)),
             "History"   -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowHistory)),
             "Controls"  -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowControls)),
             "Quit"      -> Batch(GameEvent.WindowEvent(WindowManagerCommand.ShowQuit))

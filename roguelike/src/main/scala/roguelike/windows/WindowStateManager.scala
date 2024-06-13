@@ -30,8 +30,9 @@ object WindowStateManager:
       Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.DropMenu))
         .addGlobalEvents(WindowEvent.Open(DropWindow.windowId))
 
-    case WindowManagerCommand.ShowEquipMenu =>
-      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.EquipMenu))
+    case WindowManagerCommand.ShowUnequipMenu =>
+      Outcome(updateActive.set(model.pauseForWindow, ActiveWindow.UnequipMenu))
+        .addGlobalEvents(WindowEvent.Open(UnequipWindow.windowId))
 
     case WindowManagerCommand.ShowInventoryMenu =>
       Outcome(
@@ -53,7 +54,7 @@ object WindowStateManager:
           case ActiveWindow.Quit          => Batch(WindowEvent.Close(QuitSaveWindow.windowId))
           case ActiveWindow.LevelUp       => Batch(WindowEvent.Close(LevelUpWindow.windowId))
           case ActiveWindow.DropMenu      => Batch(WindowEvent.Close(DropWindow.windowId))
-          case ActiveWindow.EquipMenu     => Batch()
+          case ActiveWindow.UnequipMenu   => Batch(WindowEvent.Close(UnequipWindow.windowId))
           case ActiveWindow.History       => Batch(WindowEvent.Close(HistoryWindow.windowId))
           case ActiveWindow.InventoryMenu => Batch()
           case ActiveWindow.Controls      => Batch(WindowEvent.Close(ControlsWindow.windowId))
@@ -86,7 +87,7 @@ enum ActiveWindow(val closeable: Boolean):
   case Quit          extends ActiveWindow(true)
   case LevelUp       extends ActiveWindow(false)
   case DropMenu      extends ActiveWindow(true)
-  case EquipMenu     extends ActiveWindow(true)
+  case UnequipMenu   extends ActiveWindow(true)
   case History       extends ActiveWindow(true)
   case InventoryMenu extends ActiveWindow(true)
   case Controls      extends ActiveWindow(true)
