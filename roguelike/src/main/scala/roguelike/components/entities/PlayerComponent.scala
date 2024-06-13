@@ -80,6 +80,16 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
           model.next(p)
         }
 
+    case Cmds.UseItem(at) =>
+      model.player.inventory
+        .use(at)
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
     case Cmds.RemoveFromInventory(at) =>
       Outcome(model.next(inventoryLens.modify(model.player, _.remove(at))))
 
@@ -270,3 +280,4 @@ object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
     case DropItem(at: Int)
     case UnequipArmour
     case UnequipWeapon
+    case UseItem(at: Int)

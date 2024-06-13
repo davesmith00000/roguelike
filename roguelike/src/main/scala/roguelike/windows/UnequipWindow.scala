@@ -36,7 +36,7 @@ object UnequipMenu:
       ComponentList(Dimensions(35, 22)) { (_: GameWindowContext) =>
         Batch(
           TextArea[GameWindowContext](
-            "Select a item to unequip\n ",
+            "Select an item to unequip\n ",
             TextArea.Theme(charSheet)
           )
         )

@@ -143,6 +143,9 @@ final case class GameViewModel(
     case GameEvent.Inventory(InventoryEvent.DropItem(_)) =>
       Outcome(this)
 
+    case GameEvent.Inventory(InventoryEvent.UseItem(_)) =>
+      Outcome(this)
+
     case GameEvent.Inventory(InventoryEvent.UnequipArmour) =>
       Outcome(this)
 

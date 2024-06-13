@@ -36,7 +36,7 @@ object DropMenu:
       ComponentList(Dimensions(35, 22)) { (_: GameWindowContext) =>
         Batch(
           TextArea[GameWindowContext](
-            "Select a collectable to drop\n ",
+            "Select an item to drop\n ",
             TextArea.Theme(charSheet)
           )
         )

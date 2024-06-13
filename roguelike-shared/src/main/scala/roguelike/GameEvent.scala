@@ -64,6 +64,7 @@ enum HostileEvent:
 enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
   case DropItem(inventoryPosition: Int)
+  case UseItem(inventoryPosition: Int)
   case DroppedItem(item: Item, mapPosition: Point)
   case UnequipArmour
   case UnequipWeapon

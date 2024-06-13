@@ -39,9 +39,6 @@ object UIElements:
       TerminalText(GameAssets.assets.init.AnikkiSquare10x10, RGBA.White, RGBA.Red)
     )
 
-  val letters: Batch[String]            = ('a' to 'z').toBatch.map(_.toString)
-  val letterPositions: Map[String, Int] = letters.zipWithIndex.toMap
-
   def renderNameHints(
       squareSize: Point,
       mousePosition: Point,

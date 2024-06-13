@@ -98,6 +98,13 @@ final case class Model(
         PlayerComponent.Cmds.DropItem(at)
       )
 
+    case InventoryEvent.UseItem(at) =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UseItem(at)
+      )
+
     case InventoryEvent.RemoveFromInventory(at) =>
       PlayerComponent.updateModel(
         context,
