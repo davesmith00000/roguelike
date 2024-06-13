@@ -58,7 +58,8 @@ final case class Model(
     this.copy(
       gameState =
         if gameState == GameState.ShowingWindow then GameState.WaitForInput
-        else gameState
+        else gameState,
+      mouseOverWindows = Batch.empty
     )
 
   def pauseForWindow: Model =

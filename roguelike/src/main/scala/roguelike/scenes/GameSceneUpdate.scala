@@ -9,7 +9,6 @@ import roguelike.model.GameState
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.model.gamedata.KeyMapping
-import roguelike.windows.HistoryWindow
 import roguelike.windows.WindowManagerCommand
 import roguelike.windows.WindowStateManager
 import roguelikestarterkit.WindowEvent
@@ -47,15 +46,10 @@ object GameSceneUpdate:
         .updateModel(context, model)(WindowManagerCommand.CloseAll)
         .map(_.closeAllWindows)
 
-    case WindowEvent.Closed(HistoryWindow.windowId) =>
-      val filtered =
-        model.copy(mouseOverWindows = model.mouseOverWindows.filterNot(_ == HistoryWindow.windowId))
-      WindowStateManager
-        .updateModel(context, filtered)(WindowManagerCommand.CloseAll)
-        .map(_.closeAllWindows)
-
     case WindowEvent.Closed(id) =>
-      Outcome(model.copy(mouseOverWindows = model.mouseOverWindows.filterNot(_ == id)))
+      WindowStateManager
+        .updateModel(context, model)(WindowManagerCommand.CloseAll)
+        .map(_.closeAllWindows)
 
     // Quit window toggle
     case KeyboardEvent.KeyUp(KeyMapping.Quit1) | KeyboardEvent.KeyUp(KeyMapping.Quit2)
