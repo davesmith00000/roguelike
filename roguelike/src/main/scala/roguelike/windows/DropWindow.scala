@@ -65,8 +65,16 @@ object DropMenu:
             collectables.map { (label, num) =>
               Button[GameWindowContext](label, Button.Theme(charSheet))
                 .onClick(
-                  GameEvent.Inventory(InventoryEvent.DropItem(num)),
-                  GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+                  if ctx.standingOn.isDefined then
+                    Batch(
+                      GameEvent.Log(Message("Cannot drop here.", ColorScheme.invalid)),
+                      GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+                    )
+                  else
+                    Batch(
+                      GameEvent.Inventory(InventoryEvent.DropItem(num)),
+                      GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+                    )
                 )
             // Also there is a bug where opening the drop window with the keyboard drops entry 'd' from the inventory
             }
