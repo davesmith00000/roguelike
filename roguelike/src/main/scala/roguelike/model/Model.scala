@@ -5,42 +5,50 @@ import indigo.scenes.SceneContext
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.GenerateLevel
 import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.ActiveWindow
-import roguelike.components.windows.WindowManager
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.*
-import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
+import roguelike.windows.ActiveWindow
+import roguelike.windows.WindowManagerCommand
+import roguelike.windows.WindowStateManager
+import roguelikestarterkit.WindowId
 
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 
-final case class Model( // TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+// TODO: Should there be a GameModel class too? (Similar to GameViewModel?)
+final case class Model(
     player: Player,
-    stairsPosition: Point, // TODO: Move into game map?
+    stairsPosition: Point,
     lookAtTarget: Point,
     gameMap: GameMap,
     messageLog: MessageLog,
     gameState: GameState,
-    targetingWithRangedAt: Option[
-      (Ranged, Int)
-    ], // TODO - is this really an 'active' inventory slot?
+    targetingWithRangedAt: Option[(Ranged, Int)],
     loadInfo: GameLoadInfo,
-    currentFloor: Int, // TODO: Should live where? Is there a 'level' metadata section missing?
+    currentFloor: Int,
     autoMovePath: Batch[Point],
-    windowManager: ActiveWindow,
+    activeWindow: ActiveWindow,
     collectables: Batch[Collectable],
-    hostiles: HostilesPool
+    hostiles: HostilesPool,
+    mouseOverWindows: Batch[WindowId]
 ):
+  val gameWindowContext: GameWindowContext =
+    GameWindowContext(
+      currentFloor,
+      player,
+      collectables.find(_.position == player.position),
+      messageLog
+    )
+
+  lazy val gameClickAllowed: Boolean =
+    mouseOverWindows.isEmpty
+
   def entitiesList: js.Array[Entity] =
     (collectables.toJSArray ++
       hostiles.toJSArray.sortBy(_.isAlive))
@@ -50,7 +58,8 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     this.copy(
       gameState =
         if gameState == GameState.ShowingWindow then GameState.WaitForInput
-        else gameState
+        else gameState,
+      mouseOverWindows = Batch.empty
     )
 
   def pauseForWindow: Model =
@@ -68,11 +77,39 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   def handleInventoryEvent(
       context: SceneContext[Size]
   ): InventoryEvent => Outcome[Model] = {
+    case InventoryEvent.UnequipArmour =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UnequipArmour
+      )
+
+    case InventoryEvent.UnequipWeapon =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UnequipWeapon
+      )
+
+    case InventoryEvent.DropItem(at) =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.DropItem(at)
+      )
+
+    case InventoryEvent.UseItem(at) =>
+      PlayerComponent.updateModel(
+        context,
+        this,
+        PlayerComponent.Cmds.UseItem(at)
+      )
+
     case InventoryEvent.RemoveFromInventory(at) =>
       PlayerComponent.updateModel(
         context,
         this,
-        PlayerComponent.Cmds.RemoveFromInvetory(at)
+        PlayerComponent.Cmds.RemoveFromInventory(at)
       )
 
     case InventoryEvent.UseConsumables(c) =>
@@ -83,7 +120,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
           PlayerComponent.Cmds.UseConsumable(c)
         )
 
-    case InventoryEvent.DropItem(item, mapPosition) =>
+    case InventoryEvent.DroppedItem(item, mapPosition) =>
       Outcome(
         this.copy(
           collectables = Collectable(mapPosition, item) :: collectables
@@ -153,11 +190,48 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
   }
 
   def update(context: SceneContext[Size]): GameEvent => Outcome[Model] =
+    case GameEvent.ModifyDefense(amount) =>
+      player.increaseDefense(amount).map(p => this.copy(player = p))
+
+    case GameEvent.ModifyMaxHp(amount) =>
+      player.increaseMaxHp(amount).map(p => this.copy(player = p))
+
+    case GameEvent.ModifyPower(amount) =>
+      player.increasePower(amount).map(p => this.copy(player = p))
+
+    case GameEvent.GenerateLevel =>
+      Outcome(this)
+
+    case GameEvent.NewGame =>
+      Outcome(this)
+
+    case GameEvent.LoadGame =>
+      Outcome(this)
+
+    case GameEvent.SaveGame if player.isAlive =>
+      val saveData = this.toSaveData
+
+      Outcome(
+        this.copy(loadInfo = this.loadInfo.withSaveData(saveData)),
+        Batch(
+          StorageEvent.Save(
+            ModelSaveData.saveKey,
+            saveData.toJsonString
+          )
+        )
+      )
+
+    case GameEvent.SaveGame =>
+      Outcome(this)
+
+    case GameEvent.SpritesLoaded(_) =>
+      Outcome(this)
+
     case GameEvent.PlayerTryPickUp =>
       pickUp
 
     case GameEvent.WindowEvent(command) =>
-      WindowManager.updateModel(context, this, command)
+      WindowStateManager.updateModel(context, this)(command)
 
     case GameEvent.Log(message) =>
       Outcome(
@@ -386,7 +460,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
       )
 
     case GameEvent.PlayerDescended =>
-      Outcome(this).addGlobalEvents(GenerateLevel)
+      Outcome(this).addGlobalEvents(GameEvent.GenerateLevel)
 
     case GameEvent.RedrawHistoryLog =>
       Outcome(this)
@@ -462,9 +536,10 @@ object Model:
       GameLoadInfo.initial,
       0,
       Batch.empty,
-      WindowManager.initialModel,
+      WindowStateManager.initialModel,
       Batch.empty,
-      HostilesPool(Batch.empty)
+      HostilesPool(Batch.empty),
+      Batch.empty
     )
 
   def fromSaveData(model: Model, saveData: ModelSaveData): Model =
@@ -504,6 +579,7 @@ object Model:
               currentFloor = dungeon.currentFloor,
               hostiles = HostilesPool(Batch.fromList(dungeon.hostiles))
             )
+
           case None =>
             val p = Player.initial(dice, dungeon.playerStart)
             Model(
@@ -517,9 +593,10 @@ object Model:
               GameLoadInfo.initial,
               dungeon.currentFloor,
               Batch.empty,
-              WindowManager.initialModel,
+              WindowStateManager.initialModel,
               Batch.fromList(dungeon.collectables),
-              HostilesPool(Batch.fromList(dungeon.hostiles))
+              HostilesPool(Batch.fromList(dungeon.hostiles)),
+              Batch.empty
             )
         }
       }

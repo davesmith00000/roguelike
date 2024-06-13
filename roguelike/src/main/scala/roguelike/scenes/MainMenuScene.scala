@@ -1,16 +1,11 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
-import indigo.shared.datatypes.Fill.Color.apply
 import indigo.syntax.*
 import indigo.syntax.animations.*
-import indigoextras.ui.Button
-import indigoextras.ui.HitArea
 import roguelike.GameEvent
 import roguelike.assets.GameAssets
-import roguelike.game.GameScene
-import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
@@ -37,21 +32,21 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(
       context: SceneContext[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
-    case NewGame =>
+    case GameEvent.NewGame =>
       Outcome(model)
         .addGlobalEvents(
           SceneEvent.JumpTo(GeneratingLevelScene.name),
-          GenerateLevel
+          GameEvent.GenerateLevel
         )
 
-    case LoadGame =>
+    case GameEvent.LoadGame =>
       model.loadInfo.loadedData match
         case None =>
           Outcome(model)
@@ -63,10 +58,10 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
             )
 
     case KeyboardEvent.KeyUp(Key.KEY_N) =>
-      Outcome(model).addGlobalEvents(NewGame)
+      Outcome(model).addGlobalEvents(GameEvent.NewGame)
 
     case KeyboardEvent.KeyUp(Key.KEY_C) =>
-      Outcome(model).addGlobalEvents(LoadGame)
+      Outcome(model).addGlobalEvents(GameEvent.LoadGame)
 
     case _ =>
       Outcome(model)
@@ -82,8 +77,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
       val menuMagnification = 2
 
       val mainMenu = {
-        if model.loadInfo.loadedData.isDefined then
-          MainMenuUi(Batch(NewGame), Batch(LoadGame), true)
+        if model.loadInfo.loadedData.isDefined then MainMenuUi(true)
         else viewModel
       }
         .withScale(menuMagnification)
@@ -96,7 +90,9 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
 
       val newGame = mainMenu.newGame.update(context.mouse)
 
-      (Outcome(mainMenu), newGame).map2((vm, ng) => vm.copy(newGame = ng))
+      (Outcome(mainMenu), newGame).map2 { (vm, ng) =>
+        vm.copy(newGame = ng)
+      }
 
     case _ =>
       Outcome(viewModel)
@@ -173,7 +169,6 @@ object MainMenuTitle:
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     val groupAtStart = group.moveTo(titleStart)
-    val groupAtEnd   = group.moveTo(titleEnd)
 
     val titleAnimation: Timeline[Group] =
       timeline(
@@ -198,7 +193,7 @@ object MainMenuTitle:
 
 object MainMenuItems:
 
-  def menuItems(mainMenuUi: MainMenuUi): Layer =
+  def menuItems(mainMenuUi: MainMenuUi): Layer.Content =
     Layer(Group(mainMenuUi.view)).withBlendMaterial(BlendMaterial.BlendEffects(0))
 
   def present(
@@ -206,7 +201,7 @@ object MainMenuItems:
       viewportSize: Size,
       model: Model,
       mainMenuUi: MainMenuUi
-  ): Batch[Layer] =
+  ): Batch[Layer.Content] =
     MenuAnimFunctions
       .layerFadeInAnimation(1.5.second, 1.second)
       .atOrLast(time) {
@@ -241,7 +236,7 @@ object MainMenuAudio:
 
 object MenuAnimFunctions:
 
-  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
+  val applyAlpha: Layer.Content => SignalFunction[Double, Layer.Content] = l =>
     SignalFunction { d =>
       val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
 
@@ -251,10 +246,10 @@ object MenuAnimFunctions:
         case _ => l
     }
 
-  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer] =
+  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer.Content] =
     timeline(
       layer(
-        startAfter[Layer](delay),
+        startAfter[Layer.Content](delay),
         animate(over)(lerp >>> applyAlpha(_))
       )
     )

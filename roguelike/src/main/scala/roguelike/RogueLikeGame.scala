@@ -1,16 +1,15 @@
 package roguelike
 
 import indigo.*
-import indigo.platform.assets.AssetLoader
 import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
 import roguelike.assets.GameAssets
 import roguelike.config.Config
-import roguelike.game.GameScene
 import roguelike.model.GameAssetLoader
 import roguelike.model.Model
 import roguelike.model.SpriteAssetData
+import roguelike.scenes.*
 import roguelike.screeneffects.InnerGlow
 import roguelike.shaders.Hover
 import roguelike.subsystems.FloatingMessage
@@ -28,6 +27,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val layerKeyGame      = BindingKey("game")
   val layerKeyUiOverlay = BindingKey("ui-overlay")
   val layerKeyUi        = BindingKey("ui")
+  val layerKeyWindows   = BindingKey("windows")
   val layerKeyFPS       = BindingKey("fps")
 
   def initialScene(bootData: Size): Option[SceneName] =
@@ -45,7 +45,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[Size]] =
+  def boot(flags: Map[String, String]): Outcome[BootResult[Size, Model]] =
     val gameViewport =
       (flags.get("width"), flags.get("height")) match {
         case (Some(w), Some(h)) =>
@@ -64,13 +64,13 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
         .withFonts(RoguelikeTiles.Size10x10.Fonts.fontInfo)
         .withAssets(GameAssets.initialAssets)
         .withShaders(
-          TerminalText.standardShader,
           InnerGlow.shader,
           Hover.shader
         )
+        .addShaders(roguelikestarterkit.shaders.all)
         .withSubSystems(
           FPSCounter(
-            Point(5, 100),
+            Point(0, 700),
             layerKeyFPS
           ),
           FloatingMessage.subSystem
@@ -92,6 +92,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
       val spriteAnimationLoader: (SpriteAssetData, Depth) => Outcome[SpriteAndAnimations] =
         GameAssetLoader.loadAnimation(assetCollection, dice)
 
+      // TODO: Can this be replaced with generated code?
       val spritesAndAnimations: Outcome[Batch[(AssetName, SpriteAndAnimations)]] =
         SpriteAssetData.spriteData.map { s =>
           spriteAnimationLoader(s, Depth.zero)
@@ -106,7 +107,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
               sprites.map(_._2.animations).toList
             )
         ).addGlobalEvents(
-          LoadEvent.SpritesLoaded(
+          GameEvent.SpritesLoaded(
             sprites.map(s => (s._1, s._2.sprite))
           )
         )
@@ -133,9 +134,10 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        Layer(layerKeyGame),
-        Layer(layerKeyUiOverlay),
-        Layer(layerKeyUi),
-        Layer(layerKeyFPS)
+        layerKeyGame      -> Layer.empty,
+        layerKeyUiOverlay -> Layer.empty,
+        layerKeyUi        -> Layer.empty,
+        layerKeyWindows   -> Layer.empty,
+        layerKeyFPS       -> Layer.empty
       )
     )

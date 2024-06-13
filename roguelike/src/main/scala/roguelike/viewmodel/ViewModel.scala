@@ -2,37 +2,35 @@ package roguelike.viewmodel
 
 import indigo.*
 import indigo.scenes.SceneContext
+import indigo.shared.events.FrameTick
 import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.NewGame
-import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
-import roguelike.components.windows.WindowManager
-import roguelike.model.GameMap
 import roguelike.model.GameTile
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
-import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
 import roguelike.viewmodel.ui.*
-import roguelikestarterkit.*
+import roguelike.windows.WindowStateManager
 
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
-final case class ViewModel(game: GameViewModel, mainMenu: MainMenuUi)
+final case class ViewModel(
+    game: GameViewModel,
+    mainMenu: MainMenuUi
+)
 
 object ViewModel:
 
   def initial(player: Player, initialViewportSize: Size): ViewModel =
     ViewModel(
       GameViewModel.initial(player, initialViewportSize),
-      MainMenuUi(Batch(NewGame), Batch.empty, false)
+      MainMenuUi(false)
     )
 
 final case class GameViewModel(
@@ -47,8 +45,6 @@ final case class GameViewModel(
     tiles: Batch[(GameTile, Point)],
     tilePositions: Batch[Point],
     collectables: js.Array[Collectable],
-    terminals: CachedTerminals,
-    helpControlsText: String,
     sprites: Option[GameSprites]
 ):
 
@@ -87,15 +83,17 @@ final case class GameViewModel(
       GameViewModel.nextViewModel(context, model, this)
 
     case _: MouseEvent.Click
-        if !WindowManager.showingWindow(model) &&
+        if !WindowStateManager.showingWindow(model) &&
           model.player.position == hoverSquare &&
-          model.gameState.isWaitForInput =>
+          model.gameState.isWaitForInput &&
+          model.gameClickAllowed =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerTryPickUp)
 
     case _: MouseEvent.Click
-        if !WindowManager.showingWindow(model) &&
-          model.gameState.isWaitForInput =>
+        if !WindowStateManager.showingWindow(model) &&
+          model.gameState.isWaitForInput &&
+          model.gameClickAllowed =>
       Outcome(this)
         .addGlobalEvents(GameEvent.PlayerMoveTowards(hoverSquare))
 
@@ -109,6 +107,30 @@ final case class GameViewModel(
       context: SceneContext[Size],
       model: Model
   ): GameEvent => Outcome[GameViewModel] =
+    case GameEvent.ModifyDefense(_) =>
+      Outcome(this)
+
+    case GameEvent.ModifyMaxHp(_) =>
+      Outcome(this)
+
+    case GameEvent.ModifyPower(_) =>
+      Outcome(this)
+
+    case GameEvent.GenerateLevel =>
+      Outcome(this)
+
+    case GameEvent.NewGame =>
+      Outcome(this)
+
+    case GameEvent.LoadGame =>
+      Outcome(this)
+
+    case GameEvent.SaveGame =>
+      Outcome(this)
+
+    case GameEvent.SpritesLoaded(_) =>
+      Outcome(this)
+
     case GameEvent.Inventory(InventoryEvent.PickedUp(item)) =>
       Outcome(this)
         .addGlobalEvents(
@@ -118,7 +140,19 @@ final case class GameViewModel(
           )
         )
 
-    case GameEvent.Inventory(InventoryEvent.DropItem(item, _)) =>
+    case GameEvent.Inventory(InventoryEvent.DropItem(_)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.UseItem(_)) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.UnequipArmour) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.UnequipWeapon) =>
+      Outcome(this)
+
+    case GameEvent.Inventory(InventoryEvent.DroppedItem(item, _)) =>
       Outcome(this)
         .addGlobalEvents(
           FloatingMessage.spawnEvent(
@@ -128,30 +162,7 @@ final case class GameViewModel(
         )
 
     case GameEvent.RedrawHistoryLog =>
-      val history =
-        model.messageLog
-          .toTerminal(Size(50, 30), false, 0, true)
-          .toCloneTiles(CloneId("history_tiles"), Point(3, 4), RoguelikeTiles.Size10x10.charCrops) {
-            (fg, bg) =>
-              Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
-
-      val shortLog =
-        model.messageLog
-          .toTerminal(Size(50, 5), false, 0, false)
-          .toCloneTiles(
-            CloneId("short_log_tiles"),
-            Point(3, 4),
-            RoguelikeTiles.Size10x10.charCrops
-          ) { (fg, bg) =>
-            Graphic(10, 10, TerminalText(GameAssets.assets.init.AnikkiSquare10x10, fg, bg))
-          }
-
-      Outcome(
-        this.copy(
-          terminals = terminals.copy(history = history, shortLog = shortLog)
-        )
-      )
+      Outcome(this)
 
     case GameEvent.CameraSnapToPlayer =>
       Outcome(
@@ -231,17 +242,6 @@ object GameViewModel:
   val SquareSize: Point = Point(32)
 
   def initial(player: Player, initialViewportSize: Size): GameViewModel =
-    val separator = " | "
-    val commandsAndValues =
-      KeyMapping.helpText.map(p => (p._1, p._2.mkString(separator)))
-    val longest = KeyMapping.longestMappings + separator.length
-    val helpControlsText = commandsAndValues
-      .map { case (cmd, value) =>
-        val v = List.fill(longest - value.length)(" ").mkString + value
-        s"$cmd $v"
-      }
-      .mkString("\n")
-
     GameViewModel(
       magnification = 2,
       viewportSize = initialViewportSize,
@@ -254,8 +254,6 @@ object GameViewModel:
       tiles = Batch.empty,
       tilePositions = Batch.empty,
       collectables = js.Array(),
-      terminals = CachedTerminals.initial,
-      helpControlsText = helpControlsText,
       sprites = None
     )
 
@@ -308,7 +306,7 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
+    (nextPlayerPosition `combine` hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,
@@ -320,14 +318,5 @@ object GameViewModel:
         collectables = collectables
       )
     }
-
-final case class CachedTerminals(
-    history: TerminalClones,
-    shortLog: TerminalClones
-)
-
-object CachedTerminals:
-  def initial: CachedTerminals =
-    CachedTerminals(TerminalClones.empty, TerminalClones.empty)
 
 final case class GameSprites(player: Sprite[Bitmap], orc: Sprite[Bitmap], troll: Sprite[Bitmap])

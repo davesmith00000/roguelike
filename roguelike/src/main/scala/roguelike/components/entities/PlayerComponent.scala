@@ -6,9 +6,7 @@ import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
-import roguelike.assets.GameAssets
-import roguelike.components.Component
-import roguelike.components.windows.WindowManagerCommand
+import roguelike.components.GameComponent
 import roguelike.model.GameState
 import roguelike.model.Inventory
 import roguelike.model.Message
@@ -20,8 +18,9 @@ import roguelike.viewmodel.ActorDirection
 import roguelike.viewmodel.ActorMoveState
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
+import roguelike.windows.WindowManagerCommand
 
-object PlayerComponent extends Component[Size, Model, GameViewModel]:
+object PlayerComponent extends GameComponent[Size, Model, GameViewModel]:
   type ComponentModel     = PlayerM
   type ComponentViewModel = PlayerVM
   type Command            = Cmds
@@ -53,7 +52,45 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
       context: SceneContext[Size],
       model: PlayerM
   ): Cmds => Outcome[PlayerM] =
-    case Cmds.RemoveFromInvetory(at) =>
+    case Cmds.UnequipArmour =>
+      model.player.inventory.unequipArmour
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.UnequipWeapon =>
+      model.player.inventory.unequipWeapon
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.DropItem(at) =>
+      model.player.inventory
+        .drop(at, model.player.position)
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.UseItem(at) =>
+      model.player.inventory
+        .use(at)
+        .map { inventory =>
+          inventoryLens.modify(model.player, _ => inventory)
+        }
+        .map { p =>
+          model.next(p)
+        }
+
+    case Cmds.RemoveFromInventory(at) =>
       Outcome(model.next(inventoryLens.modify(model.player, _.remove(at))))
 
     case Cmds.GiveToPlayer(i) =>
@@ -236,7 +273,11 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
 
   enum Cmds:
     case Update
-    case RemoveFromInvetory(at: Int)
+    case RemoveFromInventory(at: Int)
     case GiveToPlayer(item: Item)
     case UseConsumable(c: Consumables)
     case HostileInteraction(e: HostileEvent)
+    case DropItem(at: Int)
+    case UnequipArmour
+    case UnequipWeapon
+    case UseItem(at: Int)

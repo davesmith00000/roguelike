@@ -2,13 +2,11 @@ package roguelike
 
 import indigo.*
 import indigo.shared.materials.Material.Bitmap
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.Message
-import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 import roguelike.model.items.Item
+import roguelike.windows.WindowManagerCommand
 
 enum GameEvent extends GlobalEvent:
   // Player events
@@ -45,9 +43,19 @@ enum GameEvent extends GlobalEvent:
   case RedrawHistoryLog
   case Targeted(position: Point)
   case WindowEvent(command: WindowManagerCommand)
+  case GenerateLevel
+  case NewGame
+  case LoadGame
+  case SaveGame
+  case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
 
   // ViewModel events
   case CameraSnapToPlayer
+
+  // Stats
+  case ModifyPower(amount: Int)
+  case ModifyMaxHp(amount: Int)
+  case ModifyDefense(amount: Int)
 
 enum HostileEvent:
   case HostileMeleeAttack(attackerName: String, power: Int)
@@ -55,15 +63,12 @@ enum HostileEvent:
 
 enum InventoryEvent:
   case UseConsumables(consumables: Consumables)
-  case DropItem(item: Item, mapPosition: Point)
+  case DropItem(inventoryPosition: Int)
+  case UseItem(inventoryPosition: Int)
+  case DroppedItem(item: Item, mapPosition: Point)
+  case UnequipArmour
+  case UnequipWeapon
   case UseRanged(inventoryPosition: Int, ranged: Ranged)
   case TargetUsingRanged(inventoryPosition: Int, ranged: Ranged)
   case PickedUp(item: Item)
   case RemoveFromInventory(inventoryPosition: Int)
-
-enum LoadEvent extends GlobalEvent:
-  case SpritesLoaded(sprites: Batch[(AssetName, Sprite[Bitmap])])
-
-case object GenerateLevel extends GlobalEvent
-case object NewGame       extends GlobalEvent
-case object LoadGame      extends GlobalEvent

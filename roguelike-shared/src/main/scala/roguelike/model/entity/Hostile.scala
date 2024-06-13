@@ -9,7 +9,6 @@ import roguelike.HostileEvent
 import roguelike.model.GameMap
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
-import roguelikestarterkit.*
 
 sealed trait Hostile extends Entity:
   val name: String

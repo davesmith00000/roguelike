@@ -1,0 +1,133 @@
+package roguelike.windows
+
+import indigo.*
+import roguelike.ColorScheme
+import roguelike.model.GameWindowContext
+import roguelike.model.entity.Player
+import roguelikestarterkit.*
+
+object InfoPanel:
+
+  val windowId: WindowId = WindowId("Info")
+
+  def window(
+      charSheet: CharSheet
+  ): WindowModel[Unit, GameWindowContext] =
+    WindowModel(
+      windowId,
+      charSheet,
+      ()
+    )
+      .withTitle("Info")
+      .moveTo(0, 3)
+      .resizeTo(
+        Dimensions(25, 16)
+      )
+      .isDraggable
+
+  given WindowContent[Unit, GameWindowContext] with
+
+    def updateModel(
+        context: UIContext[GameWindowContext],
+        model: Unit
+    ): GlobalEvent => Outcome[Unit] =
+      case _ =>
+        Outcome(model)
+
+    def present(
+        context: UIContext[GameWindowContext],
+        model: Unit
+    ): Outcome[Layer] =
+      Outcome(
+        Layer(
+          renderLevel(
+            context.charSheet,
+            context.screenSpaceBounds.position,
+            context.reference.currentFloor
+          ),
+          renderBar(
+            context.charSheet,
+            context.reference.player,
+            20,
+            context.screenSpaceBounds.position + Point(0, context.charSheet.size.height + 4)
+          ),
+          renderCharacterInfo(
+            context.charSheet,
+            context.reference.player,
+            context.screenSpaceBounds.position,
+            Coords(0, 4)
+          )
+        )
+      )
+
+    def refresh(reference: GameWindowContext, model: Unit, contentDimensions: Dimensions): Unit =
+      model
+
+  def renderBar(charSheet: CharSheet, player: Player, totalWidth: Int, position: Point): Group =
+    val height = charSheet.size.height + 4
+    val width  = charSheet.size.width * totalWidth
+    val barWidth =
+      (player.fighter.hp.toFloat / player.fighter.maxHp.toFloat * width).toInt
+
+    Group(
+      Shape.Box(
+        Rectangle(0, 0, width, height),
+        Fill.Color(ColorScheme.barEmpty)
+      ),
+      Shape.Box(
+        Rectangle(0, 0, barWidth, height),
+        Fill.Color(ColorScheme.barFilled)
+      ),
+      healthStatusLine(charSheet).withText(formatStatus(player))
+    ).moveTo(position)
+
+  def renderLevel(charSheet: CharSheet, position: Point, currentFloor: Int): Text[TerminalText] =
+    healthStatusLine(charSheet)
+      .withText("Dungeon level: " + currentFloor.toString)
+      .moveTo(position)
+
+  def formatStatus(player: Player): String =
+    s"HP: ${Math.max(0, player.fighter.hp)}/${player.fighter.maxHp}"
+
+  def healthStatusLine(charSheet: CharSheet): Text[TerminalText] =
+    Text(
+      "",
+      RoguelikeTiles.Size10x10.Fonts.fontKey,
+      TerminalText(charSheet.assetName, RGBA.White, RGBA.Zero)
+    )
+      .moveTo(1, 2)
+
+  def renderCharacterInfo(
+      charSheet: CharSheet,
+      player: Player,
+      contentPosition: Point,
+      offset: Coords
+  ): Text[TerminalText] =
+    val powerBonus: String =
+      if player.inventory.equipment.powerBonus == 0 then ""
+      else s" + ${player.inventory.equipment.powerBonus}"
+
+    val defenseBonus: String =
+      if player.inventory.equipment.defenseBonus == 0 then ""
+      else s" + ${player.inventory.equipment.defenseBonus}"
+
+    val text =
+      s"""Level: ${player.level}
+      |XP: ${player.xp}
+      |XP for next level: ${player.experienceToNextLevel}
+      |Attack: ${player.fighter.power}$powerBonus
+      |Defense: ${player.fighter.defense}$defenseBonus
+      |Weapon: ${player.inventory.equipment.weapon
+          .map(_.name)
+          .getOrElse("--none--")}
+      |Armour: ${player.inventory.equipment.armour
+          .map(_.name)
+          .getOrElse("--none--")}
+      |""".stripMargin
+
+    Text(
+      text,
+      RoguelikeTiles.Size10x10.Fonts.fontKey,
+      TerminalText(charSheet.assetName, RGBA.White, RGBA.Zero)
+    )
+      .moveTo(contentPosition + offset.toScreenSpace(charSheet.size))

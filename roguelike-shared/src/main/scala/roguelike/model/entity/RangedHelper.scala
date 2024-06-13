@@ -1,15 +1,10 @@
 package roguelike.model.entity
 
 import indigo.*
-import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.model.Message
 import roguelike.model.gamedata.Ranged
-
-import scala.annotation.tailrec
-import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 
 object RangedHelper:
 

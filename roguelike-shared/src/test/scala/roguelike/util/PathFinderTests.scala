@@ -2,7 +2,6 @@ package roguelike.util
 
 import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.Size
 
 class PathFinderTests extends munit.FunSuite {
 

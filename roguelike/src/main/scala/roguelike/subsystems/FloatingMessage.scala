@@ -4,6 +4,7 @@ import indigo.*
 import indigoextras.subsystems.*
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
+import roguelike.model.Model
 import roguelikestarterkit.terminal.TerminalText
 import roguelikestarterkit.tiles.RoguelikeTiles
 
@@ -13,7 +14,7 @@ object FloatingMessage:
 
   private val poolKey = AutomataPoolKey("floating messages")
 
-  def subSystem: Automata =
+  def subSystem: Automata[Model] =
     Automata(
       poolKey,
       Automaton(

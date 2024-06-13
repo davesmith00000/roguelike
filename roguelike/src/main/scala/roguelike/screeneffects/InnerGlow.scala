@@ -1,9 +1,7 @@
 package roguelike.screeneffects
 
 import indigo.*
-import indigo.scenes.*
 import indigo.syntax.*
-import roguelike.assets.GameAssets
 import roguelike.assets.ShaderInnerGlow
 
 final case class InnerGlow(

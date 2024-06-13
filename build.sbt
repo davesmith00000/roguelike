@@ -6,24 +6,21 @@ import indigoplugin._
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
-
 lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   version      := "0.0.1",
   organization := "purplekingdomgames",
-  scalaVersion := "3.3.1",
+  scalaVersion := "3.4.1",
   libraryDependencies ++= Seq(
     "org.scalameta" %%% "munit" % "0.7.29" % Test
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalafixOnCompile := true,
   semanticdbEnabled := true,
-  semanticdbVersion := scalafixSemanticdb.revision,
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.16.0"
-val roguelikeStarterKitVersion = "0.5.0"
+val indigoVersion              = "0.17.0"
+val roguelikeStarterKitVersion = "0.5.1-SNAPSHOT"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(

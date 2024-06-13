@@ -6,7 +6,7 @@ import indigo.shared.materials.Material.Bitmap
 import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.components.Component
+import roguelike.components.GameComponent
 import roguelike.model.GameMap
 import roguelike.model.GameState
 import roguelike.model.HostilesPool
@@ -16,7 +16,7 @@ import roguelike.model.entity.Hostile
 import roguelike.viewmodel.ActorPosition
 import roguelike.viewmodel.GameViewModel
 
-object HostilesManager extends Component[Size, Model, GameViewModel]:
+object HostilesManager extends GameComponent[Size, Model, GameViewModel]:
   type Command            = Cmds
   type ComponentModel     = HostilesM
   type ComponentViewModel = HostilesVM

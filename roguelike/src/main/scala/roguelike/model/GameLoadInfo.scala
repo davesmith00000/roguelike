@@ -1,7 +1,5 @@
 package roguelike.model
 
-import indigo.*
-
 final case class GameLoadInfo(
     state: LoadingState,
     loadedData: Option[ModelSaveData]

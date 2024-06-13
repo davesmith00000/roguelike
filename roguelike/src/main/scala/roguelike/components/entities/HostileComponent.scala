@@ -6,17 +6,15 @@ import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
-import roguelike.components.Component
-import roguelike.components.windows.WindowManagerCommand
-import roguelike.model.GameMap
-import roguelike.model.HostilesPool
+import roguelike.components.GameComponent
 import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 import roguelike.viewmodel.ActorPosition
+import roguelike.windows.WindowManagerCommand
 
-object HostileComponent extends Component[Size, Hostile, HostilesManager.HostilesVM]:
+object HostileComponent extends GameComponent[Size, Hostile, HostilesManager.HostilesVM]:
   type Command            = Cmds
   type ComponentModel     = Hostile
   type ComponentViewModel = HostileVM

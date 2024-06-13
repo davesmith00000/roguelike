@@ -6,16 +6,11 @@ import io.circe.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.InventoryEvent
-import roguelike.model.Equipment
 import roguelike.model.GameMap
 import roguelike.model.HostilesPool
 import roguelike.model.Inventory
 import roguelike.model.Message
 import roguelike.model.SharedCodecs
-import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.Melee
-import roguelike.model.items.Item
-import roguelikestarterkit.*
 
 final case class Player(
     position: Point,

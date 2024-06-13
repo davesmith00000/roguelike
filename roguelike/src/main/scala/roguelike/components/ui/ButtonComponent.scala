@@ -14,8 +14,6 @@ final case class ButtonComponent(
     hitArea: HitArea,
     scale: Int
 ):
-  private val tileWidth =
-    (ButtonComponent.baseTile * ButtonComponent.multiplier).toInt
   val height = (ButtonComponent.baseTile * ButtonComponent.multiplier).toInt
 
   def moveTo(pos: Point): ButtonComponent =

@@ -4,7 +4,6 @@ import dungeonviewer.generated.Assets
 import dungeonviewer.generated.Config
 import indigo.*
 import indigo.scenes.*
-import indigoextras.subsystems.FPSCounter
 import roguelikestarterkit.*
 
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -25,7 +24,7 @@ object DungeonViewer extends IndigoGame[Unit, Unit, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[Unit]] =
+  def boot(flags: Map[String, String]): Outcome[BootResult[Unit, Model]] =
     Outcome(
       BootResult
         .noData(Config.config)

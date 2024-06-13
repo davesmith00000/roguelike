@@ -3,7 +3,7 @@ package roguelike.components
 import indigo.*
 import indigo.scenes.SceneContext
 
-trait Component[StartupData, ParentModel, ParentViewModel]:
+trait GameComponent[StartupData, ParentModel, ParentViewModel]:
   type ComponentModel
   type ComponentViewModel
   type Command

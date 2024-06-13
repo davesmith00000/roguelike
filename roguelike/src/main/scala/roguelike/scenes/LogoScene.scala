@@ -1,18 +1,12 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
 import indigo.syntax.animations.*
-import indigoextras.subsystems.AssetBundleLoader
-import indigoextras.subsystems.AssetBundleLoaderEvent
 import roguelike.assets.GameAssets
-import roguelike.model.GameLoadInfo
-import roguelike.model.LoadingState
 import roguelike.model.Model
-import roguelike.model.ModelSaveData
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 
@@ -31,7 +25,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(

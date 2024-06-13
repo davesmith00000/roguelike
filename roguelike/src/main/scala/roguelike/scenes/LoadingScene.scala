@@ -1,10 +1,11 @@
-package roguelike
+package roguelike.scenes
 
 import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.AssetBundleLoader
 import indigoextras.subsystems.AssetBundleLoaderEvent
+import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.model.GameLoadInfo
 import roguelike.model.LoaderAnim
@@ -14,7 +15,6 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 
@@ -33,8 +33,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
-    Set(AssetBundleLoader)
+  val subSystems: Set[SubSystem[Model]] =
+    Set(AssetBundleLoader[Model])
 
   val loadBindingKey: BindingKey = BindingKey("initial game load")
 
@@ -96,7 +96,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
       loadInfo: GameLoadInfo,
       viewModel: GameViewModel
   ): GlobalEvent => Outcome[GameViewModel] =
-    case LoadEvent.SpritesLoaded(sprites) =>
+    case GameEvent.SpritesLoaded(sprites) =>
       val player = sprites.find(_._1 == GameAssets.assets.game.Player).map(_._2)
       val orc    = sprites.find(_._1 == GameAssets.assets.game.enemy1).map(_._2)
       val troll  = sprites.find(_._1 == GameAssets.assets.game.ENEMY2).map(_._2)

@@ -7,13 +7,11 @@ import io.circe.*
 import io.circe.syntax.*
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.PositionedTile
-import roguelike.model.entity.*
 import roguelike.util.Indices
 import roguelike.util.PathFinder
 
 import scala.annotation.tailrec
 import scala.scalajs.js
-import scala.scalajs.js.JSConverters.*
 
 final case class GameMap(
     size: Size,
