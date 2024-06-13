@@ -6,7 +6,6 @@ import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.model.GameWindowContext
 import roguelike.model.Message
-import roguelike.scenes.UIElements
 import roguelikestarterkit.*
 import roguelikestarterkit.syntax.*
 
@@ -36,10 +35,13 @@ object DropMenu:
     DropMenu(
       ComponentList(Dimensions(35, 22)) { (_: GameWindowContext) =>
         Batch(
-          Label[GameWindowContext]("Select a collectable to drop", Label.Theme(charSheet))
+          TextArea[GameWindowContext](
+            "Select a collectable to drop\n ",
+            TextArea.Theme(charSheet)
+          )
         )
       }
-        .withLayout(ComponentLayout.Vertical(Padding.zero.withBottom(1)))
+        .withLayout(ComponentLayout.Vertical(Padding.zero))
         .add(ctx =>
           if ctx.player.inventory.backpack.count > 0 then Batch.empty
           else
@@ -52,17 +54,20 @@ object DropMenu:
         )
         .add((ctx: GameWindowContext) =>
           if ctx.player.inventory.backpack.count > 0 then
-            val collectables: Batch[String] =
+            val collectables: Batch[(String, Int)] =
               ctx.player.inventory.backpack.items
                 .map(_.name)
-                .zip(UIElements.letters)
-                .map { case (name, letter) =>
-                  s"[$letter] $name"
+                .zipWithIndex
+                .map { case (name, num) =>
+                  s"$num. $name" -> num
                 }
 
-            collectables.map { label =>
+            collectables.map { (label, num) =>
               Button[GameWindowContext](label, Button.Theme(charSheet))
-            // TODO: .onClick(GameEvent.Inventory(InventoryEvent.DropItem))
+                .onClick(
+                  GameEvent.Inventory(InventoryEvent.DropItem(num)),
+                  GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
+                )
             // Also there is a bug where opening the drop window with the keyboard drops entry 'd' from the inventory
             }
           else Batch.empty
@@ -71,12 +76,18 @@ object DropMenu:
 
   given WindowContent[DropMenu, GameWindowContext] with
 
+    // This function takes a key, uses the code to check its a numeric value, and then return that value as an Option
+    private def keyToNumber(keyCode: Int): Option[Int] =
+      if keyCode >= Key.KEY_0.code && keyCode <= Key.KEY_9.code then
+        Option(keyCode - Key.KEY_0.code)
+      else None
+
     def updateModel(
         context: UIContext[GameWindowContext],
         model: DropMenu
     ): GlobalEvent => Outcome[DropMenu] =
       case KeyboardEvent.KeyUp(key) =>
-        UIElements.letterPositions.get(key.key) match
+        keyToNumber(key.code) match
           case None =>
             Outcome(model)
 
@@ -87,10 +98,10 @@ object DropMenu:
                 GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
               )
 
-          case Some(keyIndex) =>
+          case Some(num) =>
             Outcome(model)
               .addGlobalEvents(
-                GameEvent.Inventory(InventoryEvent.DropItem(keyIndex)),
+                GameEvent.Inventory(InventoryEvent.DropItem(num)),
                 GameEvent.WindowEvent(WindowManagerCommand.CloseAll)
               )
 
