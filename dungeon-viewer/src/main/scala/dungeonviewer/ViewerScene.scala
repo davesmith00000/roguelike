@@ -11,8 +11,6 @@ import indigo.syntax.*
 import roguelike.model.dungeon.Dungeon
 import roguelikestarterkit.*
 
-import scala.annotation.tailrec
-
 object ViewerScene extends Scene[Unit, Model, ViewModel]:
 
   type SceneModel     = Model
@@ -30,7 +28,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(context: SceneContext[Unit], model: Model): GlobalEvent => Outcome[Model] =
@@ -55,7 +53,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
     case KeyboardEvent.KeyUp(Key.SPACE) | KeyboardEvent.KeyUp(Key.KEY_2) =>
       val dungeon: Dungeon =
         dungeongen.v2.DungeonGen.makeMap(
-          context.dice,
+          context.frame.dice,
           DungeonRules.MaxRooms,
           DungeonRules.RoomMinSize,
           DungeonRules.RoomMaxSize,
@@ -65,12 +63,12 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           0
         )
 
-      ViewModel.updateFromDungeon(context.dice, viewModel, dungeon)
+      ViewModel.updateFromDungeon(context.frame.dice, viewModel, dungeon)
 
     case KeyboardEvent.KeyUp(Key.KEY_1) =>
       val dungeon: Dungeon =
         dungeongen.classic.DungeonGen.makeMap(
-          context.dice,
+          context.frame.dice,
           DungeonRules.MaxRooms,
           DungeonRules.RoomMinSize,
           DungeonRules.RoomMaxSize,
@@ -80,7 +78,7 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
           0
         )
 
-      ViewModel.updateFromDungeon(context.dice, viewModel, dungeon)
+      ViewModel.updateFromDungeon(context.frame.dice, viewModel, dungeon)
 
     case KeyboardEvent.KeyUp(Key.KEY_H) =>
       Outcome(viewModel.copy(isMeshVisible = !viewModel.isMeshVisible))
@@ -95,9 +93,8 @@ object ViewerScene extends Scene[Unit, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     val tiles =
       viewModel.terminal
-        .toCloneTiles(CloneId("tiles"), Point.zero, RoguelikeTiles.Size10x10.charCrops) {
-          (fg, bg) =>
-            Graphic(10, 10, TerminalText(Assets.assets.AnikkiSquare10x10, fg, bg))
+        .toCloneTiles(CloneId("tiles"), Point.zero, RoguelikeTiles.Size10x10.charCrops) { (fg, bg) =>
+          Graphic(10, 10, TerminalText(Assets.assets.AnikkiSquare10x10, fg, bg))
         }
 
     val mesh: Batch[SceneNode] =

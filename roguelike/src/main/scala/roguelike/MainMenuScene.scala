@@ -2,15 +2,10 @@ package roguelike
 
 import indigo.*
 import indigo.scenes.*
-import indigo.shared.datatypes.Fill.Color.apply
 import indigo.syntax.*
 import indigo.syntax.animations.*
-import indigoextras.ui.Button
-import indigoextras.ui.HitArea
-import roguelike.GameEvent
 import roguelike.assets.GameAssets
 import roguelike.game.GameScene
-import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.screeneffects.InnerGlow
 import roguelike.viewmodel.ViewModel
@@ -37,7 +32,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(
@@ -94,7 +89,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
           )
         )
 
-      val newGame = mainMenu.newGame.update(context.mouse)
+      val newGame = mainMenu.newGame.update(context.frame.input.mouse)
 
       (Outcome(mainMenu), newGame).map2((vm, ng) => vm.copy(newGame = ng))
 
@@ -108,7 +103,7 @@ object MainMenuScene extends Scene[Size, Model, ViewModel]:
   ): Outcome[SceneUpdateFragment] =
     val time            = context.sceneRunning
     val viewportSize    = context.startUpData
-    val boundaryLocator = context.boundaryLocator
+    val boundaryLocator = context.services.bounds
 
     Outcome(
       SceneUpdateFragment.empty
@@ -162,10 +157,10 @@ object MainMenuTitle:
   def presentTitleText(
       time: Seconds,
       viewportSize: Size,
-      boundaryLocator: BoundaryLocator
+      boundaryLocator: Context.Services.Bounds
   ): Batch[Group] =
     val halfSize       = viewportSize * 0.5
-    val titleTextBound = boundaryLocator.textBounds(titleText)
+    val titleTextBound = boundaryLocator.find(titleText)
 
     val titleStart =
       (halfSize - (titleTextBound.size * textMagnification.toDouble * 0.5)).toPoint
@@ -173,7 +168,6 @@ object MainMenuTitle:
     val titleEnd = titleStart.moveTo(titleStart.x, 60)
 
     val groupAtStart = group.moveTo(titleStart)
-    val groupAtEnd   = group.moveTo(titleEnd)
 
     val titleAnimation: Timeline[Group] =
       timeline(
@@ -186,7 +180,11 @@ object MainMenuTitle:
 
     titleAnimation.atOrLast(time)(groupAtStart).toBatch
 
-  def present(time: Seconds, viewportSize: Size, boundaryLocator: BoundaryLocator): Batch[Layer] =
+  def present(
+      time: Seconds,
+      viewportSize: Size,
+      boundaryLocator: Context.Services.Bounds
+  ): Batch[Layer] =
     MenuAnimFunctions
       .layerFadeInAnimation(0.5.seconds, slideInTime)
       .atOrLast(time) {
@@ -198,8 +196,10 @@ object MainMenuTitle:
 
 object MainMenuItems:
 
-  def menuItems(mainMenuUi: MainMenuUi): Layer =
-    Layer(Group(mainMenuUi.view)).withBlendMaterial(BlendMaterial.BlendEffects(0))
+  def menuItems(mainMenuUi: MainMenuUi): Layer.Content =
+    Layer
+      .Content(Group(mainMenuUi.view))
+      .withBlendMaterial(BlendMaterial.BlendEffects(0))
 
   def present(
       time: Seconds,
@@ -241,7 +241,7 @@ object MainMenuAudio:
 
 object MenuAnimFunctions:
 
-  val applyAlpha: Layer => SignalFunction[Double, Layer] = l =>
+  val applyAlpha: Layer.Content => SignalFunction[Double, Layer.Content] = l =>
     SignalFunction { d =>
       val material = l.blending.map(_.blendMaterial).getOrElse(BlendMaterial.BlendEffects.None)
 
@@ -251,10 +251,10 @@ object MenuAnimFunctions:
         case _ => l
     }
 
-  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer] =
+  def layerFadeInAnimation(delay: Seconds, over: Seconds): Timeline[Layer.Content] =
     timeline(
       layer(
-        startAfter[Layer](delay),
+        startAfter[Layer.Content](delay),
         animate(over)(lerp >>> applyAlpha(_))
       )
     )

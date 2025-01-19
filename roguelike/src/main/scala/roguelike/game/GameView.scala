@@ -2,10 +2,8 @@ package roguelike.game
 
 import indigo.*
 import indigo.scenes.SceneContext
-import indigo.shared.materials.Material.Bitmap
 import indigo.syntax.*
 import roguelike.RogueLikeGame
-import roguelike.assets.GameAssets
 import roguelike.assets.GameGraphics
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
@@ -13,16 +11,12 @@ import roguelike.components.windows.WindowManager
 import roguelike.model.GameState
 import roguelike.model.GameTile
 import roguelike.model.Model
-import roguelike.model.entity.Orc
-import roguelike.model.entity.Troll
 import roguelike.model.gamedata.Armour
 import roguelike.model.gamedata.Consumables
 import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 import roguelike.shaders.Hover
 import roguelike.viewmodel.GameViewModel
-import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object GameView:
 
@@ -155,8 +149,7 @@ object GameView:
         HostilesManager.viewModelLens.get(viewModel)
       )
     } yield SceneUpdateFragment(
-      Layer(
-        RogueLikeGame.layerKeyGame,
+      RogueLikeGame.layerKeyGame -> Layer(
         gameGrid ++
           hover ++
           collectables ++
@@ -165,7 +158,7 @@ object GameView:
           lookAround
       ).withCamera(camera)
         .withMagnification(viewModel.magnification),
-      Layer(RogueLikeGame.layerKeyUiOverlay)
+      RogueLikeGame.layerKeyUiOverlay -> Layer.empty
         .withCamera(camera)
         .withMagnification(viewModel.magnification)
     )
@@ -179,8 +172,7 @@ object GameView:
 
     WindowManager.present(context, model, viewModel).map { windows =>
       SceneUpdateFragment(
-        Layer(
-          RogueLikeGame.layerKeyUi,
+        RogueLikeGame.layerKeyUi -> Layer(
           Batch(
             UIElements.renderBar(
               model.player,
@@ -198,7 +190,7 @@ object GameView:
             ),
             UIElements.renderNameHints(
               viewModel.squareSize,
-              context.mouse.position,
+              context.frame.input.mouse.position,
               model.entitiesList,
               model.stairsPosition,
               viewModel.hoverSquare

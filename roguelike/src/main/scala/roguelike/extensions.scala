@@ -261,8 +261,8 @@ extension [M <: Material](t: Text[M])
       easeInOut(start, end, time.toFloat / duration.toFloat)
     else
       t.moveTo(end)
-extension (l: Layer)
-  def fadeIn(duration: Seconds, time: Seconds): Layer =
+extension (l: Layer.Content)
+  def fadeIn(duration: Seconds, time: Seconds): Layer.Content =
     val material = l.blending.map(b => b.blendMaterial) match {
       case Some(m) => m
       case None    => BlendMaterial.BlendEffects.None
@@ -287,7 +287,7 @@ extension (l: Layer)
     else
       fadeIn(duration, time - start)
 
-  def fadeOut(duration: Seconds, time: Seconds): Layer =
+  def fadeOut(duration: Seconds, time: Seconds): Layer.Content =
     val material = l.blending.map(b => b.blendMaterial) match {
       case Some(m) => m
       case None    => BlendMaterial.BlendEffects.None

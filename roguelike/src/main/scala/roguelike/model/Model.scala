@@ -6,19 +6,14 @@ import indigo.syntax.*
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.GenerateLevel
-import roguelike.HostileEvent
 import roguelike.InventoryEvent
 import roguelike.RogueLikeGame
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.ActiveWindow
 import roguelike.components.windows.WindowManager
-import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.*
-import roguelike.model.gamedata.Armour
-import roguelike.model.gamedata.Consumables
-import roguelike.model.gamedata.Melee
 import roguelike.model.gamedata.Ranged
 
 import scala.scalajs.js
@@ -316,7 +311,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
         if p.nonEmpty then
           val next      = p.head
           val remaining = p.tail
-          performPlayerTurn(context.dice, next - player.position).map { m =>
+          performPlayerTurn(context.frame.dice, next - player.position).map { m =>
             if m.player.position == player.position then
               m.copy(
                 autoMovePath = Batch.empty
@@ -350,7 +345,7 @@ final case class Model( // TODO: Should there be a GameModel class too? (Similar
     case GameEvent.PlayerContinueMove =>
       if autoMovePath.isEmpty then Outcome(this)
       else
-        performPlayerTurn(context.dice, autoMovePath.head - player.position)
+        performPlayerTurn(context.frame.dice, autoMovePath.head - player.position)
           .map {
             _.copy(
               autoMovePath = autoMovePath.drop(1)

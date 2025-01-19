@@ -69,7 +69,7 @@ object HostilesManager extends Component[Size, Model, GameViewModel]:
     val randomDirection: () => Point =
       () =>
         HostilesPool.getRandomDirection(
-          context.dice,
+          context.frame.dice,
           h.position,
           gameMap
         )

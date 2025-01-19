@@ -1,13 +1,10 @@
 package roguelike.model
 
 import indigo.*
-import indigo.syntax.*
 import roguelike.GameEvent
-import roguelike.HostileEvent
 import roguelike.model.entity.Hostile
 
 import scala.annotation.tailrec
-import scala.scalajs.js
 import scala.scalajs.js.JSConverters.*
 
 final case class HostilesPool(

@@ -4,15 +4,9 @@ import indigo.*
 import indigo.scenes.*
 import indigo.syntax.*
 import indigo.syntax.animations.*
-import indigoextras.subsystems.AssetBundleLoader
-import indigoextras.subsystems.AssetBundleLoaderEvent
 import roguelike.assets.GameAssets
-import roguelike.model.GameLoadInfo
-import roguelike.model.LoadingState
 import roguelike.model.Model
-import roguelike.model.ModelSaveData
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object LogoScene extends Scene[Size, Model, ViewModel]:
 
@@ -31,7 +25,7 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set()
 
   def updateModel(
@@ -69,13 +63,13 @@ object LogoScene extends Scene[Size, Model, ViewModel]:
     val logo1: Batch[Outcome[Graphic[Material.ImageEffects]]] =
       LogoAnim
         .logo(firstLogoDelay, screenCenter, false, multiplier)
-        .at(context.running - context.sceneStartTime)(Outcome(Logos.indigo))
+        .at(context.frame.time.running - context.sceneStartTime)(Outcome(Logos.indigo))
         .toBatch
 
     val logo2: Batch[Outcome[Graphic[Material.ImageEffects]]] =
       LogoAnim
         .logo(secondLogoDelay, screenCenter, true, multiplier)
-        .at(context.running - context.sceneStartTime)(Outcome(Logos.pkg))
+        .at(context.frame.time.running - context.sceneStartTime)(Outcome(Logos.pkg))
         .toBatch
 
     (logo1 ++ logo2).sequence.map(SceneUpdateFragment(_))

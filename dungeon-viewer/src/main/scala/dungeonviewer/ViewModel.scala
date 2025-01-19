@@ -9,7 +9,6 @@ import roguelike.model.GameTile.Ground
 import roguelike.model.GameTile.Wall
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.entity.Collectable
-import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
 import roguelike.model.entity.Troll
 import roguelike.model.gamedata.Armour

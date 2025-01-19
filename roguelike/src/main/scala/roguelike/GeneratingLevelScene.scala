@@ -6,16 +6,12 @@ import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
 import indigo.*
 import indigo.scenes.*
-import roguelike.GameEvent
-import roguelike.GenerateLevel
-import roguelike.assets.GameAssets
 import roguelike.game.GameScene
 import roguelike.model.LoaderAnim
 import roguelike.model.Message
 import roguelike.model.Model
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 
@@ -36,7 +32,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
 
   val workerSubSystem =
     WorkerSubSystem(DungeonGenWorker)
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set(workerSubSystem)
 
   def updateModel(
@@ -47,7 +43,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
       Outcome(model).addGlobalEvents(
         workerSubSystem.WorkerEvent.Send(
           DungeonGenConfig(
-            context.dice.seed.toDouble,
+            context.frame.dice.seed.toDouble,
             model.currentFloor,
             RogueLikeGame.screenSize.width,
             RogueLikeGame.screenSize.height
@@ -58,7 +54,7 @@ object GeneratingLevelScene extends Scene[Size, Model, ViewModel]:
     case workerSubSystem.WorkerEvent.Receive(msg) =>
       Model
         .assignDungeon(
-          context.dice,
+          context.frame.dice,
           JsDungeon.toDungeon(msg.dungeon),
           JsGameMap.toGameMap(msg.gameMap)
         )

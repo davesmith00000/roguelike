@@ -4,10 +4,10 @@
 | Inventory    | i                | <unmapped> |
 | Equipment    | e                | <unmapped> |
 | Drop         | d                | <unmapped> |
-| Move up      | up arrow         | <unmapped> |
-| Move down    | down arrow       | <unmapped> |
-| Move left    | left arrow       | <unmapped> |
-| Move right   | right arrow      | <unmapped> |
+| Move up      | arrow up         | <unmapped> |
+| Move down    | arrow down       | <unmapped> |
+| Move left    | arrow left       | <unmapped> |
+| Move right   | arrow right      | <unmapped> |
 | Close window | shift            | <unmapped> |
 | Descend      | period           | <unmapped> |
 | View history | v                | <unmapped> |

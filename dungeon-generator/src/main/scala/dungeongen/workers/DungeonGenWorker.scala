@@ -5,7 +5,6 @@ import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
 import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap
-import indigo.shared.IndigoLogger
 import indigo.shared.collections.Batch
 import indigo.shared.datatypes.Size
 import indigo.shared.dice.Dice
@@ -23,12 +22,12 @@ trait IndigoWorker[A <: js.Any, B <: js.Any]:
 
   @JSExport
   def doWork(): Unit =
-    WorkerGlobal.addEventListener("message", onMessage _)
+    WorkerGlobal.addEventListener("message", onMessage)
 
   @SuppressWarnings(Array("scalafix:DisableSyntax.asInstanceOf"))
   def onMessage(msg: dom.MessageEvent): Unit =
     process(msg.data.asInstanceOf[A])
-      .map(WorkerGlobal.postMessage(_))
+      .foreach(WorkerGlobal.postMessage(_))
 
   def process(data: A): Batch[B]
 

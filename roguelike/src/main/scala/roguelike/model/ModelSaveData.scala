@@ -1,9 +1,6 @@
 package roguelike.model
 
-import indigo.shared.IndigoLogger
 import indigo.shared.datatypes.Point
-import indigo.shared.datatypes.RGBA
-import indigo.shared.datatypes.Size
 import io.circe.*
 import io.circe.parser.decode
 import io.circe.syntax.*

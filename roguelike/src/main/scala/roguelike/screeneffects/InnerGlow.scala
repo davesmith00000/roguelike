@@ -1,10 +1,10 @@
 package roguelike.screeneffects
 
 import indigo.*
-import indigo.scenes.*
 import indigo.syntax.*
-import roguelike.assets.GameAssets
+import indigo.syntax.shaders.*
 import roguelike.assets.ShaderInnerGlow
+import ultraviolet.syntax.*
 
 final case class InnerGlow(
     screenSize: Size,
@@ -12,18 +12,18 @@ final case class InnerGlow(
     intensity: Double
 ) extends BlendMaterial:
 
-  def toShaderData: BlendShaderData =
-    BlendShaderData(
+  def toShaderData: ShaderData =
+    ShaderData(
       InnerGlow.shaderId,
-      UniformBlock(
-        UniformBlockName("InnerGlowData"),
-        Batch(
-          Uniform("GLOW_COLOR")  -> vec4.fromRGBA(colour),
-          Uniform("SCREEN_SIZE") -> vec2.fromSize(screenSize),
-          Uniform("INTENSITY")   -> float(intensity)
-        )
+      InnerGlowData(
+        colour.toUVVec4,
+        screenSize.toUVVec2,
+        intensity.toFloat
       )
     )
+
+final case class InnerGlowData(GLOW_COLOR: vec4, SCREEN_SIZE: vec2, INTENSITY: Float)
+    derives ToUniformBlock
 
 object InnerGlow:
   val shaderId: ShaderId = ShaderId("inner glow blend material")

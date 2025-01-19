@@ -14,7 +14,6 @@ import roguelike.model.ModelSaveData
 import roguelike.viewmodel.GameSprites
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
-import roguelikestarterkit.*
 
 object LoadingScene extends Scene[Size, Model, ViewModel]:
 
@@ -33,8 +32,8 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  val subSystems: Set[SubSystem] =
-    Set(AssetBundleLoader)
+  val subSystems: Set[SubSystem[Model]] =
+    Set(AssetBundleLoader[Model])
 
   val loadBindingKey: BindingKey = BindingKey("initial game load")
 
@@ -133,8 +132,7 @@ object LoadingScene extends Scene[Size, Model, ViewModel]:
         case LoadingState.InProgress(percent) =>
           "Loaded..." + (percent match
             case Some(p) => s"${p.toString}%"
-            case None    => ""
-          )
+            case None    => "")
 
         case LoadingState.Complete =>
           "Loaded successfully!"

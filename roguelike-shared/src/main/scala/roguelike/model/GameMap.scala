@@ -7,7 +7,6 @@ import io.circe.*
 import io.circe.syntax.*
 import roguelike.model.dungeon.Dungeon
 import roguelike.model.dungeon.PositionedTile
-import roguelike.model.entity.*
 import roguelike.util.Indices
 import roguelike.util.PathFinder
 

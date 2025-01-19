@@ -6,7 +6,6 @@ import indigo.shared.materials.Material.Bitmap
 import roguelike.ColorScheme
 import roguelike.GameEvent
 import roguelike.HostileEvent
-import roguelike.assets.GameAssets
 import roguelike.components.Component
 import roguelike.components.windows.WindowManagerCommand
 import roguelike.model.GameState
@@ -102,7 +101,7 @@ object PlayerComponent extends Component[Size, Model, GameViewModel]:
         case GameState.UpdatingPlayer =>
           viewModel.playerPosition
             .next(
-              context.delta,
+              context.frame.time.delta,
               model.player.position,
               GameEvent.PlayerMoveComplete
             )

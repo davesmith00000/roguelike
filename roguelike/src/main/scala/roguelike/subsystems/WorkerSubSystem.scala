@@ -1,30 +1,31 @@
 package roguelike.subsystems
 
 import dungeongen.workers.IndigoWorker
-import indigo.shared.IndigoLogger
 import indigo.shared.Outcome
 import indigo.shared.collections.Batch
 import indigo.shared.events.FrameTick
 import indigo.shared.events.GlobalEvent
 import indigo.shared.scenegraph.SceneUpdateFragment
 import indigo.shared.subsystems.SubSystem
-import indigo.shared.subsystems.SubSystemFrameContext
+import indigo.shared.subsystems.SubSystemContext
 import indigo.shared.subsystems.SubSystemId
-import org.scalajs.dom
-import org.scalajs.dom.Event
+import roguelike.model.Model
 
-import scala.annotation.nowarn.apply
 import scala.collection.mutable
 import scala.scalajs.js
 
 final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
     worker: IndigoWorker[A, B]
-) extends SubSystem:
+) extends SubSystem[Model]:
   val id: SubSystemId =
     SubSystemId("[WorkerSubSystem] " + worker.name.toString)
 
   type EventType      = GlobalEvent
   type SubSystemModel = Unit
+  type ReferenceData  = Unit
+
+  def reference(model: Model): ReferenceData =
+    ()
 
   def send(value: A): WorkerEvent.Send =
     WorkerEvent.Send(value)
@@ -47,7 +48,7 @@ final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
     Outcome(())
 
   def update(
-      context: SubSystemFrameContext,
+      context: SubSystemContext[Unit],
       model: Unit
   ): GlobalEvent => Outcome[Unit] =
     case WorkerEvent.Send(value) =>
@@ -61,7 +62,7 @@ final case class WorkerSubSystem[A <: js.Any, B <: js.Any](
       Outcome(model)
 
   def present(
-      context: SubSystemFrameContext,
+      context: SubSystemContext[Unit],
       model: Unit
   ): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment.empty)

@@ -2,17 +2,13 @@ package roguelike.game
 
 import indigo.*
 import indigo.scenes.SceneContext
-import indigo.scenes.SceneEvent
 import roguelike.ColorScheme
 import roguelike.GameEvent
-import roguelike.MainMenuScene
 import roguelike.components.entities.HostilesManager
 import roguelike.components.windows.*
-import roguelike.model.GameLoadInfo
 import roguelike.model.GameState
 import roguelike.model.Message
 import roguelike.model.Model
-import roguelike.model.ModelSaveData
 import roguelike.model.gamedata.KeyMapping
 
 object GameSceneUpdate:
@@ -75,19 +71,19 @@ object GameSceneUpdate:
     // Game controls
     case KeyboardEvent.KeyDown(KeyMapping.MoveUp)
         if model.gameState.isWaitForInput && model.player.isAlive =>
-      model.moveUp(context.dice)
+      model.moveUp(context.frame.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveDown)
         if model.gameState.isWaitForInput && model.player.isAlive =>
-      model.moveDown(context.dice)
+      model.moveDown(context.frame.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveLeft)
         if model.gameState.isWaitForInput && model.player.isAlive =>
-      model.moveLeft(context.dice)
+      model.moveLeft(context.frame.dice)
 
     case KeyboardEvent.KeyDown(KeyMapping.MoveRight)
         if model.gameState.isWaitForInput && model.player.isAlive =>
-      model.moveRight(context.dice)
+      model.moveRight(context.frame.dice)
 
     case KeyboardEvent.KeyUp(KeyMapping.PickUp)
         if model.gameState.isWaitForInput && model.player.isAlive =>

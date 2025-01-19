@@ -2,7 +2,6 @@ package roguelike.game
 
 import dungeongen.js.DungeonGenConfig
 import dungeongen.js.JsDungeon
-import dungeongen.js.JsDungeonGameMapTuple
 import dungeongen.js.JsGameMap
 import dungeongen.workers.DungeonGenWorker
 import indigo.*
@@ -11,7 +10,6 @@ import roguelike.GameEvent
 import roguelike.GenerateLevel
 import roguelike.RogueLikeGame
 import roguelike.model.Model
-import roguelike.model.dungeon.Dungeon
 import roguelike.subsystems.WorkerSubSystem
 import roguelike.viewmodel.GameViewModel
 import roguelike.viewmodel.ViewModel
@@ -35,7 +33,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
 
   val workerSubSystem =
     WorkerSubSystem(DungeonGenWorker)
-  val subSystems: Set[SubSystem] =
+  val subSystems: Set[SubSystem[Model]] =
     Set(workerSubSystem)
 
   val sprite: Set[Sprite[Material.ImageEffects]] = Set.empty
@@ -48,7 +46,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
       Outcome(model).addGlobalEvents(
         workerSubSystem.WorkerEvent.Send(
           DungeonGenConfig(
-            context.dice.seed.toDouble,
+            context.frame.dice.seed.toDouble,
             model.currentFloor,
             RogueLikeGame.screenSize.width,
             RogueLikeGame.screenSize.height
@@ -59,7 +57,7 @@ object GameScene extends Scene[Size, Model, ViewModel]:
     case workerSubSystem.WorkerEvent.Receive(msg) =>
       Model
         .assignDungeon(
-          context.dice,
+          context.frame.dice,
           JsDungeon.toDungeon(msg.dungeon),
           JsGameMap.toGameMap(msg.gameMap),
           Some(model)

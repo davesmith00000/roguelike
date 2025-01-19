@@ -19,7 +19,7 @@ object LoaderAnim:
       )
 
     val textBounds: Rectangle =
-      context.boundaryLocator.textBounds(text)
+      context.services.bounds.get(text)
 
     val bounds: Rectangle =
       Rectangle(textBounds.width, paddingToText + textBounds.height)
@@ -32,9 +32,7 @@ object LoaderAnim:
         GameAssets.assets.init.loadingMaterial
       )
 
-    val midX       = textBounds.width * 0.5
-    val screenMidX = viewportSize.width * 0.5
-    val screenMidY = viewportSize.height * 0.5
+    val midX = textBounds.width * 0.5
 
     Group(
       graphic.moveTo((midX - 16).toInt, 0),

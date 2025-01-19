@@ -6,16 +6,13 @@ import indigo.shared.materials.Material.Bitmap
 import roguelike.GameEvent
 import roguelike.InventoryEvent
 import roguelike.NewGame
-import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
 import roguelike.components.entities.HostilesManager
 import roguelike.components.entities.PlayerComponent
 import roguelike.components.windows.WindowManager
-import roguelike.model.GameMap
 import roguelike.model.GameTile
 import roguelike.model.Model
 import roguelike.model.entity.Collectable
-import roguelike.model.entity.Hostile
 import roguelike.model.entity.Player
 import roguelike.model.gamedata.KeyMapping
 import roguelike.subsystems.FloatingMessage
@@ -66,12 +63,12 @@ final case class GameViewModel(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
 
-    case FrameTick if context.mouse.scrolled.exists(_ == MouseWheel.ScrollUp) =>
+    case FrameTick if context.frame.input.mouse.scrolled.exists(_ == MouseWheel.ScrollUp) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification + 1)))
       )
 
-    case FrameTick if context.mouse.scrolled.exists(_ == MouseWheel.ScrollDown) =>
+    case FrameTick if context.frame.input.mouse.scrolled.exists(_ == MouseWheel.ScrollDown) =>
       Outcome(
         this.copy(magnification = Math.min(3, Math.max(1, magnification - 1)))
       )
@@ -265,7 +262,7 @@ object GameViewModel:
       viewModel: GameViewModel
   ): Outcome[GameViewModel] =
     val hoverSquare =
-      val mousePos     = context.mouse.position.toVector
+      val mousePos     = context.frame.input.mouse.position.toVector
       val squareSize   = viewModel.squareSize.toVector
       val viewportSize = viewModel.viewportSize.toVector
       val partSquare   = (squareSize / 2) * viewModel.magnification
@@ -308,7 +305,7 @@ object GameViewModel:
         HostilesManager.Cmds.Update(model.gameMap)
       )
 
-    (nextPlayerPosition combine hostilesPositions).map { case (pp, hps) =>
+    nextPlayerPosition.combine(hostilesPositions).map { case (pp, hps) =>
       viewModel.copy(
         visibleGridSize = visibleMapSize,
         playerPosition = pp.playerPosition,

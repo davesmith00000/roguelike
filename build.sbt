@@ -4,16 +4,16 @@ import scala.language.postfixOps
 import sbtwelcome._
 import indigoplugin._
 
-Global / onChangedBuildSource := ReloadOnSourceChanges
+import org.typelevel.scalacoptions
 
-ThisBuild / scalafixDependencies += "com.github.liancheng" %% "organize-imports" % "0.5.0"
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
 lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   version      := "0.0.1",
   organization := "purplekingdomgames",
-  scalaVersion := "3.3.1",
+  scalaVersion := "3.6.2",
   libraryDependencies ++= Seq(
-    "org.scalameta" %%% "munit" % "0.7.29" % Test
+    "org.scalameta" %%% "munit" % "1.0.4" % Test
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalafixOnCompile := true,
@@ -22,8 +22,8 @@ lazy val commonSettings: Seq[sbt.Def.Setting[_]] = Seq(
   autoAPIMappings   := true
 )
 
-val indigoVersion              = "0.16.0"
-val roguelikeStarterKitVersion = "0.5.0"
+val indigoVersion              = "0.17.1-SNAPSHOT"
+val roguelikeStarterKitVersion = "0.5.1-SNAPSHOT"
 
 lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   libraryDependencies ++= Seq(
@@ -34,8 +34,15 @@ lazy val indigoDeps: Seq[sbt.Def.Setting[_]] = Seq(
   )
 )
 
+lazy val scala3Version = "3.3.1"
+
 lazy val roguelikeProject =
   (project in file("."))
+    .settings(
+      scalacOptions ++= scalacoptions.ScalacOptions.defaultTokensForVersion(
+        scalacoptions.ScalaVersion.unsafeFromString(scala3Version)
+      )
+    )
     .aggregate(
       roguelike,
       roguelikeGenerated,
@@ -68,9 +75,6 @@ lazy val roguelikeProject =
       aliasColor       := scala.Console.BLUE,
       commandColor     := scala.Console.CYAN,
       descriptionColor := scala.Console.WHITE
-    )
-    .settings(
-      code := { "code ." ! }
     )
 
 lazy val roguelikeGenerated =
@@ -279,9 +283,6 @@ addCommandAlias(
     "ghpagesPushSite"
   ).mkString(";", ";", "")
 )
-
-lazy val code =
-  taskKey[Unit]("Launch VSCode in the current directory")
 
 // format: off
 lazy val rawLogo: String =

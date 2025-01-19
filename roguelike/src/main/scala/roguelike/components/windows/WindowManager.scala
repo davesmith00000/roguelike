@@ -3,7 +3,6 @@ package roguelike.components.windows
 import indigo.*
 import indigo.scenes.SceneContext
 import roguelike.components.Component
-import roguelike.model.GameState
 import roguelike.model.Model
 import roguelike.viewmodel.GameViewModel
 

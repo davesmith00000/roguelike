@@ -8,8 +8,6 @@ import roguelike.GameEvent
 import roguelike.HostileEvent
 import roguelike.components.Component
 import roguelike.components.windows.WindowManagerCommand
-import roguelike.model.GameMap
-import roguelike.model.HostilesPool
 import roguelike.model.Message
 import roguelike.model.entity.Hostile
 import roguelike.model.entity.Orc
@@ -117,7 +115,7 @@ object HostileComponent extends Component[Size, Hostile, HostilesManager.Hostile
 
         case Some(hp) =>
           hp.next(
-            context.delta,
+            context.frame.time.delta,
             hostile.position,
             GameEvent.NPCMoveComplete
           ).map { pp =>

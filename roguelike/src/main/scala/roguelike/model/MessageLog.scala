@@ -3,10 +3,8 @@ package roguelike.model
 import indigo.*
 import io.circe.*
 import io.circe.syntax.*
-import roguelike.ColorScheme
 import roguelike.RogueLikeGame
 import roguelike.assets.GameAssets
-import roguelikestarterkit.*
 import roguelikestarterkit.*
 
 final case class MessageLog(messages: List[Message], maxLength: Option[Int]):

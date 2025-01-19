@@ -1,7 +1,6 @@
 package roguelike
 
 import indigo.*
-import indigo.platform.assets.AssetLoader
 import indigo.scenes.*
 import indigo.syntax.*
 import indigoextras.subsystems.FPSCounter
@@ -45,7 +44,7 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
   val eventFilters: EventFilters =
     EventFilters.Permissive
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[Size]] =
+  def boot(flags: Map[String, String]): Outcome[BootResult[Size, Model]] =
     val gameViewport =
       (flags.get("width"), flags.get("height")) match {
         case (Some(w), Some(h)) =>
@@ -114,28 +113,28 @@ object RogueLikeGame extends IndigoGame[Size, Size, Model, ViewModel]:
     else Outcome(Startup.Success(bootData))
 
   def updateModel(
-      context: FrameContext[Size],
+      context: Context[Size],
       model: Model
   ): GlobalEvent => Outcome[Model] =
     _ => Outcome(model)
 
   def updateViewModel(
-      context: FrameContext[Size],
+      context: Context[Size],
       model: Model,
       viewModel: ViewModel
   ): GlobalEvent => Outcome[ViewModel] =
     _ => Outcome(viewModel)
 
   def present(
-      context: FrameContext[Size],
+      context: Context[Size],
       model: Model,
       viewModel: ViewModel
   ): Outcome[SceneUpdateFragment] =
     Outcome(
       SceneUpdateFragment(
-        Layer(layerKeyGame),
-        Layer(layerKeyUiOverlay),
-        Layer(layerKeyUi),
-        Layer(layerKeyFPS)
+        layerKeyGame      -> Layer.empty,
+        layerKeyUiOverlay -> Layer.empty,
+        layerKeyUi        -> Layer.empty,
+        layerKeyFPS       -> Layer.empty
       )
     )

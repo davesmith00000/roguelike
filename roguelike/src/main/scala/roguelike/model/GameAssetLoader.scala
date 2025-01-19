@@ -1,7 +1,6 @@
 package roguelike.model
 
 import indigo.*
-import indigo.json.Json
 import roguelike.assets.AsepriteDeath
 import roguelike.assets.AsepriteEnemy1
 import roguelike.assets.AsepriteEnemy2

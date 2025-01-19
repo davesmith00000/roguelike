@@ -1,7 +1,5 @@
 package dungeongen.js
 
-import indigo.shared.datatypes.Point
-import roguelike.model.GameTile
 import roguelike.model.dungeon.PositionedTile
 
 import scala.scalajs.js
